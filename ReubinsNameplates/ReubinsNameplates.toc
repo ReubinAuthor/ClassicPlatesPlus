@@ -1,0 +1,11 @@
+## Interface: 20504
+## Title: Reubin's nameplates
+## Notes: Shows aggro warning and NPC's health on nameplates
+## Author: Reubin
+## Version: 1.0.0
+## DefaultState: enabled
+## SavedVariablesPerCharacter:: ReubinsNameplates_settings
+
+functions.lua
+init.lua
+Settings.lua
