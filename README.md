@@ -10,7 +10,7 @@ Displays NPC's health and threat status on their nameplates
 
 <br />
 
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/165682015-59425b56-87a6-4103-854f-a31d26718a4d.jpg">
+<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/173369945-2f160cee-f531-4a94-b4b1-fc9c71e109f2.jpg">
 
 <br />
 
@@ -18,38 +18,3 @@ Displays NPC's health and threat status on their nameplates
 | Command | Description |
 | --- | --- |
 | /rplates tank | Toggles tank mode  on/off |
- 
-<br />
-
-## **Settings**
-You can adjust several of settings:
-- Show/Hide threat icon if you're solo or in a party/raid
-- Tank mode (You can also toggle Tank mode by typing "/rplates tank" in the chat)
-- Show/Hide health text
-- Font size
-
-<br />
-
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/165682026-df39f5a3-6c8b-482c-8480-bfe8b70f57a8.jpg">
-
-<br />
-
-## **Screenshots**
-
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/165682027-3fe5e937-a746-4bff-b3ad-81af03cfa4de.jpg">
-
-<br />
-
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/165682031-15dbd9e4-78f0-4a71-9211-d2d787cffc9f.jpg">
-
-<br />
-
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/165682034-704f300f-10c5-4b7d-9a34-d3cb0e96cc52.jpg">
-
-<br />
-
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/165682041-f84d6aa0-2d95-45c6-a72d-384d8ccc5a74.jpg">
-
-<br />
-
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/165682043-356527dd-4fab-4128-9c20-5abb660903ac.jpg">
