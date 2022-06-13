@@ -3,7 +3,7 @@
 ----------------------------------------
 local myAddon, core = ...
 core.func = {};
-core.frames = { strata = {}, threat = {}, health = {}, tanks = {}, combat = UnitAffectingCombat("player") };
+core.frames = { strata = {}, threat = {}, health = {}, tanks = {}, members = {}, combat = UnitAffectingCombat("player") };
 local func = core.func;
 local frames = core.frames;
 
@@ -145,12 +145,14 @@ end
 -- ASSIGNING TANKS
 ----------------------------------------
 function func:Roster_Update()
-    if IsInRaid() then
-        frames.tanks = {} -- Reseting table
+    if IsInGroup() then
+        frames.tanks = {}; -- Reseting table
         for i = 1, GetNumGroupMembers() do
+            frames.members[i] = "raid"..i;
+
             if GetPartyAssignment("MainTank" ,"raid"..i, true) then
                 if not UnitIsUnit("raid"..i, "player") then
-                    local unit = UnitName("raid"..i)
+                    local unit = UnitName("raid"..i);
                     frames.tanks[unit] = UnitName(unit);
                 end
             end
@@ -194,23 +196,36 @@ function func:Update_Threat(unit)
                 frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
             end
         else
-            if not tank then
-                if IsInRaid() and UnitExists(unit.."target") then
-                    if frames.tanks[UnitName(unit.."target")] then
-                        frames.threat[unit]:SetVertexColor(0.08, 0.66, 0.98, 1); -- Blue    
+            if not UnitExists(unit.."target") then
+                if IsInGroup() then
+                    for _, v in pairs(frames.members) do
+                        local tank, status, threat = UnitDetailedThreatSituation("player", v)
+                        if not tank and not threat then
+                            frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                        end
+                    end
+                else
+                    frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                end
+            else
+                if not tank then
+                    if IsInGroup() then
+                        if frames.tanks[UnitName(unit.."target")] then
+                            frames.threat[unit]:SetVertexColor(0.08, 0.66, 0.98, 1); -- Blue    
+                        else
+                            frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                        end
                     else
                         frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
                     end
                 else
-                    frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
-                end
-            else
-                if status == 2 then -- Tanking but not highest
-                    frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
-                elseif status == 3 then -- Tanking securly
-                    frames.threat[unit]:SetVertexColor(0, 1, 0, 1); -- Green
-                else
-                    frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                    if status == 2 then -- Tanking but not highest
+                        frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                    elseif status == 3 then -- Tanking securly
+                        frames.threat[unit]:SetVertexColor(0, 1, 0, 1); -- Green
+                    else
+                        frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                    end
                 end
             end
         end
