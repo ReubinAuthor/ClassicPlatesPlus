@@ -9,13 +9,11 @@ local frames = core.frames;
 -- INITIAL SETTINGS 
 ----------------------------------------
 function func:Initial_Settings()
-    if not ReubinsNameplates_settings then
-        ReubinsNameplates_settings = {}; -- Setting up a table
-        ReubinsNameplates_settings.Tank = false; -- Tank mode
-        ReubinsNameplates_settings.Threat_Visibility = "Always"; -- Show Threat
-        ReubinsNameplates_settings.Show_Health = true; -- Show Health
-        ReubinsNameplates_settings.FontSize = 16; -- Font Size
-    end
+    ReubinsNameplates_settings = ReubinsNameplates_settings or {}; -- Setting up a table
+    ReubinsNameplates_settings.Tank = ReubinsNameplates_settings.Tank or false; -- Tank mode
+    ReubinsNameplates_settings.Threat_Visibility = ReubinsNameplates_settings.Threat_Visibility or "Always"; -- Show Threat
+    ReubinsNameplates_settings.Show_Health = ReubinsNameplates_settings.Show_Health or true; -- Show Health
+    ReubinsNameplates_settings.FontSize = ReubinsNameplates_settings.FontSize or 16; -- Font Size
 end
 
 ----------------------------------------
