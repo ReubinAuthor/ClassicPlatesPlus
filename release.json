@@ -1,9 +1,0 @@
-{
-    "Reubin's Nameplates": "1.0.0", // replace with your release name
-    "stability": "stable", // one of: stable, beta, alpha
-    "changelog": "", // your release changelog as a markdown string
-  
-    // You have to add at least one of the following 3 properties.
-    "supported_classic_patch": "1.14.3",
-    "supported_bc_patch": "2.5.4"
-  }
