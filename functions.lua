@@ -197,23 +197,18 @@ function func:Update_Threat(unit)
             end
         else
             if not UnitExists(unit.."target") then
-                if IsInGroup() then
-                    for _, v in pairs(frames.members) do
-                        local tank, status, threat = UnitDetailedThreatSituation("player", v)
-                        if not tank and not threat then
-                            frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
-                        end
-                    end
-                else
-                    frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
-                end
+                frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
             else
                 if not tank then
                     if IsInGroup() then
                         if frames.tanks[UnitName(unit.."target")] then
                             frames.threat[unit]:SetVertexColor(0.08, 0.66, 0.98, 1); -- Blue    
                         else
-                            frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                            if UnitPlayerOrPetInParty(unit.."target") or UnitInParty(unit.."target") then
+                                frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                            else
+                                frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                            end
                         end
                     else
                         frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
