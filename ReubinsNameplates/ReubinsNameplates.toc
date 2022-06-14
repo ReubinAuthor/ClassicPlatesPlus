@@ -2,7 +2,7 @@
 ## Title: Reubin's nameplates
 ## Notes: Shows aggro warning and NPC's health on nameplates
 ## Author: Reubin
-## Version: 1.1.0
+## Version: 1.1.2
 ## DefaultState: enabled
 ## SavedVariablesPerCharacter:: ReubinsNameplates_settings
 
