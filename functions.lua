@@ -148,7 +148,7 @@ function func:Roster_Update()
     if IsInGroup() then
         frames.tanks = {}; -- Reseting table
         for i = 1, GetNumGroupMembers() do
-            frames.members[i] = "raid"..i;
+            frames.members["raid"..i] = UnitName("raid"..i);
 
             if GetPartyAssignment("MainTank" ,"raid"..i, true) then
                 if not UnitIsUnit("raid"..i, "player") then
