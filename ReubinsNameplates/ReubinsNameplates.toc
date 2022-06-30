@@ -2,7 +2,7 @@
 ## Title: Reubin's nameplates
 ## Notes: Shows NPC's threat, health and Debuffs on nameplates.
 ## Author: Reubin
-## Version: 1.2.0
+## Version: 1.2.1
 ## DefaultState: enabled
 ## SavedVariablesPerCharacter:: ReubinsNameplates_settings
 
