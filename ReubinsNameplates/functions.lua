@@ -360,7 +360,7 @@ function func:Update_Auras(unit)
                         -- Aura
                         local f = CreateFrame("Frame", nil, nameplate);
                         f:SetSize(aura_size, aura_size);
-                        f:SetScale(ReubinsNameplates_settings.auras_scale);
+                        f:SetScale(ReubinsNameplates_settings.Auras_Scale);
                         f:SetShown(ReubinsNameplates_settings.Auras_Visibility);
                         frames.auras[ui]["parent"] = f;
 
@@ -395,8 +395,8 @@ function func:Update_Auras(unit)
                         -- Stacks
                         f.Stacks = f:CreateFontString(nil, "OVERLAY");
                         f.Stacks:SetParent(f.Fonts_Strata);
-                        f.Stacks:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -4, 6);
-                        f.Stacks:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE");
+                        f.Stacks:SetPoint("bottomright", f, "bottomright", 2, 1);
+                        f.Stacks:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.Auras_Scale * 10, "OUTLINE");
                         f.Stacks:SetTextColor(1, 0.99, 0.32);
                         f.Stacks:SetShadowColor(0, 0, 0, 1);
                         f.Stacks:SetShadowOffset(1, -1);
@@ -408,7 +408,7 @@ function func:Update_Auras(unit)
                         f.Countdown = f:CreateFontString(nil, "OVERLAY");
                         f.Countdown:SetParent(f.Fonts_Strata);
                         f.Countdown:SetPoint("CENTER", f, "CENTER");
-                        f.Countdown:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.auras_scale * 12, "OUTLINE");
+                        f.Countdown:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.Auras_Scale * 10, "OUTLINE");
                         f.Countdown:SetTextColor(1, 0.99, 0.32);
                         f.Countdown:SetShadowColor(0, 0, 0, 1);
                         f.Countdown:SetShadowOffset(1, -1);
@@ -454,7 +454,7 @@ function func:Update_Auras(unit)
 
                         -- Stacks
                         stacks:SetParent(frames.auras[ui]["fonts_strata"]);
-                        stacks:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -4, 6);
+                        stacks:SetPoint("bottomright", parent, "bottomright", 2, 1);
                         stacks:SetText(func:Count_Stacks(count));
                         stacks:Show();
 
