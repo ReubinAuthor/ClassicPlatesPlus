@@ -13,14 +13,20 @@ function core:init(event, ...)
 
     if event == "ADDON_LOADED" then
         if arg == myAddon then
-            func:Initial_Settings()
             func:Load_Settings();
+            --func:Hide_Blizzard();
         end
     end
     ----------------------------------------
     if event == "PLAYER_LOGOUT" then
         func:Save_Settings();
     end
+    ----------------------------------------
+    --[[
+    if event == "NAME_PLATE_CREATED" then
+        func:Create_Nameplate(arg);
+    end
+    ]]
     ----------------------------------------
     if event == "NAME_PLATE_UNIT_ADDED" then
         func:Add_Nameplate(arg);
@@ -36,6 +42,10 @@ function core:init(event, ...)
     ----------------------------------------
     if event == "UNIT_HEALTH_FREQUENT" then
         func:Update_Health(arg);
+    end
+    ----------------------------------------
+    if event == "UNIT_AURA" then
+        func:Update_Auras(arg);
     end
     ----------------------------------------
     if event == "PLAYER_REGEN_ENABLED" then
@@ -68,6 +78,12 @@ function core:init(event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         func:Roster_Update();
     end
+    ----------------------------------------
+    --[[
+    if event == "PLAYER_TARGET_CHANGED" then
+        
+    end
+    ]]
 end
 
 ----------------------------------------
@@ -109,12 +125,15 @@ local events = CreateFrame("Frame");
 
 events:RegisterEvent("ADDON_LOADED");
 events:RegisterEvent("PLAYER_LOGOUT");
+--events:RegisterEvent("NAME_PLATE_CREATED");
 events:RegisterEvent("NAME_PLATE_UNIT_ADDED");
 events:RegisterEvent("NAME_PLATE_UNIT_REMOVED");
-events:RegisterEvent("UNIT_THREAT_LIST_UPDATE");    
+events:RegisterEvent("UNIT_THREAT_LIST_UPDATE");
 events:RegisterEvent("UNIT_HEALTH_FREQUENT");
+events:RegisterEvent("UNIT_AURA");
 events:RegisterEvent("PLAYER_REGEN_ENABLED");
 events:RegisterEvent("PLAYER_REGEN_DISABLED");
 events:RegisterEvent("GROUP_ROSTER_UPDATE");
 events:RegisterEvent("PLAYER_ENTERING_WORLD");
+--events:RegisterEvent("PLAYER_TARGET_CHANGED");
 events:SetScript("OnEvent", core.init);
