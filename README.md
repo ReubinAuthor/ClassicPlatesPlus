@@ -6,11 +6,11 @@
 <br />
 
 # **Reubin's Nameplates**
-Displays NPC's health and threat status on their nameplates
+Shows NPC's threat, health and Debuffs on nameplates.
 
 <br />
 
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/173369945-2f160cee-f531-4a94-b4b1-fc9c71e109f2.jpg">
+<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/176653121-da198c6c-2490-47b8-bf52-f99f07921839.jpg">
 
 <br />
 
