@@ -43,6 +43,8 @@ function func:Load_Settings()
     if ReubinsNameplates_settings.Auras_Scale == nil then ReubinsNameplates_settings.Auras_Scale = 1;
     else ReubinsNameplates_settings.Auras_Scale = ReubinsNameplates_settings.Auras_Scale; end
 
+    if ReubinsNameplates_settings.Auras_Cooldown_Reverse == nil then ReubinsNameplates_settings.Auras_Cooldown_Reverse = false;
+    else ReubinsNameplates_settings.Auras_Cooldown_Reverse = ReubinsNameplates_settings.Auras_Cooldown_Reverse; end
 
     -- Create a frame to use as the panel
     local panel = CreateFrame("FRAME", myAddon.."Settings");
@@ -100,9 +102,16 @@ function func:Load_Settings()
     Auras_Countdown:SetChecked(ReubinsNameplates_settings.Auras_Countdown);
     Auras_Countdown:SetEnabled(ReubinsNameplates_settings.Auras_Visibility);
 
+    -- Auras cooldown reverse animation, Check button
+    local Auras_Cooldown_reverse = CreateFrame("CheckButton", myAddon.."Settings_Auras_Cooldown_Reverse_Animation", panel, "InterfaceOptionsCheckButtonTemplate");
+    Auras_Cooldown_reverse:SetPoint("TOPLEFT", myAddon.."Settings_Auras_Countdown_Visibility", "BOTTOMLEFT", 0, -8);
+    Auras_Cooldown_reverse.Text:SetText("Reverse animation");
+    Auras_Cooldown_reverse:SetChecked(ReubinsNameplates_settings.Auras_Cooldown_Reverse);
+    Auras_Cooldown_reverse:SetEnabled(ReubinsNameplates_settings.Auras_Visibility);
+
     -- Auras scale, slider
     local AurasScaleSlider = CreateFrame("Slider", myAddon.."Settings_Auras_Scale", panel, "OptionsSliderTemplate");
-    AurasScaleSlider:SetPoint("TOPLEFT", myAddon.."Settings_Auras_Countdown_Visibility", "BOTTOMLEFT", 8, -32);
+    AurasScaleSlider:SetPoint("TOPLEFT", myAddon.."Settings_Auras_Cooldown_Reverse_Animation", "BOTTOMLEFT", 8, -32);
     AurasScaleSlider:SetOrientation("HORIZONTAL");
     AurasScaleSlider:SetWidth(140);
     AurasScaleSlider:SetHeight(18);
@@ -191,6 +200,8 @@ function func:Load_Settings()
             ReubinsNameplates_settings.Auras_Visibility = Auras_Vis:GetChecked();
             -- Auras countdown visibility
             ReubinsNameplates_settings.Auras_Countdown = Auras_Countdown:GetChecked();
+            -- Auras cooldown animation reverse
+            ReubinsNameplates_settings.Auras_Cooldown_Reverse = Auras_Cooldown_reverse:GetChecked();
             -- Auras Scale
             ReubinsNameplates_settings.Auras_Scale = AurasScaleSlider:GetValue();
 
@@ -250,6 +261,8 @@ function func:Load_Settings()
             AurasScaleSlider:SetValue(ReubinsNameplates_settings.Auras_Scale);
             -- Auras countown
             Auras_Countdown:SetChecked(ReubinsNameplates_settings.Auras_Countdown);
+            -- Auras cooldown animation reverse
+            Auras_Cooldown_reverse:SetChecked(ReubinsNameplates_settings.Auras_Cooldown_Reverse);
         end
 
     ----------------------------------------
@@ -290,6 +303,9 @@ function func:Load_Settings()
             -- Auras countown
             ReubinsNameplates_settings.Auras_Countdown = false;
             Auras_Countdown:SetChecked(ReubinsNameplates_settings.Auras_Countdown);
+            -- Auras cooldown animation reverse
+            ReubinsNameplates_settings.Auras_Cooldown_Reverse = false;
+            Auras_Cooldown_reverse:SetChecked(ReubinsNameplates_settings.Auras_Cooldown_Reverse);
         end
 
     -- Add the panel to the Interface Options

@@ -134,15 +134,28 @@ function func:Position_Aura(unit, i)
         frames.auras[unit.."_"..1]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", calc, 2);
         frames.auras[ui]["parent"]:SetPoint("LEFT", frames.auras[unit.."_"..(i - 1)]["parent"], "RIGHT", 0, 0);
     elseif i == 6 then
-        frames.auras[ui]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", 0, 24);
+        frames.auras[ui]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", 0, 32);
     elseif i > 6 and i <= 10 then
-        frames.auras[unit.."_"..6]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", calc, 24);
-        frames.auras[ui]["parent"]:SetPoint("LEFT", frames.auras[unit.."_"..(i - 1)]["parent"], "RIGHT", 0, 24);
+        frames.auras[unit.."_"..6]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", calc, 32);
+        frames.auras[ui]["parent"]:SetPoint("LEFT", frames.auras[unit.."_"..(i - 1)]["parent"], "RIGHT", 0, 32);
     elseif i == 11 then
-        frames.auras[ui]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", 0, 48);
+        frames.auras[ui]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", 0, 64);
     elseif i > 11 and i <= 15 then
-        frames.auras[unit.."_"..11]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", calc, 48);
-        frames.auras[ui]["parent"]:SetPoint("LEFT", frames.auras[unit.."_"..(i - 1)]["parent"], "RIGHT", 0, 48);
+        frames.auras[unit.."_"..11]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", calc, 64);
+        frames.auras[ui]["parent"]:SetPoint("LEFT", frames.auras[unit.."_"..(i - 1)]["parent"], "RIGHT", 0, 64);
+    end
+end
+
+----------------------------------------
+-- STACKS
+----------------------------------------
+function func:Stacks_Texture(count)
+    if count then
+        if count > 0 then
+            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border_stacks"
+        else
+            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border"
+        end
     end
 end
 
@@ -378,25 +391,26 @@ function func:Update_Auras(unit)
                         f.icon:Show();
                         frames.auras[ui]["icon"] = f.icon;
 
+                        -- Fonts strata
+                        f.Fonts_Strata = CreateFrame("Frame", nil, f);
+                        f.Fonts_Strata:SetFrameStrata("HIGH");
+                        f.Fonts_Strata:SetAllPoints();
+                        frames.auras[ui]["fonts_strata"] = f.Fonts_Strata;
+
                         -- Border
                         f.border = f:CreateTexture(nil, "OVERLAY");
-                        f.border:SetParent(f);
-                        f.border:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\aura_border");
+                        f.border:SetParent(f.Fonts_Strata);
+                        f.border:SetTexture(func:Stacks_Texture(count));
                         f.border:SetVertexColor(0.85, 0.85, 0.15, 1);
                         f.border:SetAllPoints();
                         f.border:Show();
                         frames.auras[ui]["border"] = f.border;
 
-                        -- Fonts strata
-                        f.Fonts_Strata = CreateFrame("Frame", nil, f);
-                        f.Fonts_Strata:SetFrameStrata("HIGH");
-                        frames.auras[ui]["fonts_strata"] = f.Fonts_Strata;
-
                         -- Stacks
                         f.Stacks = f:CreateFontString(nil, "OVERLAY");
                         f.Stacks:SetParent(f.Fonts_Strata);
-                        f.Stacks:SetPoint("bottomright", f, "bottomright", 2, 1);
-                        f.Stacks:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.Auras_Scale * 10, "OUTLINE");
+                        f.Stacks:SetPoint("bottomright", f, "bottomright", -2, 1);
+                        f.Stacks:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.Auras_Scale * 8, "OUTLINE");
                         f.Stacks:SetTextColor(1, 0.99, 0.32);
                         f.Stacks:SetShadowColor(0, 0, 0, 1);
                         f.Stacks:SetShadowOffset(1, -1);
@@ -424,6 +438,7 @@ function func:Update_Auras(unit)
                         f.Cooldown:SetSwipeTexture("Interface\\addons\\ReubinsNameplates\\media\\aura_mask");
                         f.Cooldown:SetSwipeColor(0, 0, 0, 0.60);
                         f.Cooldown:SetHideCountdownNumbers(true);
+                        f.Cooldown:SetReverse(ReubinsNameplates_settings.Auras_Cooldown_Reverse);
                         f.Cooldown:Show();
                         frames.auras[ui]["cooldown"] = f.Cooldown;
 
@@ -437,6 +452,7 @@ function func:Update_Auras(unit)
                         local countdown = frames.auras[ui]["countdown"];
                         local border = frames.auras[ui]["border"];
                         local cooldown = frames.auras[ui]["cooldown"];
+                        local stacks_bg = frames.auras[ui]["stacks_bg"];
 
                         -- Aura
                         parent:SetParent(nameplate);
@@ -454,7 +470,7 @@ function func:Update_Auras(unit)
 
                         -- Stacks
                         stacks:SetParent(frames.auras[ui]["fonts_strata"]);
-                        stacks:SetPoint("bottomright", parent, "bottomright", 2, 1);
+                        stacks:SetPoint("bottomright", parent, "bottomright", -2, 1);
                         stacks:SetText(func:Count_Stacks(count));
                         stacks:Show();
 
@@ -465,14 +481,16 @@ function func:Update_Auras(unit)
                         countdown:SetShown(ReubinsNameplates_settings.Auras_Countdown);
 
                         -- Border
-                        border:SetParent(parent);
+                        border:SetParent(fonts_strata);
                         border:SetAllPoints();
+                        border:SetTexture(func:Stacks_Texture(count));
                         border:Show();
 
                         -- Cooldown
                         cooldown:SetParent(parent);
                         cooldown:SetAllPoints();
                         cooldown:SetCooldown(GetTime() - (duration - (expirationTime - GetTime())), duration, timeMod);
+                        cooldown:SetReverse(ReubinsNameplates_settings.Auras_Cooldown_Reverse);
                         cooldown:Show();
 
                         -- Position auras
