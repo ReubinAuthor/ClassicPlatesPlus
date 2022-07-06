@@ -92,6 +92,19 @@ function func:Find_Auras(unit)
 end
 
 ----------------------------------------
+-- STACKS BACKGROUND
+----------------------------------------
+function func:Stacks_Texture(count)
+    if count then
+        if count > 0 then
+            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border_stacks"
+        else
+            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border"
+        end
+    end
+end
+
+----------------------------------------
 -- COUNT STACKS
 ----------------------------------------
 function func:Count_Stacks(count)
@@ -100,6 +113,19 @@ function func:Count_Stacks(count)
             return "x"..count
         else
             return ""
+        end
+    end
+end
+
+----------------------------------------
+-- COUNT POSITION
+----------------------------------------
+function func:XY_Stacks(count)
+    if count then
+        if count > 9 then
+            return -18, 1
+        else
+            return -15, 1
         end
     end
 end
@@ -143,19 +169,6 @@ function func:Position_Aura(unit, i)
     elseif i > 11 and i <= 15 then
         frames.auras[unit.."_"..11]["parent"]:SetPoint("BOTTOM", nameplate, "TOP", calc, 64);
         frames.auras[ui]["parent"]:SetPoint("LEFT", frames.auras[unit.."_"..(i - 1)]["parent"], "RIGHT", 0, 64);
-    end
-end
-
-----------------------------------------
--- STACKS
-----------------------------------------
-function func:Stacks_Texture(count)
-    if count then
-        if count > 0 then
-            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border_stacks"
-        else
-            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border"
-        end
     end
 end
 
@@ -334,12 +347,16 @@ function func:Update_Threat(unit)
                         frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
                     end
                 else
-                    if status == 2 then -- Tanking but not highest
-                        frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
-                    elseif status == 3 then -- Tanking securly
-                        frames.threat[unit]:SetVertexColor(0, 1, 0, 1); -- Green
+                    if UnitIsUnit(unit.."target", "player") then
+                        if status == 2 then -- Tanking but not highest
+                            frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                        elseif status == 3 then -- Tanking securly
+                            frames.threat[unit]:SetVertexColor(0, 1, 0, 1); -- Green
+                        else
+                            frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                        end
                     else
-                        frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                        frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
                     end
                 end
             end
@@ -409,8 +426,8 @@ function func:Update_Auras(unit)
                         -- Stacks
                         f.Stacks = f:CreateFontString(nil, "OVERLAY");
                         f.Stacks:SetParent(f.Fonts_Strata);
-                        f.Stacks:SetPoint("bottomright", f, "bottomright", -2, 1);
-                        f.Stacks:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.Auras_Scale * 8, "OUTLINE");
+                        f.Stacks:SetPoint("bottomleft", f, "bottomright", func:XY_Stacks(count));
+                        f.Stacks:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE");
                         f.Stacks:SetTextColor(1, 0.99, 0.32);
                         f.Stacks:SetShadowColor(0, 0, 0, 1);
                         f.Stacks:SetShadowOffset(1, -1);
@@ -422,7 +439,7 @@ function func:Update_Auras(unit)
                         f.Countdown = f:CreateFontString(nil, "OVERLAY");
                         f.Countdown:SetParent(f.Fonts_Strata);
                         f.Countdown:SetPoint("CENTER", f, "CENTER");
-                        f.Countdown:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.Auras_Scale * 10, "OUTLINE");
+                        f.Countdown:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE");
                         f.Countdown:SetTextColor(1, 0.99, 0.32);
                         f.Countdown:SetShadowColor(0, 0, 0, 1);
                         f.Countdown:SetShadowOffset(1, -1);
@@ -470,7 +487,7 @@ function func:Update_Auras(unit)
 
                         -- Stacks
                         stacks:SetParent(frames.auras[ui]["fonts_strata"]);
-                        stacks:SetPoint("bottomright", parent, "bottomright", -2, 1);
+                        stacks:SetPoint("bottomleft", parent, "bottomright", func:XY_Stacks(count));
                         stacks:SetText(func:Count_Stacks(count));
                         stacks:Show();
 
