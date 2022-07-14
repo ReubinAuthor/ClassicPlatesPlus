@@ -139,7 +139,7 @@ function func:Time(seconds)
             return math.floor(seconds / 3600 + 0.5) .. "h"
         elseif seconds >= 60 then
             return math.floor(seconds / 60 + 0.5) .. "m"
-        elseif seconds < 60 and seconds > 5 then
+        elseif seconds < 60 and seconds > 9 then
             return math.floor(seconds)
         else
             return string.format("%.1f", seconds)
@@ -153,7 +153,7 @@ end
 -- AURA TYPE
 ----------------------------------------
 function func:AuraType(unit)
-    if UnitIsEnemy(unit, "player") then
+    if UnitCanAttack("player", unit) then
         return "HARMFUL"
     else
         return "HELPFUL"
