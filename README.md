@@ -6,7 +6,7 @@
 <br />
 
 # **Reubin's Nameplates**
-Shows NPC's threat, health and Debuffs on nameplates.
+Displays threat, health and debuffs on nameplates.
 
 <br />
 
