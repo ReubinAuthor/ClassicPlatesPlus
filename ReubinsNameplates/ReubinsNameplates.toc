@@ -1,6 +1,6 @@
 ## Interface: 20504
 ## Title: Reubin's nameplates
-## Notes: Shows NPC's threat, health and Debuffs on nameplates.
+## Notes: Displays threat, health and debuffs on nameplates.
 ## Author: Reubin
 ## Version: 1.2.4
 ## DefaultState: enabled
