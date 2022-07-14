@@ -11,6 +11,13 @@ local frames = core.frames;
 function core:init(event, ...)
     local arg = ...
 
+    -- Tweaking CVars
+    if event == "VARIABLES_LOADED" then
+        SetCVar("nameplateSelectedScale", 1.15);
+        SetCVar("nameplateTargetRadialPosition", 1);
+        SetCVar("clampTargetNameplateToScreen", 1);
+    end
+    ----------------------------------------
     if event == "ADDON_LOADED" then
         if arg == myAddon then
             func:Load_Settings();
@@ -20,6 +27,11 @@ function core:init(event, ...)
     ----------------------------------------
     if event == "PLAYER_LOGOUT" then
         func:Save_Settings();
+
+        --Restoring CVars on logout to avoid poluting CVars in case user decides to uninstall addon
+        SetCVar("nameplateSelectedScale", 1);
+        SetCVar("nameplateTargetRadialPosition", 0);
+        SetCVar("clampTargetNameplateToScreen", 0);
     end
     ----------------------------------------
     --[[
@@ -73,17 +85,17 @@ function core:init(event, ...)
                 func:Update_Threat(k);
             end
         end
+
+        for k, v in pairs(frames.health) do
+            if k then
+                func:Update_Health(k);
+            end
+        end
     end
     ----------------------------------------
     if event == "PLAYER_ENTERING_WORLD" then
         func:Roster_Update();
     end
-    ----------------------------------------
-    --[[
-    if event == "PLAYER_TARGET_CHANGED" then
-        
-    end
-    ]]
 end
 
 ----------------------------------------
@@ -123,9 +135,9 @@ SlashCmdList["RPLATES"] = Slash_Handler;
 ----------------------------------------
 local events = CreateFrame("Frame");
 
+events:RegisterEvent("VARIABLES_LOADED");
 events:RegisterEvent("ADDON_LOADED");
 events:RegisterEvent("PLAYER_LOGOUT");
---events:RegisterEvent("NAME_PLATE_CREATED");
 events:RegisterEvent("NAME_PLATE_UNIT_ADDED");
 events:RegisterEvent("NAME_PLATE_UNIT_REMOVED");
 events:RegisterEvent("UNIT_THREAT_LIST_UPDATE");
@@ -136,4 +148,6 @@ events:RegisterEvent("PLAYER_REGEN_DISABLED");
 events:RegisterEvent("GROUP_ROSTER_UPDATE");
 events:RegisterEvent("PLAYER_ENTERING_WORLD");
 --events:RegisterEvent("PLAYER_TARGET_CHANGED");
+--events:RegisterEvent("NAME_PLATE_CREATED");
+
 events:SetScript("OnEvent", core.init);

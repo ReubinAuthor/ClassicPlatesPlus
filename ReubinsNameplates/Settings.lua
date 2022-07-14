@@ -64,7 +64,7 @@ function func:Load_Settings()
     -- Show Health, Check button
     local ShowHealthCheck = CreateFrame("CheckButton", myAddon.."Settings_ShowHealth", panel, "InterfaceOptionsCheckButtonTemplate");
     ShowHealthCheck:SetPoint("TOPLEFT", myAddon.."Settings_subTitle_Health", "BOTTOMLEFT", 0, -16);
-    ShowHealthCheck.Text:SetText("Show health");
+    ShowHealthCheck.Text:SetText("Enable");
     ShowHealthCheck:SetChecked(ReubinsNameplates_settings.Show_Health);
 
     -- Font size, slider
@@ -87,12 +87,12 @@ function func:Load_Settings()
     -- Auras, Sub-title
     local subTitle = panel:CreateFontString(myAddon.."Settings_subTitle_Auras", "OVERLAY", "GameFontNormal");
     subTitle:SetPoint("topleft", myAddon.."Settings_FontSizeSlider", "bottomleft", -8, -64);
-    subTitle:SetText("Debuffs");
+    subTitle:SetText("Buffs & Debuffs");
 
     -- Auras visibility, Check button
     local Auras_Vis = CreateFrame("CheckButton", myAddon.."Settings_Auras_Visibility", panel, "InterfaceOptionsCheckButtonTemplate");
     Auras_Vis:SetPoint("TOPLEFT", myAddon.."Settings_subTitle_Auras", "BOTTOMLEFT", 0, -16);
-    Auras_Vis.Text:SetText("Show debuffs");
+    Auras_Vis.Text:SetText("Enable");
     Auras_Vis:SetChecked(ReubinsNameplates_settings.Auras_Visibility);
 
     -- Auras countdown visibility, Check button
@@ -100,14 +100,12 @@ function func:Load_Settings()
     Auras_Countdown:SetPoint("TOPLEFT", myAddon.."Settings_Auras_Visibility", "BOTTOMLEFT", 0, -8);
     Auras_Countdown.Text:SetText("Show countdown");
     Auras_Countdown:SetChecked(ReubinsNameplates_settings.Auras_Countdown);
-    Auras_Countdown:SetEnabled(ReubinsNameplates_settings.Auras_Visibility);
 
     -- Auras cooldown reverse animation, Check button
     local Auras_Cooldown_reverse = CreateFrame("CheckButton", myAddon.."Settings_Auras_Cooldown_Reverse_Animation", panel, "InterfaceOptionsCheckButtonTemplate");
     Auras_Cooldown_reverse:SetPoint("TOPLEFT", myAddon.."Settings_Auras_Countdown_Visibility", "BOTTOMLEFT", 0, -8);
     Auras_Cooldown_reverse.Text:SetText("Reverse animation");
     Auras_Cooldown_reverse:SetChecked(ReubinsNameplates_settings.Auras_Cooldown_Reverse);
-    Auras_Cooldown_reverse:SetEnabled(ReubinsNameplates_settings.Auras_Visibility);
 
     -- Auras scale, slider
     local AurasScaleSlider = CreateFrame("Slider", myAddon.."Settings_Auras_Scale", panel, "OptionsSliderTemplate");
@@ -176,12 +174,7 @@ function func:Load_Settings()
 
     local subTitle = panel:CreateFontString(myAddon.."Settings_Text_Notes", "OVERLAY", "GameFontNormal");
     subTitle:SetPoint("TOPLEFT", myAddon.."Settings_subTitle_Notes", "BOTTOMLEFT", 0, -16);
-    subTitle:SetText('You can also toggle Tank mode by typing "/rplates tank" in the chat');
-
-    -- Script
-    Auras_Vis:SetScript("OnClick", function()
-        Auras_Countdown:SetEnabled(Auras_Vis:GetChecked());
-    end)
+    subTitle:SetText('You can toggle Tank mode by typing "/rplates tank" in the chat');
 
     ----------------------------------------
     -- APPLYTING SETTINGS (Ok button)
@@ -207,7 +200,7 @@ function func:Load_Settings()
 
             -- Applying Health settings
             for k, v in pairs(frames.health) do
-                if k then
+                if k then --and UnitExists(k) then
                     v:SetShown(ReubinsNameplates_settings.Show_Health);
                     v:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.FontSize, "OUTLINE");
                 end
@@ -215,26 +208,15 @@ function func:Load_Settings()
 
             -- Applying Threat visibility & Tank mode settings
             for k, v in pairs(frames.threat) do
-                if k then
-                    if not ReubinsNameplates_settings.Tank then
-                        v:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\aggro");
-                    else
-                        v:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\tanking");
-                    end
+                if k and UnitExists(k) then
                     func:Add_Nameplate(k);
                     func:Update_Threat(k);
                 end
             end
 
-            if ReubinsNameplates_settings.Tank == true then
-                print("|cff00ccffReubin's Nameplates: |cffFFFC54Tank mode activated");
-            else
-                print("|cff00ccffReubin's Nameplates: |cffFFFC54Tank mode deactivated");
-            end
-
             -- Applying Aura settings
             for k, v in pairs(frames.auras) do
-                if k then
+                if k and UnitExists(k) then
                     if UnitExists((k):match('^(.-)_')) then
                         func:Update_Auras((k):match('^(.-)_'));
                     end
