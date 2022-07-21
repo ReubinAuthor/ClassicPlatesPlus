@@ -3,7 +3,7 @@
 ----------------------------------------
 local myAddon, core = ...
 core.func = {};
-core.frames = { nameplates = {}, strata = {}, threat = {}, health = {}, auras = {}, tanks = {}, members = {}};
+core.frames = { nameplates = {}, strata = {}, threat = {}, threat_num = {}, threat_bg = {}, health = {}, auras = {}, tanks = {}, members = {}};
 local func = core.func;
 local frames = core.frames;
 local aura_size = 32;
@@ -73,6 +73,47 @@ function func:Threat_Icon_Toggle()
 end
 
 ----------------------------------------
+-- STACKS BACKGROUND
+----------------------------------------
+function func:Stacks_Texture(count)
+    if count then
+        if count > 0 then
+            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border_stacks"
+        else
+            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border"
+        end
+    else
+        return "Interface\\addons\\ReubinsNameplates\\media\\aura_border"
+    end
+end
+
+----------------------------------------
+-- STACKS MASK
+----------------------------------------
+function func:Stacks_Mask(count)
+    if count then
+        if count > 0 then
+            return "Interface\\addons\\ReubinsNameplates\\media\\aura_mask_stacks"
+        else
+            return "Interface\\addons\\ReubinsNameplates\\media\\aura_mask"
+        end
+    else
+        return "Interface\\addons\\ReubinsNameplates\\media\\aura_mask"
+    end
+end
+
+----------------------------------------
+-- AURA TYPE
+----------------------------------------
+function func:AuraType(unit)
+    if UnitCanAttack("player", unit) then
+        return "HARMFUL"
+    else
+        return "HELPFUL"
+    end
+end
+
+----------------------------------------
 -- ASSIGN TANKS
 ----------------------------------------
 function func:Roster_Update()
@@ -92,45 +133,6 @@ function func:Roster_Update()
 end
 
 ----------------------------------------
--- STACKS BACKGROUND
-----------------------------------------
-function func:Stacks_Texture(count)
-    if count then
-        if count > 0 then
-            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border_stacks"
-        else
-            return "Interface\\addons\\ReubinsNameplates\\media\\aura_border"
-        end
-    end
-end
-
-----------------------------------------
--- COUNT STACKS
-----------------------------------------
-function func:Count_Stacks(count)
-    if count then
-        if count > 0 then
-            return "x"..count
-        else
-            return ""
-        end
-    end
-end
-
-----------------------------------------
--- COUNT POSITION
-----------------------------------------
-function func:XY_Stacks(count)
-    if count then
-        if count > 9 then
-            return -18, 2
-        else
-            return -15, 2
-        end
-    end
-end
-
-----------------------------------------
 -- CONVEWRT SECONDS TO TIME
 ----------------------------------------
 function func:Time(seconds)
@@ -139,24 +141,13 @@ function func:Time(seconds)
             return math.floor(seconds / 3600 + 0.5) .. "h"
         elseif seconds >= 60 then
             return math.floor(seconds / 60 + 0.5) .. "m"
-        elseif seconds < 60 and seconds > 9 then
+        elseif seconds < 60 and seconds >= 9.9 then
             return math.floor(seconds)
         else
-            return string.format("%.1f", seconds)
+            return string.format("%.1f", seconds )
         end
     else
         return ""
-    end
-end
-
-----------------------------------------
--- AURA TYPE
-----------------------------------------
-function func:AuraType(unit)
-    if UnitCanAttack("player", unit) then
-        return "HARMFUL"
-    else
-        return "HELPFUL"
     end
 end
 
@@ -187,106 +178,105 @@ function func:Position_Aura(unit, i)
 end
 
 ----------------------------------------
--- HIDING BLIZZARD'S NAMEPLATES
-----------------------------------------
---[[
-function func:Hide_Blizzard()
-    local f = CreateFrame("Frame");
-
-    NamePlateDriverFrame:UnregisterAllEvents();
-    NamePlateDriverFrame:Hide();
-    NamePlateDriverFrame.UpdateNamePlateOptions = f.UpdateNamePlateOptions;
-end
-]]
-
-----------------------------------------
--- CREATING NAMEPLATE
-----------------------------------------
---[[
-function func:Create_Nameplate(nameplate)
-    -- Do stuff
-end
-]]
-
-----------------------------------------
 -- ADDING NAMEPLATES
 ----------------------------------------
 function func:Add_Nameplate(unit)
     local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+    local f = CreateFrame("Frame", nil, UIParent);
 
-    --if not UnitIsPlayer(unit) and not UnitIsOtherPlayersPet(unit) then
-        local f = CreateFrame("Frame", nil, UIParent);
+    -- Strata
+    if not frames.strata[unit] then
+        f.Strata = CreateFrame("Frame", nil, nameplate);
+        f.Strata:SetFrameStrata("DIALOG");
+        frames.strata[unit] = f.Strata;
+    else
+        frames.strata[unit]:SetParent(nameplate);
+        frames.strata[unit]:Show();
+    end
 
-        -- Health bar
-        -- local unitFrame = CreateFrame("Button", nameplate:GetName().."UnitFrame", nameplate);
+    -- Threat icon
+    if not frames.threat[unit] then
+        f.Threat = f:CreateTexture(nil, "ARTWORK");
+        f.Threat:SetParent(nameplate);
+        f.Threat:SetPoint("LEFT", nameplate, "RIGHT", -1, -7);
+        f.Threat:SetTexture(func:Threat_Icon_Toggle());
+        f.Threat:SetSize(22, 22);
+        f.Threat:SetShown(func:Threat_Toggle());
+        frames.threat[unit] = f.Threat;
+    else
+        frames.threat[unit]:SetParent(nameplate);
+        frames.threat[unit]:SetPoint("LEFT", nameplate, "RIGHT", -1, -7);
+        frames.threat[unit]:SetTexture(func:Threat_Icon_Toggle());
+        frames.threat[unit]:SetShown(func:Threat_Toggle());
+    end
 
-        -- Strata
-        if not frames.strata[unit] then
-            f.Strata = CreateFrame("Frame", nil, nameplate);
-            f.Strata:SetFrameStrata("DIALOG");
-            frames.strata[unit] = f.Strata;
-        else
-            frames.strata[unit]:SetParent(nameplate);
-            frames.strata[unit]:Show();
-        end
+    --[[ Threat numbers
+    if not frames.threat_num[unit] and frames.threat[unit] then
+        f.Threat_BG = f:CreateTexture(nil, "ARTWORK");
+        f.Threat_BG:SetParent(nameplate);
+        f.Threat_BG:SetPoint("left", frames.threat[unit], "right", 0, 0);
+        f.Threat_BG:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\wide_border");
+        f.Threat_BG:SetVertexColor(0.85, 0.85, 0.15, 1);
+        f.Threat_BG:SetSize(36, 14);
+        f.Threat_BG:SetShown(tostring(frames.threat[unit]:GetVertexColor()) ~= "0");
+        frames.threat_bg[unit] = f.Threat_BG;
 
-        -- Threat icon
-        if not frames.threat[unit] then
-            f.Threat = f:CreateTexture(nil, "ARTWORK");
-            f.Threat:SetParent(nameplate);
-            f.Threat:SetPoint("LEFT", nameplate, "RIGHT", -1, -7);
-            f.Threat:SetTexture(func:Threat_Icon_Toggle());
-            f.Threat:SetSize(22, 22);
-            f.Threat:SetShown(func:Threat_Toggle());
-            frames.threat[unit] = f.Threat;
-            func:Update_Threat(unit); -- Checking threat
-        else
-            frames.threat[unit]:SetParent(nameplate);
-            frames.threat[unit]:SetPoint("LEFT", nameplate, "RIGHT", -1, -7);
-            frames.threat[unit]:SetTexture(func:Threat_Icon_Toggle());
-            frames.threat[unit]:SetShown(func:Threat_Toggle());
-            func:Update_Threat(unit); -- Checking threat
-        end
+        f.Threat_Num = f:CreateFontString(nil, "OVERLAY");
+        f.Threat_Num:SetPoint("center", f.Threat_BG, "center");
+        f.Threat_Num:SetParent(frames.strata[unit]);
+        f.Threat_Num:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE");
+        f.Threat_Num:SetTextColor(1, 0.99, 0.32);
+        f.Threat_Num:SetShadowColor(0, 0, 0, 1);
+        f.Threat_Num:SetShadowOffset(1, -1);
+        f.Threat_Num:SetText(format_number(unit));
+        f.Threat_Num:SetShown(f.Threat_BG:IsShown());
+        frames.threat_num[unit] = f.Threat_Num;
+    else
+        frames.threat_bg[unit]:SetParent(nameplate);
+        frames.threat_bg[unit]:SetPoint("left", frames.threat[unit], "right", 0, 0);
+        frames.threat_bg[unit]:SetShown(tostring(frames.threat[unit]:GetVertexColor()) ~= "0");
 
-        -- Scripts
-        local timeElapsed = 0;
+        frames.threat_num[unit]:SetParent(frames.strata[unit]);
+        frames.threat_num[unit]:SetPoint("center", frames.threat_bg[unit], "center", 0, 0);
+        frames.threat_num[unit]:SetText(format_number(unit));
+        frames.threat_num[unit]:SetShown(frames.threat_bg[unit]:IsShown());
+    end--]]
 
-        if frames.strata[unit] then
-            frames.strata[unit]:SetScript("OnUpdate", function(self, elapsed)
-                timeElapsed = timeElapsed + elapsed;
+    -- Health numbers
+    if not frames.health[unit] then
+        f.Health = f:CreateFontString(nil, "OVERLAY");
+        f.Health:SetPoint("CENTER", nameplate, "CENTER", 0, -7);
+        f.Health:SetParent(frames.strata[unit]);
+        f.Health:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.FontSize, "OUTLINE");
+        f.Health:SetTextColor(1, 0.99, 0.32);
+        f.Health:SetShadowColor(0, 0, 0, 1);
+        f.Health:SetShadowOffset(1, -1);
+        f.Health:SetText(format_number(unit));
+        f.Health:SetShown(ReubinsNameplates_settings.Show_Health);
+        frames.health[unit] = f.Health;
+    else
+        frames.health[unit]:SetPoint("CENTER", nameplate, "CENTER", 0, -7);
+        frames.health[unit]:SetParent(frames.strata[unit]);
+        frames.health[unit]:SetText(format_number(unit));
+        frames.health[unit]:SetShown(ReubinsNameplates_settings.Show_Health);
+    end
 
-                if timeElapsed > 0.1 then
-                    timeElapsed = 0;
+    -- Scripts
+    local timeElapsed = 0;
 
-                    if func:PVP(unit) then
-                       func:Update_Threat(unit);
-                    end
-                end
-            end);
-        end
+    if frames.strata[unit] then
+        frames.strata[unit]:SetScript("OnUpdate", function(self, elapsed)
+            timeElapsed = timeElapsed + elapsed;
 
-        -- Health numbers
-        if not frames.health[unit] then
-            f.Health = f:CreateFontString(nil, "OVERLAY");
-            f.Health:SetPoint("CENTER", nameplate, "CENTER", 0, -7);
-            f.Health:SetParent(frames.strata[unit]);
-            f.Health:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.FontSize, "OUTLINE");
-            f.Health:SetTextColor(1, 0.99, 0.32);
-            f.Health:SetShadowColor(0, 0, 0, 1);
-            f.Health:SetShadowOffset(1, -1);
-            f.Health:SetText(format_number(unit));
-            f.Health:SetShown(ReubinsNameplates_settings.Show_Health);
-            frames.health[unit] = f.Health;
-        else
-            frames.health[unit]:SetPoint("CENTER", nameplate, "CENTER", 0, -7);
-            frames.health[unit]:SetParent(frames.strata[unit]);
-            frames.health[unit]:SetText(format_number(unit));
-            frames.health[unit]:SetShown(ReubinsNameplates_settings.Show_Health);
-        end
-    --end
+            if timeElapsed > 0.1 then
+                timeElapsed = 0;
+                func:Update_Threat(unit);
+            end
+        end);
+    end
 
-    -- Auras
-    func:Update_Auras(unit)
+    func:Update_Threat(unit); -- Update threat
+    func:Update_Auras(unit) -- Update auras
 end
 
 ----------------------------------------
@@ -298,6 +288,12 @@ function func:Remove_Nameplate(unit)
     if frames.strata[unit] then
         frames.strata[unit]:Hide();
         frames.strata[unit]:ClearAllPoints();
+    end
+
+    -- Threat numbers
+    if frames.threat_num[unit] then
+        frames.threat_num[unit]:Hide();
+        frames.threat_num[unit]:ClearAllPoints();
     end
 
     -- Threat icons
@@ -356,29 +352,33 @@ function func:Update_Threat(unit)
                 frames.threat[unit]:SetTexture(func:Threat_Icon_Toggle()); -- Icon check
 
                 if not ReubinsNameplates_settings.Tank then
-                    if not tank then
-                        if threat then
-                            if threat < 50 then
+                    if UnitIsUnit(unit.."target", "player") then
+                        frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                    else
+                        if not tank then
+                            if threat then
+                                if threat < 50 then
+                                    frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                                end
+                                if threat >= 50 then
+                                    frames.threat[unit]:SetVertexColor(1.0, 0.94, 0.0, 1); -- Yellow
+                                end
+                                if threat >= 75 then
+                                    frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                                end
+                            else
                                 frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
                             end
-                            if threat >= 50 then
-                                frames.threat[unit]:SetVertexColor(1.0, 0.94, 0.0, 1); -- Yellow
-                            end
-                            if threat >= 75 then
-                                frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
-                            end
                         else
-                            frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                            frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
                         end
-                    else
-                        frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
                     end
                 else
-                    if not UnitExists(unit.."target") then
+                    if not UnitExists(unit.."target") and not UnitAffectingCombat(unit) then
                         frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
                     else
                         if not tank then
-                            if UnitIsEnemy(unit, "player") then
+                            if UnitCanAttack("player", unit) then
                                 if IsInGroup() then
                                     if frames.tanks[UnitName(unit.."target")] then
                                         frames.threat[unit]:SetVertexColor(0.08, 0.66, 0.98, 1); -- Blue    
@@ -419,18 +419,8 @@ end
 function func:Update_Auras(unit)
     local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
-    -- Hiding countdowns
-    --[[
-    for _, ui in pairs(frames.auras) do
-        if ui.cooldown:GetCooldownDuration() == 0 then
-            ui.parent:Hide();
-            ui.parent:ClearAllPoints();
-        end
-    end
-    ]]
-
     for i = 1, 40 do
-        local name, icon, count, debuffType, duration, expirationTime, source, _, _, spellId, _, _, _, _, timeMod = UnitAura(unit, i, "PLAYER|" .. func:AuraType(unit));
+        local name, icon, count, _, duration, expirationTime, _, _, _, _, _, _, _, _, timeMod = UnitAura(unit, i, "PLAYER|" .. func:AuraType(unit));
         local ui = unit .. "_" .. i;
 
         if name and UnitExists(unit) then
@@ -446,8 +436,10 @@ function func:Update_Auras(unit)
 
                 -- Mask
                 f.mask = f:CreateMaskTexture();
+                f.mask:SetParent(f);
                 f.mask:SetAllPoints(f);
-                f.mask:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\aura_mask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
+                f.mask:SetTexture(func:Stacks_Mask(count), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
+                frames.auras[ui]["mask"] = f.mask;
 
                 -- Icon
                 f.icon = f:CreateTexture(nil, "ARTWORK");
@@ -464,7 +456,33 @@ function func:Update_Auras(unit)
                 f.Fonts_Strata:SetAllPoints();
                 frames.auras[ui]["fonts_strata"] = f.Fonts_Strata;
 
-                -- Border
+                -- Stacks
+                if count then
+                    -- border
+                    f.Stacks_border = f:CreateTexture(nil, "OVERLAY");
+                    f.Stacks_border:SetParent(f.Fonts_Strata);
+                    f.Stacks_border:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\wide_border");
+                    f.Stacks_border:SetSize(28, 14);
+                    f.Stacks_border:SetVertexColor(0.85, 0.85, 0.15, 1);
+                    f.Stacks_border:SetPoint("BottomRight", f, "BottomRight", 3, -2);
+                    f.Stacks_border:SetDrawLayer("OVERLAY", 1);
+                    f.Stacks_border:SetShown(count > 0);
+                    frames.auras[ui]["stacks_border"] = f.Stacks_border;
+
+                    -- Counter
+                    f.Stacks = f:CreateFontString(nil, "OVERLAY");
+                    f.Stacks:SetParent(f.Fonts_Strata);
+                    f.Stacks:SetPoint("center", f.Stacks_border, "center");
+                    f.Stacks:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE");
+                    f.Stacks:SetTextColor(1, 0.99, 0.32);
+                    f.Stacks:SetShadowColor(0, 0, 0, 1);
+                    f.Stacks:SetShadowOffset(1, -1);
+                    f.Stacks:SetText("x" .. count);
+                    f.Stacks:SetShown(count > 0);
+                    frames.auras[ui]["stacks"] = f.Stacks;
+                end
+
+                -- Aura border
                 f.border = f:CreateTexture(nil, "OVERLAY");
                 f.border:SetParent(f.Fonts_Strata);
                 f.border:SetTexture(func:Stacks_Texture(count));
@@ -472,18 +490,6 @@ function func:Update_Auras(unit)
                 f.border:SetAllPoints();
                 f.border:Show();
                 frames.auras[ui]["border"] = f.border;
-
-                -- Stacks
-                f.Stacks = f:CreateFontString(nil, "OVERLAY");
-                f.Stacks:SetParent(f.Fonts_Strata);
-                f.Stacks:SetPoint("bottomleft", f, "bottomright", func:XY_Stacks(count));
-                f.Stacks:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE");
-                f.Stacks:SetTextColor(1, 0.99, 0.32);
-                f.Stacks:SetShadowColor(0, 0, 0, 1);
-                f.Stacks:SetShadowOffset(1, -1);
-                f.Stacks:SetText(func:Count_Stacks(count));
-                f.Stacks:Show();
-                frames.auras[ui]["stacks"] = f.Stacks;
 
                 -- Countdown
                 f.Countdown = f:CreateFontString(nil, "OVERLAY");
@@ -502,7 +508,7 @@ function func:Update_Auras(unit)
                 f.Cooldown:SetCooldown(GetTime() - (duration - (expirationTime - GetTime())), duration, timeMod);
                 f.Cooldown:SetDrawEdge(false);
                 f.Cooldown:SetDrawBling(false);
-                f.Cooldown:SetSwipeTexture("Interface\\addons\\ReubinsNameplates\\media\\aura_mask");
+                f.Cooldown:SetSwipeTexture(func:Stacks_Mask(count));
                 f.Cooldown:SetSwipeColor(0, 0, 0, 0.60);
                 f.Cooldown:SetHideCountdownNumbers(true);
                 f.Cooldown:SetReverse(ReubinsNameplates_settings.Auras_Cooldown_Reverse);
@@ -520,7 +526,13 @@ function func:Update_Auras(unit)
                     local countdown = frames.auras[ui]["countdown"];
                     local border = frames.auras[ui]["border"];
                     local cooldown = frames.auras[ui]["cooldown"];
-                    local stacks_bg = frames.auras[ui]["stacks_bg"];
+                    local Stacks_border = frames.auras[ui]["stacks_border"];
+                    local mask = frames.auras[ui]["mask"];
+
+                    -- Mask
+                    mask:SetParent(parent);
+                    mask:SetAllPoints();
+                    mask:SetTexture(func:Stacks_Mask(count), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
 
                     -- Aura
                     parent:SetParent(nameplate);
@@ -531,24 +543,32 @@ function func:Update_Auras(unit)
                     aura_icon:SetParent(parent);
                     aura_icon:SetAllPoints();
                     aura_icon:SetTexture(icon);
+                    aura_icon:AddMaskTexture(mask);
                     aura_icon:Show();
 
                     -- Fonts strata
                     fonts_strata:SetParent(parent);
 
                     -- Stacks
-                    stacks:SetParent(frames.auras[ui]["fonts_strata"]);
-                    stacks:SetPoint("bottomleft", parent, "bottomright", func:XY_Stacks(count));
-                    stacks:SetText(func:Count_Stacks(count));
-                    stacks:Show();
+                    if count then
+                        -- Border
+                        Stacks_border:SetParent(fonts_strata);
+                        Stacks_border:SetPoint("BottomRight", parent, "BottomRight", 3, -2);
+                        Stacks_border:SetShown(count > 0);
+
+                        -- Counter
+                        stacks:SetParent(frames.auras[ui]["fonts_strata"]);
+                        stacks:SetPoint("center", Stacks_border, "center");
+                        stacks:SetText("x" .. count);
+                        stacks:SetShown(count > 0);
+                    end
 
                     -- Countdown
-                    --countdown:SetText(expirationTime - GetTime());
                     countdown:SetPoint("CENTER", parent, "CENTER");
                     countdown:SetText(func:Time(expirationTime - GetTime()));
                     countdown:SetShown(ReubinsNameplates_settings.Auras_Countdown);
 
-                    -- Border
+                    -- Aura border
                     border:SetParent(fonts_strata);
                     border:SetAllPoints();
                     border:SetTexture(func:Stacks_Texture(count));
@@ -559,6 +579,7 @@ function func:Update_Auras(unit)
                     cooldown:SetAllPoints();
                     cooldown:SetCooldown(GetTime() - (duration - (expirationTime - GetTime())), duration, timeMod);
                     cooldown:SetReverse(ReubinsNameplates_settings.Auras_Cooldown_Reverse);
+                    cooldown:SetSwipeTexture(func:Stacks_Mask(count));
                     cooldown:Show();
 
                     -- Position auras
