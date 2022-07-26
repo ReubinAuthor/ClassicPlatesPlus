@@ -22,4 +22,4 @@ Displays threat, health and debuffs on nameplates.
 <br />
 <br />
 
-<a href="https://discord.gg/FvtVgMSr7E"><img width="256" alt="discord button" src="https://user-images.githubusercontent.com/82573908/176664134-8cc052ec-2761-4219-bc9c-90849423f5e0.png"></a>
+<a href="https://discord.gg/Hj49J2APGZ"><img width="256" alt="discord button" src="https://user-images.githubusercontent.com/82573908/176664134-8cc052ec-2761-4219-bc9c-90849423f5e0.png"></a>
