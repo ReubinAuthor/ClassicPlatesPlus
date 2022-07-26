@@ -328,7 +328,7 @@ end
 function func:Update_Health(unit)
     if frames.health[unit] then
         frames.health[unit]:SetText(format_number(unit));
-        frames.health[unit]:Show();
+        frames.health[unit]:SetShown(ReubinsNameplates_settings.Show_Health);
     end
 end
 

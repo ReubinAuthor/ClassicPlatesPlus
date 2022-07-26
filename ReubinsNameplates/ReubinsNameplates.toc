@@ -1,0 +1,11 @@
+## Interface: 11403
+## Title: Reubin's nameplates
+## Notes: Displays threat, health and debuffs on nameplates.
+## Author: Reubin
+## Version: 1.2.7
+## DefaultState: enabled
+## SavedVariablesPerCharacter:: ReubinsNameplates_settings
+
+functions.lua
+init.lua
+Settings.lua
