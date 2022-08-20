@@ -1,4 +1,4 @@
-<a href="https://www.buymeacoffee.com/reubin"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=reubin&button_colour=BD5FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" /></a>
+<a href="https://www.buymeacoffee.com/reubin" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px !important;width: 180px !important;" ></a>
 <a href="https://www.patreon.com/bePatron?u=72927614"><img width="50" alt="Become a patron" src="https://user-images.githubusercontent.com/82573908/185756697-34d65503-03bc-43a4-b905-86cc1ecd1c2f.png"></a>
 <a href="https://discord.gg/Hj49J2APGZ"><img width="50" alt="Join the discord" src="https://user-images.githubusercontent.com/82573908/185756670-b92eaf9e-f4fb-4f8a-b0b0-6325e6a16886.png"></a>
 
