@@ -1,9 +1,6 @@
-<br />
-
-<a href="https://www.patreon.com/bePatron?u=72927614"><img width="256" alt="patreon button" src="https://user-images.githubusercontent.com/82573908/165378139-b394ba7a-0651-4c9c-b11b-c3d53dbaca8e.png"></a>
-
- 
-<br />
+<a href="https://www.buymeacoffee.com/reubin"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=reubin&button_colour=BD5FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" /></a>
+<a href="https://www.patreon.com/bePatron?u=72927614"><img width="50" alt="Become a patron" src="https://user-images.githubusercontent.com/82573908/185756697-34d65503-03bc-43a4-b905-86cc1ecd1c2f.png"></a>
+<a href="https://discord.gg/Hj49J2APGZ"><img width="50" alt="Join the discord" src="https://user-images.githubusercontent.com/82573908/185756670-b92eaf9e-f4fb-4f8a-b0b0-6325e6a16886.png"></a>
 
 # **Reubin's Nameplates**
 Displays threat, health and debuffs on nameplates.
@@ -22,4 +19,4 @@ Displays threat, health and debuffs on nameplates.
 <br />
 <br />
 
-<a href="https://discord.gg/Hj49J2APGZ"><img width="256" alt="discord button" src="https://user-images.githubusercontent.com/82573908/176664134-8cc052ec-2761-4219-bc9c-90849423f5e0.png"></a>
+
