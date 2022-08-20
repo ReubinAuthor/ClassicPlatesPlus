@@ -1,6 +1,6 @@
-<a href="https://www.buymeacoffee.com/reubin" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px !important;width: 180px !important;" ></a>
-<a href="https://www.patreon.com/bePatron?u=72927614"><img width="50" alt="Become a patron" src="https://user-images.githubusercontent.com/82573908/185756697-34d65503-03bc-43a4-b905-86cc1ecd1c2f.png"></a>
-<a href="https://discord.gg/Hj49J2APGZ"><img width="50" alt="Join the discord" src="https://user-images.githubusercontent.com/82573908/185756670-b92eaf9e-f4fb-4f8a-b0b0-6325e6a16886.png"></a>
+<a href="https://www.buymeacoffee.com/reubin" target="_blank"><img height="50" width="180" alt="Buy me a coffee" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee"></a>
+<a href="https://www.patreon.com/bePatron?u=72927614" target="_blank"><img width="50" alt="Become a patron" src="https://user-images.githubusercontent.com/82573908/185756697-34d65503-03bc-43a4-b905-86cc1ecd1c2f.png"></a>
+<a href="https://discord.gg/Hj49J2APGZ" target="_blank"><img width="50" alt="Join my discord" src="https://user-images.githubusercontent.com/82573908/185756670-b92eaf9e-f4fb-4f8a-b0b0-6325e6a16886.png"></a>
 
 # **Reubin's Nameplates**
 Displays threat, health and debuffs on nameplates.
