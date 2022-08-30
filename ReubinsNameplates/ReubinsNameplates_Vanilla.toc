@@ -2,9 +2,13 @@
 ## Title: Reubin's nameplates
 ## Notes: Displays threat, health and debuffs on nameplates.
 ## Author: Reubin
-## Version: 1.2.8
+## Version: 1.2.9
 ## DefaultState: enabled
 ## SavedVariablesPerCharacter:: ReubinsNameplates_settings
+
+#@no-lib-strip@
+Libs\LibClassicDurations\LibClassicDurations.xml
+#@end-no-lib-strip@
 
 functions.lua
 init.lua

@@ -109,7 +109,7 @@ local function Slash_Handler(msg)
         ReubinsNameplates_settings.Tank = not ReubinsNameplates_settings.Tank;
 
         -- Applying Threat visibility & Tank mode settings
-        for k, v in pairs(frames.threat) do
+        for k, v in pairs(frames.threatIcon) do
             if k then
                 if not ReubinsNameplates_settings.Tank then
                     v:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\aggro");
@@ -117,6 +117,13 @@ local function Slash_Handler(msg)
                     v:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\tanking");
                 end
                 func:Update_Threat(k);
+            end
+        end
+
+        -- Applying Threat visibility & Tank mode settings
+        for k, v in pairs(frames.threat_num) do
+            if k then
+                v:SetPoint(func:posThreatValue(k, C_NamePlate.GetNamePlateForUnit(k)));
             end
         end
 

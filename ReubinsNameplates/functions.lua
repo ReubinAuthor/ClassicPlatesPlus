@@ -3,15 +3,32 @@
 ----------------------------------------
 local myAddon, core = ...
 core.func = {};
-core.frames = { nameplates = {}, strata = {}, threat = {}, threat_num = {}, threat_bg = {}, health = {}, auras = {}, tanks = {}, members = {}};
+core.frames = { nameplates = {}, strata = {}, classification = {}, threat = {}, threatIcon = {}, threat_num = {}, animation = {}, health = {}, auras = {}, tanks = {}, members = {}};
 local func = core.func;
 local frames = core.frames;
-local aura_size = 32;
 
 ----------------------------------------
--- FORMATING NUMBER
+-- LOCALS
 ----------------------------------------
-local function format_number(unit)
+local aura_size = 32;
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+
+----------------------------------------
+-- CLASSIC DURATIONS
+----------------------------------------
+if isClassic then
+    local LibClassicDurations = LibStub("LibClassicDurations", true)
+
+    if LibClassicDurations then
+        LibClassicDurations:Register(myAddon)
+        UnitAura = LibClassicDurations.UnitAuraWrapper
+    end
+end
+
+----------------------------------------
+-- FORMATING HEALTH
+----------------------------------------
+local function format_health(unit)
     local health = UnitHealth(unit)
 
     if health then
@@ -114,6 +131,25 @@ function func:AuraType(unit)
 end
 
 ----------------------------------------
+-- SHOW / HIDE AURA
+----------------------------------------
+function func:ShowHideAura(unit)
+    if UnitCanAttack("player", unit) then
+        if ReubinsNameplates_settings.Debuffs then
+            return true
+        else
+            return false
+        end
+    else
+        if ReubinsNameplates_settings.Buffs then
+            return true
+        else
+            return false
+        end
+    end
+end
+
+----------------------------------------
 -- ASSIGN TANKS
 ----------------------------------------
 function func:Roster_Update()
@@ -178,10 +214,163 @@ function func:Position_Aura(unit, i)
 end
 
 ----------------------------------------
+-- FORMATING THREAT VALUE
+----------------------------------------
+local function format_threatValue(unit, num)
+    if num then
+        local value = num / 100
+
+        if not UnitIsPlayer(unit) and not UnitIsOtherPlayersPet(unit) then
+            if value >= 10^6 then
+                return string.format("%.2fm", value / 10^6)
+            elseif value >= 10^4 then
+                return string.format("%.0fk", value / 10^3)
+            elseif value >= 10^3 then
+                return string.format("%.1fk", value / 10^3)
+            elseif value <= -10^6 then
+                return string.format("%.2fm", value / 10^6)
+            elseif value <= -10^4 then
+                return string.format("%.0fk", value / 10^3)
+            elseif value <= -10^3 then
+                return string.format("%.1fk", value / 10^3)
+            else
+                return string.format("%.f", value)
+            end
+        else
+            return ""
+        end
+    end
+end
+
+----------------------------------------
+-- THREAT VALUE
+----------------------------------------
+function func:ThreatValue(unit)
+    local playerThreat = select(5, UnitDetailedThreatSituation("player", unit));
+    local values = {};
+    local group;
+
+    if IsInRaid() then
+        group = "raid"
+    elseif IsInGroup() then
+        group = "party"
+    else
+        group = nil
+    end
+
+    if playerThreat then
+        if group then
+            for i = 1, GetNumGroupMembers() do
+                local member, pet;
+
+                member = group .. i;
+                pet = member .. "Pet";
+
+                if UnitExists(member) then
+                    local memberThreat = select(5, UnitDetailedThreatSituation(member, unit));
+                    values[member] = memberThreat;
+                end
+
+                if UnitExists(pet) then
+                    local petThreat = select(5, UnitDetailedThreatSituation(pet, unit));
+                    values[pet] = petThreat;
+                end
+            end
+        else
+            if UnitExists(unit .. "target") then
+                local targetThreat = select(5, UnitDetailedThreatSituation(unit .. "target", unit));
+                values[unit .. "target"] = targetThreat;
+            end
+
+            if UnitExists("playerPet") then
+                local petThreat = select(5, UnitDetailedThreatSituation("playerPet", unit));
+                values.playerPet = petThreat;
+            end
+        end
+
+        local sorted = {};
+        for k,v in pairs(values) do
+            table.insert(sorted, {k,v});
+        end
+
+        table.sort(sorted, function(a,b) return a[2] > b[2] end);
+
+        if #sorted > 1 then
+            if UnitIsUnit("player", sorted[1][1]) then
+                return playerThreat - sorted[2][2];
+            else
+                return playerThreat - sorted[1][2];
+            end
+        elseif #sorted == 1 then
+            return playerThreat - sorted[1][2];
+        end
+    end
+end
+
+----------------------------------------
+-- SET SHOWN CLASSIFICATION
+----------------------------------------
+function func:classificationTexture(classification)
+    if classification == "rareelite" then
+        return "Interface\\addons\\ReubinsNameplates\\media\\rareElite"
+    elseif classification == "rare" then
+        return "Interface\\addons\\ReubinsNameplates\\media\\rare"
+    elseif classification == "elite" then
+        return  "Interface\\addons\\ReubinsNameplates\\media\\elite"
+    elseif classification == "worldboss" then
+        return  "Interface\\addons\\ReubinsNameplates\\media\\worldBoss"
+    end
+end
+
+----------------------------------------
+-- IS RARE OR ELITE
+----------------------------------------
+function func:IsRareOrElite(unit)
+    local classification = UnitClassification(unit);
+
+    if classification == "rareelite" or classification == "elite" or classification == "worldboss" or classification == "rare" then
+        return true
+    else
+        return false
+    end
+end
+
+----------------------------------------
+-- POSITION THREAT ICON
+----------------------------------------
+function func:PosThreatIcon(unit)
+    if func:IsRareOrElite(unit) then
+        return 10, -7;
+    else
+        return -1, -7;
+    end
+end
+
+----------------------------------------
+-- POSITION THREAT VALUE
+----------------------------------------
+function func:posThreatValue(unit, nameplate)
+    if unit then
+        if frames.threat[unit] then
+            if frames.threat[unit]:IsShown() then
+                if ReubinsNameplates_settings.Tank then
+                    return "left", frames.threatIcon[unit], "right",  0, 0;
+                else
+                    return "left", frames.threatIcon[unit], "right",  -7, 0;
+                end
+            else
+                return "left", nameplate, "right", func:PosThreatIcon(unit);
+            end
+        end
+    end
+end
+
+----------------------------------------
 -- ADDING NAMEPLATES
 ----------------------------------------
 function func:Add_Nameplate(unit)
     local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+    local classification = UnitClassification(unit);
     local f = CreateFrame("Frame", nil, UIParent);
 
     -- Strata
@@ -194,53 +383,80 @@ function func:Add_Nameplate(unit)
         frames.strata[unit]:Show();
     end
 
-    -- Threat icon
-    if not frames.threat[unit] then
-        f.Threat = f:CreateTexture(nil, "ARTWORK");
-        f.Threat:SetParent(nameplate);
-        f.Threat:SetPoint("LEFT", nameplate, "RIGHT", -1, -7);
-        f.Threat:SetTexture(func:Threat_Icon_Toggle());
-        f.Threat:SetSize(22, 22);
-        f.Threat:SetShown(func:Threat_Toggle());
-        frames.threat[unit] = f.Threat;
+    -- Classification
+    if not frames.classification[unit] then
+        f.Classification = f:CreateTexture(nil, "ARTWORK");
+        f.Classification:SetParent(nameplate);
+        f.Classification:SetPoint("Right", nameplate, "Right", 38, -10);
+        f.Classification:SetTexture(func:classificationTexture(classification));
+        f.Classification:SetSize(64, 32);
+        f.Classification:SetShown(func:IsRareOrElite(unit));
+        frames.classification[unit] = f.Classification;
     else
-        frames.threat[unit]:SetParent(nameplate);
-        frames.threat[unit]:SetPoint("LEFT", nameplate, "RIGHT", -1, -7);
-        frames.threat[unit]:SetTexture(func:Threat_Icon_Toggle());
-        frames.threat[unit]:SetShown(func:Threat_Toggle());
+        frames.classification[unit]:SetParent(nameplate);
+        frames.classification[unit]:SetPoint("Right", nameplate, "Right", 38, -10);
+        frames.classification[unit]:SetTexture(func:classificationTexture(classification));
+        frames.classification[unit]:SetShown(func:IsRareOrElite(unit));
     end
 
-    --[[ Threat numbers
-    if not frames.threat_num[unit] and frames.threat[unit] then
-        f.Threat_BG = f:CreateTexture(nil, "ARTWORK");
-        f.Threat_BG:SetParent(nameplate);
-        f.Threat_BG:SetPoint("left", frames.threat[unit], "right", 0, 0);
-        f.Threat_BG:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\wide_border");
-        f.Threat_BG:SetVertexColor(0.85, 0.85, 0.15, 1);
-        f.Threat_BG:SetSize(36, 14);
-        f.Threat_BG:SetShown(tostring(frames.threat[unit]:GetVertexColor()) ~= "0");
-        frames.threat_bg[unit] = f.Threat_BG;
+    -- Threat icon & numbers
+    if not frames.threat[unit] then
+        -- Parent
+        f.Threat = CreateFrame("Frame", nil, nameplate);
+        f.Threat:SetAllPoints(nameplate);
+        f.Threat:Hide();
+        frames.threat[unit] = f.Threat;
 
+        -- Icon
+        f.ThreatIcon = f:CreateTexture(nil, "ARTWORK");
+        f.ThreatIcon:SetParent(f.Threat);
+        f.ThreatIcon:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+        f.ThreatIcon:SetTexture(func:Threat_Icon_Toggle());
+        f.ThreatIcon:SetSize(22, 22);
+        f.ThreatIcon:Hide();
+        frames.threatIcon[unit] = f.ThreatIcon;
+
+        -- Animation
+        local AnimationGroup = f.Threat:CreateAnimationGroup();
+        local AlphaAnimation = AnimationGroup:CreateAnimation("Alpha");
+        AlphaAnimation:SetDuration(0.2);
+        AlphaAnimation:SetFromAlpha(0);
+        AlphaAnimation:SetToAlpha(1);
+        local ScaleAnimation = AnimationGroup:CreateAnimation("Scale");
+        ScaleAnimation:SetDuration(0.2);
+        ScaleAnimation:SetFromScale(2,2);
+        ScaleAnimation:SetToScale(1,1);
+        AnimationGroup:Stop();
+        frames.animation[unit] = AnimationGroup;
+
+        --Value
         f.Threat_Num = f:CreateFontString(nil, "OVERLAY");
-        f.Threat_Num:SetPoint("center", f.Threat_BG, "center");
-        f.Threat_Num:SetParent(frames.strata[unit]);
-        f.Threat_Num:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE");
-        f.Threat_Num:SetTextColor(1, 0.99, 0.32);
+        f.Threat_Num:SetParent(nameplate);
+        f.Threat_Num:SetPoint(func:posThreatValue(unit, nameplate));
+        f.Threat_Num:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.ThreatValueFontSize, "OUTLINE");
         f.Threat_Num:SetShadowColor(0, 0, 0, 1);
         f.Threat_Num:SetShadowOffset(1, -1);
-        f.Threat_Num:SetText(format_number(unit));
-        f.Threat_Num:SetShown(f.Threat_BG:IsShown());
+        f.Threat_Num:SetTextColor(1.0, 0.94, 0.0, 1);
+        f.Threat_Num:SetText(format_threatValue(unit));
+        f.Threat_Num:SetShown(ReubinsNameplates_settings.ThreatValue);
         frames.threat_num[unit] = f.Threat_Num;
     else
-        frames.threat_bg[unit]:SetParent(nameplate);
-        frames.threat_bg[unit]:SetPoint("left", frames.threat[unit], "right", 0, 0);
-        frames.threat_bg[unit]:SetShown(tostring(frames.threat[unit]:GetVertexColor()) ~= "0");
+        frames.threat[unit]:SetParent(nameplate);
+        frames.threat[unit]:Hide();
 
-        frames.threat_num[unit]:SetParent(frames.strata[unit]);
-        frames.threat_num[unit]:SetPoint("center", frames.threat_bg[unit], "center", 0, 0);
-        frames.threat_num[unit]:SetText(format_number(unit));
-        frames.threat_num[unit]:SetShown(frames.threat_bg[unit]:IsShown());
-    end--]]
+        frames.threatIcon[unit]:SetParent(frames.threat[unit]);
+        frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+        frames.threatIcon[unit]:SetTexture(func:Threat_Icon_Toggle());
+        frames.threatIcon[unit]:Hide();
+
+        frames.threat_num[unit]:SetParent(nameplate);
+        frames.threat_num[unit]:SetPoint(func:posThreatValue(unit, nameplate));
+        frames.threat_num[unit]:SetFont("Fonts\\FRIZQT__.TTF", ReubinsNameplates_settings.ThreatValueFontSize, "OUTLINE");
+        frames.threat_num[unit]:SetText(format_threatValue(unit));
+        frames.threat_num[unit]:SetShown(ReubinsNameplates_settings.ThreatValue);
+
+        frames.animation[unit]:Stop();
+    end
 
     -- Health numbers
     if not frames.health[unit] then
@@ -251,13 +467,13 @@ function func:Add_Nameplate(unit)
         f.Health:SetTextColor(1, 0.99, 0.32);
         f.Health:SetShadowColor(0, 0, 0, 1);
         f.Health:SetShadowOffset(1, -1);
-        f.Health:SetText(format_number(unit));
+        f.Health:SetText(format_health(unit));
         f.Health:SetShown(ReubinsNameplates_settings.Show_Health);
         frames.health[unit] = f.Health;
     else
         frames.health[unit]:SetPoint("CENTER", nameplate, "CENTER", 0, -7);
         frames.health[unit]:SetParent(frames.strata[unit]);
-        frames.health[unit]:SetText(format_number(unit));
+        frames.health[unit]:SetText(format_health(unit));
         frames.health[unit]:SetShown(ReubinsNameplates_settings.Show_Health);
     end
 
@@ -275,8 +491,17 @@ function func:Add_Nameplate(unit)
         end);
     end
 
+    if frames.threat[unit] then
+        frames.threat[unit]:SetScript("OnShow", function(self)
+            if not frames.animation[unit]:IsPlaying() then
+                frames.animation[unit]:Play();
+            end
+        end);
+    end
+
     func:Update_Threat(unit); -- Update threat
     func:Update_Auras(unit) -- Update auras
+    func:ThreatValue(unit)
 end
 
 ----------------------------------------
@@ -290,6 +515,12 @@ function func:Remove_Nameplate(unit)
         frames.strata[unit]:ClearAllPoints();
     end
 
+    -- Classification
+    if frames.classification[unit] then
+        frames.classification[unit]:Hide();
+        frames.classification[unit]:ClearAllPoints();
+    end
+
     -- Threat numbers
     if frames.threat_num[unit] then
         frames.threat_num[unit]:Hide();
@@ -299,8 +530,8 @@ function func:Remove_Nameplate(unit)
     -- Threat icons
     if frames.threat[unit] then
         frames.threat[unit]:Hide();
-        frames.threat[unit]:ClearAllPoints();
-        frames.threat[unit]:SetVertexColor(0, 0, 0, 0);
+        frames.threatIcon[unit]:Hide();
+        frames.threatIcon[unit]:ClearAllPoints();
     end
 
     -- Health numbers
@@ -327,89 +558,161 @@ end
 -- Health
 function func:Update_Health(unit)
     if frames.health[unit] then
-        frames.health[unit]:SetText(format_number(unit));
+        frames.health[unit]:SetText(format_health(unit));
         frames.health[unit]:SetShown(ReubinsNameplates_settings.Show_Health);
     end
 end
 
 -- Threat
 function func:Update_Threat(unit)
-    if frames.threat[unit] then
+    if frames.threat[unit] and UnitExists(unit) then
         local tank, status, threat = UnitDetailedThreatSituation("player", unit);
+        local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
         -- PVP
         if func:PVP(unit) then
-            frames.threat[unit]:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\aggro"); -- Swap to aggro icon
+            frames.threatIcon[unit]:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\aggro"); -- Swap to aggro icon
 
             if UnitIsUnit(unit.."target", "player") then
-                frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                frames.threatIcon[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                frames.threatIcon[unit]:Show();
+                frames.threat[unit]:Show()
             else
-                frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                frames.threat[unit]:Hide()
+                frames.threatIcon[unit]:Hide();
+                frames.threatIcon[unit]:ClearAllPoints();
             end
         else
             -- PVE
             if UnitAffectingCombat("player") then
-                frames.threat[unit]:SetTexture(func:Threat_Icon_Toggle()); -- Icon check
+                frames.threatIcon[unit]:SetTexture(func:Threat_Icon_Toggle()); -- Icon check
 
                 if not ReubinsNameplates_settings.Tank then
                     if UnitIsUnit(unit.."target", "player") then
-                        frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                        frames.threatIcon[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                        frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                        frames.threatIcon[unit]:Show();
+                        frames.threat[unit]:SetShown(func:Threat_Toggle())
                     else
                         if not tank then
                             if threat then
                                 if threat < 50 then
-                                    frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                                    frames.threat[unit]:Hide()
+                                    frames.threatIcon[unit]:Hide();
+                                    frames.threatIcon[unit]:ClearAllPoints();
                                 end
                                 if threat >= 50 then
-                                    frames.threat[unit]:SetVertexColor(1.0, 0.94, 0.0, 1); -- Yellow
+                                    frames.threatIcon[unit]:SetVertexColor(1.0, 0.94, 0.0, 1); -- Yellow
+                                    frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                                    frames.threatIcon[unit]:Show();
+                                    frames.threat[unit]:SetShown(func:Threat_Toggle())
                                 end
                                 if threat >= 75 then
-                                    frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                                    frames.threatIcon[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                                    frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                                    frames.threatIcon[unit]:Show();
+                                    frames.threat[unit]:SetShown(func:Threat_Toggle())
                                 end
                             else
-                                frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                                frames.threat[unit]:Hide()
+                                frames.threatIcon[unit]:Hide();
+                                frames.threatIcon[unit]:ClearAllPoints();
                             end
                         else
-                            frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                            frames.threatIcon[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                            frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                            frames.threatIcon[unit]:Show();
+                            frames.threat[unit]:SetShown(func:Threat_Toggle())
                         end
                     end
                 else
                     if not UnitExists(unit.."target") and not UnitAffectingCombat(unit) then
-                        frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                        frames.threat[unit]:Hide();
+                        frames.threatIcon[unit]:Hide();
+                        frames.threatIcon[unit]:ClearAllPoints();
                     else
                         if not tank then
                             if UnitCanAttack("player", unit) then
                                 if IsInGroup() then
                                     if frames.tanks[UnitName(unit.."target")] then
-                                        frames.threat[unit]:SetVertexColor(0.08, 0.66, 0.98, 1); -- Blue    
+                                        frames.threatIcon[unit]:SetVertexColor(0.08, 0.66, 0.98, 1); -- Blue
+                                        frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                                        frames.threatIcon[unit]:Show();
+                                        frames.threat[unit]:SetShown(func:Threat_Toggle())
                                     else
                                         if UnitPlayerOrPetInParty(unit.."target") or UnitInParty(unit.."target") then
-                                            frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                                            frames.threatIcon[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                                            frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                                            frames.threatIcon[unit]:Show();
+                                            frames.threat[unit]:SetShown(func:Threat_Toggle());
                                         else
-                                            frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                                            frames.threat[unit]:Hide()
+                                            frames.threatIcon[unit]:Hide();
+                                            frames.threatIcon[unit]:ClearAllPoints();
                                         end
                                     end
                                 else
-                                    frames.threat[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                                    frames.threatIcon[unit]:SetVertexColor(1, 0, 0, 1); -- Red
+                                    frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                                    frames.threatIcon[unit]:Show();
+                                    frames.threat[unit]:SetShown(func:Threat_Toggle());
                                 end
                             end
                         else
                             if UnitIsUnit(unit.."target", "player") then
                                 if status == 2 then -- Tanking but not highest
-                                    frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                                    frames.threatIcon[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                                    frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                                    frames.threatIcon[unit]:Show();
+                                    frames.threat[unit]:SetShown(func:Threat_Toggle());
                                 elseif status == 3 then -- Tanking securly
-                                    frames.threat[unit]:SetVertexColor(0, 1, 0, 1); -- Green
+                                    frames.threatIcon[unit]:SetVertexColor(0, 1, 0, 1); -- Green
+                                    frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                                    frames.threatIcon[unit]:Show();
+                                    frames.threat[unit]:SetShown(func:Threat_Toggle());
                                 else
-                                    frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                                    frames.threat[unit]:Hide();
+                                    frames.threatIcon[unit]:Hide();
+                                    frames.threatIcon[unit]:ClearAllPoints();
                                 end
                             else
-                                frames.threat[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                                frames.threatIcon[unit]:SetVertexColor(0.96, 0.58, 0.11, 1); -- Orange
+                                frames.threatIcon[unit]:SetPoint("LEFT", nameplate, "RIGHT", func:PosThreatIcon(unit));
+                                frames.threatIcon[unit]:Show();
+                                frames.threat[unit]:SetShown(func:Threat_Toggle());
                             end
                         end
                     end
                 end
+                if frames.threat_num[unit] then
+                    local value = func:ThreatValue(unit);
+
+                    if value then
+                        if value > 0 then
+                            if ReubinsNameplates_settings.Tank then
+                                frames.threat_num[unit]:SetTextColor(0, 1, 0, 1); -- Green
+                            else
+                                frames.threat_num[unit]:SetTextColor(1, 0, 0, 1); -- Red
+                            end
+                        elseif value < 1 and value > -1 then
+                            frames.threat_num[unit]:SetTextColor(0, 0, 0, 0); -- Transparent
+                        else
+                            if ReubinsNameplates_settings.Tank then
+                                frames.threat_num[unit]:SetTextColor(1, 0, 0, 1); -- Red
+                            else
+                                frames.threat_num[unit]:SetTextColor(0, 1, 0, 1); -- Green
+                            end
+                        end
+
+                        frames.threat_num[unit]:SetPoint(func:posThreatValue(unit, nameplate));
+                        frames.threat_num[unit]:SetText(format_threatValue(unit, value));
+                    end
+                end
             else
-                frames.threat[unit]:SetVertexColor(0, 0, 0, 0); -- Transparent
+                frames.threat[unit]:Hide();
+                frames.threatIcon[unit]:Hide();
+                frames.threatIcon[unit]:ClearAllPoints();
             end
         end
     end
@@ -431,7 +734,7 @@ function func:Update_Auras(unit)
                 local f = CreateFrame("Frame", nil, nameplate);
                 f:SetSize(aura_size, aura_size);
                 f:SetScale(ReubinsNameplates_settings.Auras_Scale);
-                f:SetShown(ReubinsNameplates_settings.Auras_Visibility);
+                f:SetShown(func:ShowHideAura(unit));
                 frames.auras[ui]["parent"] = f;
 
                 -- Mask
@@ -537,7 +840,7 @@ function func:Update_Auras(unit)
                     -- Aura
                     parent:SetParent(nameplate);
                     parent:SetScale(ReubinsNameplates_settings.Auras_Scale);
-                    parent:SetShown(ReubinsNameplates_settings.Auras_Visibility);
+                    parent:SetShown(func:ShowHideAura(unit));
 
                     -- Icon
                     aura_icon:SetParent(parent);
