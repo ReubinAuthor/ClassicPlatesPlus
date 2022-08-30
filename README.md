@@ -3,7 +3,17 @@
 <a href="https://discord.gg/Hj49J2APGZ" target="_blank"><img width="50" alt="Join my discord" src="https://user-images.githubusercontent.com/82573908/185756670-b92eaf9e-f4fb-4f8a-b0b0-6325e6a16886.png"></a>
 
 # **Reubin's Nameplates**
-Displays threat, health and debuffs on nameplates.
+Reubin's Nameplates is a simple Classic style friendly nameplates addon that provides more information about everyone around you.
+
+<br />
+
+Features:
+- Shows Health.
+- Shows Threat Status and differential.
+- Shows Buffs and Debuffs applied by you.
+- Shows NPC's type (Elite, Rare, Rare elite, World Boss)
+- Shows if enemy player is targeting you.
+- Tank mode - Shows which NPCs are running loose and which are tanked by you or another tank.
 
 <br />
 
