@@ -17,7 +17,9 @@ Features:
 
 <br />
 
-<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/176653121-da198c6c-2490-47b8-bf52-f99f07921839.jpg">
+<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/187562002-fb394268-211b-4b31-b9c9-0d6d4de1c431.jpg">
+<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/187562014-c9e4bb50-dc21-47ff-b0fa-de7f586f7cad.jpg">
+<img width="825" alt="picture_07" src="https://user-images.githubusercontent.com/82573908/187562019-1f64053b-cd61-4b7e-a746-24cb73a25a24.jpg">
 
 <br />
 
