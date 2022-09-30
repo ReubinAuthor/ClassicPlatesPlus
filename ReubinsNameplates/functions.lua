@@ -30,9 +30,23 @@ end
 ----------------------------------------
 local function format_health(unit)
     local health = UnitHealth(unit)
-
+   
     if health then
-        if UnitPlayerOrPetInParty(unit) or not UnitIsPlayer(unit) and not UnitIsOtherPlayersPet(unit) then
+        if isClassic then
+            if UnitPlayerOrPetInParty(unit) or not UnitIsPlayer(unit) and not UnitIsOtherPlayersPet(unit) then
+                if health >= 10^6 then
+                    return string.format("%.2fm", health / 10^6)
+                elseif health >= 10^4 then
+                    return string.format("%.0fk", health / 10^3)
+                elseif health >= 10^3 then
+                    return string.format("%.1fk", health / 10^3)
+                else
+                    return tostring(health)
+                end
+            else
+                return tostring(health) .. "%"
+            end
+        else
             if health >= 10^6 then
                 return string.format("%.2fm", health / 10^6)
             elseif health >= 10^4 then
@@ -42,8 +56,6 @@ local function format_health(unit)
             else
                 return tostring(health)
             end
-        else
-            return tostring(health) .. "%"
         end
     end
 end
