@@ -1,10 +1,12 @@
-## Interface: 30400
+## Interface: 11403
 ## Title: Reubin's nameplates
 ## Notes: Replaces default nameplates with Classic themed adjustable nameplates with a lot more inforamtion, like threat, buffs/debuffs, and more.
 ## Author: Reubin
 ## Version: 2.0.0
 ## DefaultState: enabled
 ## SavedVariablesPerCharacter:: ReubinsNameplates_settings
+
+embeds.xml
 
 core.lua
 nameplate.lua
