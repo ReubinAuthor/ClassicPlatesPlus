@@ -148,6 +148,7 @@ function func:Nameplate_Created(nameplate)
 
         -- Threat percentage
         unitFrame.threat.percentage = CreateFrame("Frame");
+        unitFrame.threat.percentage:Hide();
 
         unitFrame.threat.percentage.text = unitFrame:CreateFontString();
         unitFrame.threat.percentage.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "Outline");
@@ -311,6 +312,20 @@ function func:Nameplate_Added(unit)
 
             -- Name (fontstring)
             unitFrame.name:SetParent(unitFrame);
+            unitFrame.name:ClearAllPoints();
+            if unitFrame.threat.percentage:IsShown() and ReubinsNameplates_settings.ThreatPercentage then
+                if ReubinsNameplates_settings.Portrait then
+                    unitFrame.name:SetPoint("bottom", nameplate.unitFrame.healthbar, "top", -1, 18);
+                else
+                    unitFrame.name:SetPoint("bottom", nameplate.unitFrame.healthbar, "top", 8, 18);
+                end
+            else
+                if ReubinsNameplates_settings.Portrait then
+                    unitFrame.name:SetPoint("bottom", nameplate.unitFrame.healthbar, "top", -1, 12);
+                else
+                    unitFrame.name:SetPoint("bottom", nameplate.unitFrame.healthbar, "top", 8, 8);
+                end
+            end
 
             -- Level (fontstring)
             unitFrame.level:SetParent(unitFrame);

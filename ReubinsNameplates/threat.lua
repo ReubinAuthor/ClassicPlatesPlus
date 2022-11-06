@@ -193,7 +193,7 @@ function func:Update_ThreatPercentage(unit)
                         unitFrame.name:SetPoint("bottom", nameplate.unitFrame.healthbar, "top", 8, 18);
                     end
 
-                    percentage:SetShown(ReubinsNameplates_settings.ThreatPercentage);
+                    percentage:Show();
                 else
                     percentage:Hide();
 

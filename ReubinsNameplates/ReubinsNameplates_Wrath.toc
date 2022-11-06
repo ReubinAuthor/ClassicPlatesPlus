@@ -2,7 +2,7 @@
 ## Title: Reubin's nameplates
 ## Notes: Reubin's nameplates is a simple Classic-themed addon that provides additional information about everyone around you.
 ## Author: Reubin
-## Version: 2.0.0
+## Version: 2.0.1
 ## DefaultState: enabled
 ## SavedVariablesPerCharacter:: ReubinsNameplates_settings
 
