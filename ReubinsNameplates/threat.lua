@@ -42,17 +42,27 @@ function func:Update_ThreatIcon(unit)
 
                     -- Tank mode Activated
                     if ReubinsNameplates_settings.TankMode then
-                        local isTanking = UnitDetailedThreatSituation("player", unit)
+                        local iAmTanking = UnitDetailedThreatSituation("player", unit);
+
+                        local function otherTank()
+                            for k in pairs(data.tanks) do
+                                if k then
+                                    local isTanking = UnitDetailedThreatSituation(k, unit);
+                                    if isTanking then
+                                        return true;
+                                    end
+                                end
+                            end
+                        end
 
                         -- Swapping icon
                         icon:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\icons\\tank");
 
-                        if isTanking then
+                        if iAmTanking then
                             icon:SetVertexColor(data.colors.green.r, data.colors.green.g, data.colors.green.b);
                             unitFrame.threat.color = "green";
                             frame:SetShown(toggle);
-                        -- Target is anoter Tank
-                        elseif data.tanks[UnitName(unit .. "target")] then
+                        elseif otherTank() then
                             icon:SetVertexColor(data.colors.blue.r, data.colors.blue.g, data.colors.blue.b);
                             unitFrame.threat.color = "blue";
                             frame:SetShown(toggle);
@@ -127,8 +137,8 @@ function func:Update_ThreatPercentage(unit)
                 local treatPercentage = UnitThreatPercentageOfLead("player",unit)
 
                 if treatPercentage and treatPercentage > 0 then
-                    if treatPercentage > 999 then
-                        text:SetText(">999%");
+                    if treatPercentage >= 999 then
+                        text:SetText("999%");
                     else
                         text:SetText(math.floor(treatPercentage) .. "%");
                     end

@@ -6,10 +6,6 @@ local func = core.func;
 local data = core.data;
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC;
 
---[[ TO DO LIST:
-
---]]
-
 ----------------------------------------
 -- Creating nameplate
 ----------------------------------------
@@ -148,8 +144,8 @@ function func:Nameplate_Created(nameplate)
 
         -- Threat percentage
         unitFrame.threat.percentage = CreateFrame("Frame");
-        unitFrame.threat.percentage:Hide();
 
+        -- Threat text
         unitFrame.threat.percentage.text = unitFrame:CreateFontString();
         unitFrame.threat.percentage.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "Outline");
         unitFrame.threat.percentage.text:SetShadowColor(0, 0, 0);
@@ -230,6 +226,8 @@ function func:Nameplate_Created(nameplate)
         unitFrame.raidTarget.icon = unitFrame:CreateTexture();
         unitFrame.raidTarget.icon:SetSize(20, 20);
 
+        -- Hiding what has to be hidden
+        unitFrame.threat.percentage:Hide();
         unitFrame.raidTarget:Hide();
         unitFrame.castbar:Hide();
         unitFrame:Hide();
@@ -241,10 +239,13 @@ end
 ----------------------------------------
 function func:Nameplate_Added(unit)
     if unit then
-        local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+        local nameplate = C_NamePlate.GetNamePlateForUnit(unit, false);
 
         if nameplate then
             local unitFrame = nameplate.unitFrame;
+
+            -- Adding nameplate to a list of currently available nameplates
+            data.nameplates[unit] = nameplate;
 
             -- Parent
             unitFrame:SetScale(ReubinsNameplates_settings.NameplatesScale);
@@ -553,18 +554,20 @@ function func:Nameplate_Added(unit)
             func:Update_Auras(unit);
             func:Selected(unitFrame);
             func:MouseoverCheck(unitFrame);
-            func:Castbar_Start(unit);
+            func:Castbar_Start(event, unit);
             func:RaidTargetIndex();
 
             -- Scripts
             local timeElapsed1, timeElapsed2 = 0, 0;
             unitFrame:SetScript("OnUpdate", function(self, elapsed)
+
                 -- Highlight
                 timeElapsed1 = timeElapsed1 + elapsed;
-                if timeElapsed1 > 0.16 then
+                if timeElapsed1 > 0.15 then
                     timeElapsed1 = 0;
                     func:Highlight(unitFrame);
                 end
+
                 -- Threat icon
                 timeElapsed2 = timeElapsed2 + elapsed;
                 if timeElapsed2 > 1 then
@@ -577,14 +580,22 @@ function func:Nameplate_Added(unit)
                 end
             end);
 
+            -- Hiding default nameplates
+            nameplate.UnitFrame:SetScript("OnShow", function()
+                nameplate.UnitFrame:Hide();
+            end);
+
+            -- Threat icon animation on show
             unitFrame.threat.icon:SetScript("OnShow", function()
                 unitFrame.threat.animation:Play();
             end);
 
+            -- Hiding castbar when animation finishes
             unitFrame.castbar.animation:SetScript("OnFinished", function()
                 unitFrame.castbar:Hide();
             end);
 
+            -- Raid target animation on show
             unitFrame.raidTarget:SetScript("OnShow", function()
                 if unitFrame.raidTarget.animation:IsPlaying() then
                     unitFrame.raidTarget.animation:Restart();
@@ -605,6 +616,9 @@ function func:Nameplate_Removed(unit)
 
         if nameplate then
             local unitFrame = nameplate.unitFrame;
+
+            -- Removing nameplate from a list of currently available nameplates
+            data.nameplates[unit] = nil;
 
             func:MouseoverCheck(unitFrame);
 

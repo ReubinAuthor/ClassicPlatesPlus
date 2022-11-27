@@ -74,7 +74,7 @@ end
 ----------------------------------------
 -- Hook NamePlateDriverFrame to hide default nameplates
 ----------------------------------------
-hooksecurefunc(NamePlateDriverFrame,"OnNamePlateAdded",function(functions, unit)
+hooksecurefunc(NamePlateDriverFrame,"OnNamePlateAdded", function(functions, unit)
     local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
     if nameplate then
@@ -91,7 +91,7 @@ hooksecurefunc(NamePlateDriverFrame,"OnNamePlateAdded",function(functions, unit)
     end
 end);
 
-hooksecurefunc(NamePlateDriverFrame,"ApplyFrameOptions",function(functions, nameplateFrame)
+hooksecurefunc(NamePlateDriverFrame,"ApplyFrameOptions", function(functions, nameplateFrame)
     local inInstance, instanceType = IsInInstance();
 
     -- Hiding Blizzard's namepaltes
@@ -986,50 +986,47 @@ function func:BlacklistedAuras()
 end
 
 ----------------------------------------
--- Castbar Classic
+-- Castbar start
 ----------------------------------------
---[[
-function func:Castbar(subevent, sourceGUID, spellID, spellName, spellSchool)
-    if sourceGUID then
-        local nameplates = C_NamePlate.GetNamePlates();
-
-        if nameplates then
-            for k,v in pairs(nameplates) do
-                if k then
-                    local unit = v.unitFrame.unit;
-
-                    if UnitGUID(unit) == sourceGUID then
-                        if subevent == "SPELL_CAST_START" then
-                            --do stuff
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-]]
-
-----------------------------------------
--- Castbar start WOTLK
-----------------------------------------
-function func:Castbar_Start(unit)
+function func:Castbar_Start(event, unit)
     if unit then
         local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
         if nameplate then
             local castbar = nameplate.unitFrame.castbar;
-            local text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible;
+            local name, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible, minValue, maxValue, reverser;
 
-            local _, text1, icon1, startTimeMS1, endTimeMS1, isTradeSkill1, _, notInterruptible1 = UnitCastingInfo(unit);
-            local _, text2, icon2, startTimeMS2, endTimeMS2, isTradeSkill2, notInterruptible2 = UnitChannelInfo(unit);
+            if event then
+                if event == "UNIT_SPELLCAST_START" then
+                    name, text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = UnitCastingInfo(unit);
+                    minValue = -(endTimeMS - startTimeMS) / 1000;
+                    maxValue = 0;
+                    reverser = -1;
+                    castbar.statusbar:SetStatusBarColor(data.colors.orange.r, data.colors.orange.g, data.colors.orange.b);
+                elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
+                    name, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = UnitChannelInfo(unit);
+                    minValue = 0;
+                    maxValue = (endTimeMS - startTimeMS) / 1000;
+                    reverser = 1;
+                    castbar.statusbar:SetStatusBarColor(data.colors.purple.r, data.colors.purple.g, data.colors.purple.b);
+                end
+            else
+                local name1, text1, icon1, startTimeMS1, endTimeMS1, isTradeSkill1, _, notInterruptible1 = UnitCastingInfo(unit);
+                local name2, text2, icon2, startTimeMS2, endTimeMS2, isTradeSkill2, notInterruptible2 = UnitChannelInfo(unit);
 
-            if text1 then
-                text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = text1, icon1, startTimeMS1, endTimeMS1, isTradeSkill1, notInterruptible1;
-                castbar.statusbar:SetStatusBarColor(data.colors.orange.r, data.colors.orange.g, data.colors.orange.b);
-            elseif text2 then
-                text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = text2, icon2, startTimeMS2, endTimeMS2, isTradeSkill2, notInterruptible2;
-                castbar.statusbar:SetStatusBarColor(data.colors.purple.r, data.colors.purple.g, data.colors.purple.b);
+                if name1 then
+                    name, text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = name1, text1, icon1, startTimeMS1, endTimeMS1, isTradeSkill1, notInterruptible1;
+                    minValue = -(endTimeMS - startTimeMS) / 1000;
+                    maxValue = 0;
+                    reverser = -1;
+                    castbar.statusbar:SetStatusBarColor(data.colors.orange.r, data.colors.orange.g, data.colors.orange.b);
+                elseif name2 then
+                    name, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = name2, text2, icon2, startTimeMS2, endTimeMS2, isTradeSkill2, notInterruptible2;
+                    minValue = 0;
+                    maxValue = (endTimeMS - startTimeMS) / 1000;
+                    reverser = 1;
+                    castbar.statusbar:SetStatusBarColor(data.colors.purple.r, data.colors.purple.g, data.colors.purple.b);
+                end
             end
 
             if text then
@@ -1051,19 +1048,21 @@ function func:Castbar_Start(unit)
                 castbar.name:SetTextColor(1,1,1);
                 castbar.icon:SetTexture(icon);
                 castbar.border:SetVertexColor(0.75, 0.75, 0.75);
-                castbar.statusbar:SetMinMaxValues(-(endTimeMS - startTimeMS) / 1000, 0);
+                castbar.statusbar:SetMinMaxValues(minValue, maxValue);
 
                 local timeElapsed = 0;
                 castbar:SetScript("OnUpdate", function(self, elapsed)
                     timeElapsed = timeElapsed + elapsed;
                     if not castbar.animation:IsPlaying() then
-                        castbar.statusbar:SetValue(-((endTimeMS / 1000) - GetTime()));
+                        castbar.statusbar:SetValue(reverser * ((endTimeMS / 1000) - GetTime()));
                     end
 
                     if timeElapsed > 0.1 then
                         local value = (endTimeMS / 1000) - GetTime();
                         timeElapsed = 0;
-                        if value > 0 then
+                        if value >= 10 then
+                            castbar.countdown:SetText(string.format("%.0f", value));
+                        elseif value < 10 and value > 0 then
                             castbar.countdown:SetText(string.format("%.1f", value));
                         else
                             castbar.countdown:SetText("");
@@ -1082,7 +1081,7 @@ function func:Castbar_Start(unit)
 end
 
 ----------------------------------------
--- Castbar end WOTLK
+-- Castbar end
 ----------------------------------------
 function func:Castbar_End(event, unit)
     if unit then
@@ -1090,7 +1089,6 @@ function func:Castbar_End(event, unit)
 
         if nameplate then
             local castbar = nameplate.unitFrame.castbar;
-
             local channelName = UnitChannelInfo(unit);
 
             if event == "UNIT_SPELLCAST_FAILED"

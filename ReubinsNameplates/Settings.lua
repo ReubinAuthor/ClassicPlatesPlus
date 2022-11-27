@@ -9,7 +9,6 @@ local data = core.data;
 -- Loading settings
 ----------------------------------------
 function func:Load_Settings()
-
     ----------------------------------------
     -- First time launch settings
     ----------------------------------------

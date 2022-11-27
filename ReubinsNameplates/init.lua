@@ -100,7 +100,7 @@ function core:init(event, ...)
     or event == "UNIT_SPELLCAST_CHANNEL_START"
     or event == "UNIT_SPELLCAST_DELAYED"
     or event == "UNIT_SPELLCAST_CHANNEL_UPDATE" then
-        func:Castbar_Start(arg);
+        func:Castbar_Start(event, arg);
     end
     if event == "UNIT_SPELLCAST_STOP"
     or event == "UNIT_SPELLCAST_CHANNEL_STOP"
@@ -112,6 +112,28 @@ function core:init(event, ...)
     end
     if event == "RAID_TARGET_UPDATE" then
         func:RaidTargetIndex();
+    end
+    if event == "UPDATE_SHAPESHIFT_FORM" then
+        local nameplates = C_NamePlate.GetNamePlates();
+
+        if nameplates then
+            for k,v in pairs(nameplates) do
+                if k then
+                    local UnitFrame = v.UnitFrame;
+                    local inInstance, instanceType = IsInInstance();
+                    local unit = v.unitFrame.unit;
+
+                    -- Hiding Blizzard's nemplates for enemies inside dungeons
+                    if inInstance and (instanceType == "party" or instanceType == "raid") then
+                        if not UnitPlayerOrPetInParty(unit) then
+                            UnitFrame:Hide();
+                        end
+                    else
+                        UnitFrame:Hide();
+                    end
+                end
+            end
+        end
     end
 end
 
@@ -183,6 +205,7 @@ events:RegisterEvent("MODIFIER_STATE_CHANGED");
 events:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
 events:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
 events:RegisterEvent("RAID_TARGET_UPDATE");
+events:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
 
 -- Castbar events
 events:RegisterEvent("UNIT_SPELLCAST_START");
