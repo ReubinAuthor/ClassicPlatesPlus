@@ -72,15 +72,15 @@ function func:ResizeNameplates()
 end
 
 ----------------------------------------
--- Hook NamePlateDriverFrame to hide default nameplates
+-- Hooking NamePlateDriverFrame
 ----------------------------------------
+-- Hiding default nameplates
 hooksecurefunc(NamePlateDriverFrame,"OnNamePlateAdded", function(functions, unit)
     local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
     if nameplate then
         local inInstance, instanceType = IsInInstance();
 
-        -- Hiding Blizzard's nemplates for enemies inside dungeons
         if inInstance and (instanceType == "party" or instanceType == "raid") then
             if not UnitPlayerOrPetInParty(unit) then
                 nameplate.UnitFrame:Hide();
@@ -91,30 +91,8 @@ hooksecurefunc(NamePlateDriverFrame,"OnNamePlateAdded", function(functions, unit
     end
 end);
 
+-- Resizing clickable base
 hooksecurefunc(NamePlateDriverFrame,"ApplyFrameOptions", function(functions, nameplateFrame)
-    local inInstance, instanceType = IsInInstance();
-
-    -- Hiding Blizzard's namepaltes
-    if nameplateFrame then
-        if nameplateFrame.unitFrame then
-            local unit = nameplateFrame.unitFrame.unit;
-
-            if unit then
-                local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
-
-                if inInstance and (instanceType == "party" or instanceType == "raid") then
-                    if not UnitPlayerOrPetInParty(unit) then
-                        nameplate.UnitFrame:Hide();
-                    end
-                else
-                    nameplate.UnitFrame:Hide();
-                end
-            end
-
-        end
-    end
-
-    -- Resizing nameplate's clickable base
     func:ResizeNameplates()
 end);
 
@@ -142,7 +120,6 @@ end
 ----------------------------------------
 -- Mouseover check
 ----------------------------------------
-
 function func:MouseoverCheck(unitFrame)
     local border = data.colors.nameplateBorder;
     local nameDefault = data.colors.nameDefault;
@@ -486,7 +463,9 @@ function func:Update_Powerbar(unit)
             -- Show or hide highlight
             -- If powerbar is shown
             if power and powerMax > 0 then
-                unitFrame.powerbar.statusbar:SetStatusBarColor(color.r, color.g, color.b);
+                if color then
+                    unitFrame.powerbar.statusbar:SetStatusBarColor(color.r, color.g, color.b);
+                end
                 unitFrame.powerbar.statusbar:SetMinMaxValues(0, powerMax);
                 unitFrame.powerbar.statusbar:SetValue(power);
                 unitFrame.powerbar:SetShown(ReubinsNameplates_settings.Powerbar);

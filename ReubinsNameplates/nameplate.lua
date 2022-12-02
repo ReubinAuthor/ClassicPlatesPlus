@@ -6,6 +6,13 @@ local func = core.func;
 local data = core.data;
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC;
 
+--[[ TO DO LIST
+    Add new icon (tanking one) to "Theat icon" when tank mode is disabled.
+    Add important auras warnings
+
+    ...Down the line check Retail compatability.
+]]
+
 ----------------------------------------
 -- Creating nameplate
 ----------------------------------------

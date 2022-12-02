@@ -31,6 +31,7 @@ function func:Update_ThreatIcon(unit)
 
             if toggle then
                 local notPlayerOrPet = not UnitIsPlayer(unit) and not UnitIsOtherPlayersPet(unit);
+                local iAmTanking = UnitDetailedThreatSituation("player", unit);
                 local icon = unitFrame.threat.icon.texture;
                 local animation = unitFrame.threat.animation;
 
@@ -42,8 +43,6 @@ function func:Update_ThreatIcon(unit)
 
                     -- Tank mode Activated
                     if ReubinsNameplates_settings.TankMode then
-                        local iAmTanking = UnitDetailedThreatSituation("player", unit);
-
                         local function otherTank()
                             for k in pairs(data.tanks) do
                                 if k then
@@ -78,10 +77,17 @@ function func:Update_ThreatIcon(unit)
                     else
                         local treatPercentage = UnitThreatPercentageOfLead("player",unit)
 
-                        -- Swapping icon
-                        icon:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\icons\\aggro");
+                        if iAmTanking then
+                            -- Swapping icon
+                            icon:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\icons\\pulled");
 
-                        if treatPercentage then
+                            icon:SetVertexColor(data.colors.red.r, data.colors.red.g, data.colors.red.b);
+                            unitFrame.threat.color = "red";
+                            frame:SetShown(toggle);
+                        elseif treatPercentage then
+                            -- Swapping icon
+                            icon:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\icons\\aggro");
+
                             if treatPercentage >= 100 then
                                 icon:SetVertexColor(data.colors.red.r, data.colors.red.g, data.colors.red.b);
                                 unitFrame.threat.color = "red";

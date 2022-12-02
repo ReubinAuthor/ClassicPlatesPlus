@@ -592,7 +592,6 @@ function func:Load_Settings()
         func:BlacklistedAuras();
 
         -----> Updating nameplates <-----
-
         local nameplates = C_NamePlate.GetNamePlates();
         if nameplates then
             for k,v in pairs(nameplates) do
