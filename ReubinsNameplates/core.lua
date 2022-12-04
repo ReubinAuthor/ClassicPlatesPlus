@@ -118,6 +118,50 @@ function func:CVars(event)
 end
 
 ----------------------------------------
+-- Coloring names
+----------------------------------------
+function func:ColorName(unit)
+
+    local function PaintNames(unit, unitFrame)
+        if unit and unitFrame then
+            if UnitIsPlayer(unit) then
+                if IsGuildMember(unit) and UnitInParty(unit) then
+                    unitFrame.name:SetTextColor(1, 0.75, 1);
+                elseif UnitInParty(unit) then
+                    unitFrame.name:SetTextColor(0, 0.9, 1);
+                elseif IsGuildMember(unit) then
+                    unitFrame.name:SetTextColor(0, 1, 0);
+                else
+                    unitFrame.name:SetTextColor(1, 1, 1);
+                end
+            elseif UnitIsFriend("player", unit) then
+                unitFrame.name:SetTextColor(1, 1, 1);
+            elseif UnitIsTapDenied(unit) then
+                unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
+            else
+                unitFrame.name:SetTextColor(1, 1, 1);
+            end
+        end
+    end
+
+    if unit then
+        local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+        if nameplate then
+            PaintNames(unit, nameplate.unitFrame);
+        end
+    else
+        local nameplates = C_NamePlate.GetNamePlates();
+        if nameplates then
+            for k,v in pairs(nameplates) do
+                if k then
+                    PaintNames(v.unitFrame.unit, v.unitframe);
+                end
+            end
+        end
+    end
+end
+
+----------------------------------------
 -- Mouseover check
 ----------------------------------------
 function func:MouseoverCheck(unitFrame)
@@ -138,15 +182,8 @@ function func:MouseoverCheck(unitFrame)
                 unitFrame.healthbar_highlight:Show();
                 unitFrame.mouseover = 1;
             else
-                if not UnitIsTapDenied(unit) then
-                    unitFrame.name:SetTextColor(nameDefault.r, nameDefault.g, nameDefault.b);
-                else
-                    if UnitIsFriend("player", unit) then
-                        unitFrame.name:SetTextColor(nameDefault.r, nameDefault.g, nameDefault.b);
-                    else
-                        unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
-                    end
-                end
+                -- color name
+                func:ColorName(unit);
 
                 unitFrame.border:SetVertexColor(border.r, border.g, border.b);
                 unitFrame.portrait.border:SetVertexColor(border.r, border.g, border.b);
@@ -180,22 +217,13 @@ function func:Mouseover()
                     unitFrame.portrait.border:SetVertexColor(border.r + 0.18, border.g + 0.18, border.b + 0.18);
                     unitFrame.powerbar.border:SetVertexColor(border.r + 0.18, border.g + 0.18, border.b + 0.18);
                     unitFrame.threat.percentage.border:SetVertexColor(border.r + 0.18, border.g + 0.18, border.b + 0.18);
-                    unitFrame.healthbar_highlight:Show();
+                    unitFrame.healthbar_highlight:Show(); 
                     unitFrame.mouseover = 1;
                 else
                     local unit = unitFrame.unit;
 
-                    if unit then
-                        if not UnitIsTapDenied(unit) then
-                            unitFrame.name:SetTextColor(nameDefault.r, nameDefault.g, nameDefault.b);
-                        else
-                            if UnitIsFriend("player", unit) then
-                                unitFrame.name:SetTextColor(nameDefault.r, nameDefault.g, nameDefault.b);
-                            else
-                                unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
-                            end
-                        end
-                    end
+                    -- color name
+                    func:ColorName(unit);
 
                     unitFrame.border:SetVertexColor(border.r, border.g, border.b);
                     unitFrame.portrait.border:SetVertexColor(border.r, border.g, border.b);
@@ -215,7 +243,9 @@ function func:Mouseover()
                     local unitFrame = v.unitFrame;
 
                     if unitFrame.mouseover and not unitFrame.selected then
-                        unitFrame.name:SetTextColor(nameDefault.r, nameDefault.g, nameDefault.b);
+                        -- color name
+                        func:ColorName(unitFrame.unit);
+
                         unitFrame.border:SetVertexColor(border.r, border.g, border.b);
                         unitFrame.portrait.border:SetVertexColor(border.r, border.g, border.b);
                         unitFrame.powerbar.border:SetVertexColor(border.r, border.g, border.b);
@@ -242,17 +272,8 @@ function func:Selected()
         if not UnitExists("mouseover") then
             local unit = unitFrame.unit;
 
-            if unit then
-                if unitFrame.unit and not UnitIsTapDenied(unit) then
-                    unitFrame.name:SetTextColor(nameDefault.r, nameDefault.g, nameDefault.b);
-                else
-                    if UnitIsFriend("player", unit) then
-                        unitFrame.name:SetTextColor(nameDefault.r, nameDefault.g, nameDefault.b);
-                    else
-                        unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
-                    end
-                end
-            end
+            -- color name
+            func:ColorName(unit);
 
             unitFrame.border:SetVertexColor(border.r, border.g, border.b);
             unitFrame.portrait.border:SetVertexColor(border.r, border.g, border.b);

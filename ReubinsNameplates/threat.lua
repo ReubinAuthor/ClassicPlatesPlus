@@ -151,53 +151,53 @@ function func:Update_ThreatPercentage(unit)
 
                     if ReubinsNameplates_settings.TankMode then
                         if treatPercentage >= 200 then
-                            background:SetVertexColor(0, 1, 0); -- 1 Green
+                            background:SetVertexColor(0, 1, 0); ----- >= 200% (Green)
                         elseif treatPercentage < 100 then
-                            background:SetVertexColor(1, 0, 0); -- 12 Red
+                            background:SetVertexColor(1, 0, 0); ----- < 100% (Red)
                         elseif treatPercentage < 110 then
-                            background:SetVertexColor(1, 0.23, 0); -- 11
+                            background:SetVertexColor(1, 0.23, 0); -- < 110%
                         elseif treatPercentage < 120 then
-                            background:SetVertexColor(1, 0.34, 0); -- 10
+                            background:SetVertexColor(1, 0.34, 0); -- < 120%
                         elseif treatPercentage < 130 then
-                            background:SetVertexColor(1, 0.44, 0); -- 9
+                            background:SetVertexColor(1, 0.44, 0); -- < 130%
                         elseif treatPercentage < 140 then
-                            background:SetVertexColor(1, 0.55, 0); -- 8
+                            background:SetVertexColor(1, 0.55, 0); -- < 140%
                         elseif treatPercentage < 150 then
-                            background:SetVertexColor(1, 0.69, 0); -- 7
+                            background:SetVertexColor(1, 0.69, 0); -- < 150%
                         elseif treatPercentage < 160 then
-                            background:SetVertexColor(1, 0.83, 0); -- 6
+                            background:SetVertexColor(1, 0.83, 0); -- < 160%
                         elseif treatPercentage < 170 then
-                            background:SetVertexColor(1, 0.95, 0); -- 5
+                            background:SetVertexColor(1, 0.95, 0); -- < 170%
                         elseif treatPercentage < 180 then
-                            background:SetVertexColor(0.94, 1, 0); -- 4
+                            background:SetVertexColor(0.94, 1, 0); -- < 180%
                         elseif treatPercentage < 190 then
-                            background:SetVertexColor(0.79, 1, 0); -- 3
+                            background:SetVertexColor(0.79, 1, 0); -- < 190%
                         elseif treatPercentage < 200 then
-                            background:SetVertexColor(0.56, 1, 0); -- 2
+                            background:SetVertexColor(0.56, 1, 0); -- < 200%
                         end
                     else
                         if treatPercentage >= 100 then
-                            background:SetVertexColor(1, 0, 0); -- 10 Red
+                            background:SetVertexColor(1, 0, 0); ----- >= 100% (Red)
                         elseif treatPercentage >= 90 then
-                            background:SetVertexColor(1, 0.27, 0); -- 9
+                            background:SetVertexColor(1, 0.27, 0); -- >= 90%
                         elseif treatPercentage >= 80 then
-                            background:SetVertexColor(1, 0.39, 0); -- 8
+                            background:SetVertexColor(1, 0.39, 0); -- >= 80%
                         elseif treatPercentage >= 70 then
-                            background:SetVertexColor(1, 0.53, 0); -- 7
+                            background:SetVertexColor(1, 0.53, 0); -- >= 70%
                         elseif treatPercentage >= 60 then
-                            background:SetVertexColor(1, 0.67, 0); -- 6
+                            background:SetVertexColor(1, 0.67, 0); -- >= 60%
                         elseif treatPercentage >= 50 then
-                            background:SetVertexColor(1, 0.84, 0); -- 5
+                            background:SetVertexColor(1, 0.84, 0); -- >= 50%
                         elseif treatPercentage >= 40 then
-                            background:SetVertexColor(1, 0.98, 0); -- 4
+                            background:SetVertexColor(1, 0.98, 0); -- >= 40%
                         elseif treatPercentage >= 30 then
-                            background:SetVertexColor(0.88, 1, 0); -- 3
+                            background:SetVertexColor(0.88, 1, 0); -- >= 30%
                         elseif treatPercentage >= 20 then
-                            background:SetVertexColor(0.63, 1, 0); -- 2
+                            background:SetVertexColor(0.63, 1, 0); -- >= 20%
                         elseif treatPercentage >= 10 then
-                            background:SetVertexColor(0, 1, 0); -- 1
+                            background:SetVertexColor(0, 1, 0); ----- >= 10%
                         elseif treatPercentage >= 0 then
-                            background:SetVertexColor(0, 1, 0); -- 0 Green
+                            background:SetVertexColor(0, 1, 0); ----- >= 0% (Green)
                         end
                     end
 
