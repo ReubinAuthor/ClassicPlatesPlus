@@ -144,8 +144,13 @@ function func:Nameplate_Created(nameplate)
         -- Threat animation scale
         local scaleAnimation = unitFrame.threat.animation:CreateAnimation("Scale");
         scaleAnimation:SetDuration(0.25);
-        scaleAnimation:SetFromScale(2, 2);
-        scaleAnimation:SetToScale(1, 1);
+        if isClassic then
+            scaleAnimation:SetFromScale(2, 2);
+            scaleAnimation:SetToScale(1, 1);
+        else
+            scaleAnimation:SetScaleFrom(2, 2);
+            scaleAnimation:SetScaleTo(1, 1);
+        end
         unitFrame.threat.animation:Stop();
 
         -- Threat percentage
@@ -288,7 +293,7 @@ function func:Nameplate_Added(unit)
 
             -- Portrait border (texture)
             unitFrame.portrait.border:SetParent(unitFrame.portrait);
-            unitFrame.portrait.border:SetPoint("right", unitFrame.border, "left", 78, 0);
+            unitFrame.portrait.border:SetPoint("right", unitFrame.border, "left", 79, 0);
             unitFrame.portrait.border:SetDrawLayer("border", 2);
 
             -- Classification (texture)
@@ -528,15 +533,25 @@ function func:Nameplate_Added(unit)
             -- Raid target animation scale
             unitFrame.raidTarget.animation.scale1 = unitFrame.raidTarget.animation:CreateAnimation("Scale");
             unitFrame.raidTarget.animation.scale1:SetDuration(0.13);
-            unitFrame.raidTarget.animation.scale1:SetFromScale(0,0);
-            unitFrame.raidTarget.animation.scale1:SetToScale(1.15, 1.15);
+            if isClassic then
+                unitFrame.raidTarget.animation.scale1:SetFromScale(0,0);
+                unitFrame.raidTarget.animation.scale1:SetToScale(1.15, 1.15);
+            else
+                unitFrame.raidTarget.animation.scale1:SetScaleFrom(0,0);
+                unitFrame.raidTarget.animation.scale1:SetScaleTo(1.15, 1.15);
+            end
             unitFrame.raidTarget.animation.scale1:SetSmoothing("out")
 
             unitFrame.raidTarget.animation.scale2 = unitFrame.raidTarget.animation:CreateAnimation("Scale");
             unitFrame.raidTarget.animation.scale2:SetStartDelay(0.13);
             unitFrame.raidTarget.animation.scale2:SetDuration(0.13);
-            unitFrame.raidTarget.animation.scale2:SetFromScale(1.15, 1.15);
-            unitFrame.raidTarget.animation.scale2:SetToScale(1, 1);
+            if isClassic then
+                unitFrame.raidTarget.animation.scale2:SetFromScale(1.15, 1.15);
+                unitFrame.raidTarget.animation.scale2:SetToScale(1, 1);
+            else
+                unitFrame.raidTarget.animation.scale2:SetScaleFrom(1.15, 1.15);
+                unitFrame.raidTarget.animation.scale2:SetScaleTo(1, 1);
+            end
             unitFrame.raidTarget.animation.scale2:SetSmoothing("in")
 
             -- Adding nameplate
@@ -563,7 +578,7 @@ function func:Nameplate_Added(unit)
             func:Castbar_Start(event, unit);
             func:RaidTargetIndex();
 
-            -- Scripts
+            -----> Scripts <-----
             local timeElapsed1, timeElapsed2 = 0, 0;
             unitFrame:SetScript("OnUpdate", function(self, elapsed)
 
@@ -574,7 +589,7 @@ function func:Nameplate_Added(unit)
                     func:Highlight(unitFrame);
                 end
 
-                -- Threat icon
+                --[[ Threat icon
                 timeElapsed2 = timeElapsed2 + elapsed;
                 if timeElapsed2 > 1 then
                     timeElapsed2 = 0;
@@ -583,7 +598,7 @@ function func:Nameplate_Added(unit)
                             func:Update_ThreatIcon(unit);
                         end
                     end
-                end
+                end]]
             end);
 
             -- Hiding default nameplates

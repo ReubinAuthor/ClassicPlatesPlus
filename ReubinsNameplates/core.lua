@@ -128,7 +128,7 @@ function func:ColorName(unit)
                 if IsGuildMember(unit) and UnitInParty(unit) then
                     unitFrame.name:SetTextColor(1, 0.75, 1);
                 elseif UnitInParty(unit) then
-                    unitFrame.name:SetTextColor(0, 0.9, 1);
+                    unitFrame.name:SetTextColor(0.2, 1, 1);
                 elseif IsGuildMember(unit) then
                     unitFrame.name:SetTextColor(0, 1, 0);
                 else

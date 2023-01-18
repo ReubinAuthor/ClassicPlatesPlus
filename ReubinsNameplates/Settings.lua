@@ -112,18 +112,29 @@ function func:Load_Settings()
     ----------------------------------------
     -- Create a frame to use as the panel
     local panel = CreateFrame("frame", myAddon .. "Settings");
+    
+    panel.icon = panel:CreateTexture();
+    panel.icon:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\icons\\ReubinsNameplates_icon");
+    panel.icon:SetSize(16, 16);
+
     panel.name = myAddon;
+    
+    -- Icon
+    icon = panel:CreateTexture();
+    icon:SetPoint("topLeft", 16, -16);
+    icon:SetTexture("Interface\\addons\\ReubinsNameplates\\media\\icons\\ReubinsNameplates_icon");
+    icon:SetSize(20, 20);
 
     -- Title
     local title = panel:CreateFontString(myAddon .. "Settings_title", "overlay", "GameFontNormalLarge");
-    title:SetPoint("topLeft", 16, -16);
+    title:SetPoint("left", icon, "right", 6, 0);
     title:SetText("Reubin's Nameplates");
 
     -----> General <-----
 
     -- SubTitle: General
     local SubTitle_General = panel:CreateFontString(myAddon .. "SubTitle_General", "overlay", "GameFontNormal");
-    SubTitle_General:SetPoint("topLeft", myAddon.."Settings_title", "bottomLeft", 0, -16);
+    SubTitle_General:SetPoint("topLeft", icon, "bottomLeft", 0, -16);
     SubTitle_General:SetText("General");
 
     -- CheckButton: Powerbar
