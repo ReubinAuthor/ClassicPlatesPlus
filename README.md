@@ -25,6 +25,10 @@ Grab it on [CurseForge](https://www.curseforge.com/wow/addons/classicplatesplus)
 
 <br />
 
+![pic7](https://github.com/ReubinAuthor/ClassicPlatesPlus/assets/82573908/f36fe40d-330a-4b47-9abc-d0524227074d)
+
+<br />
+
 ![pic1](https://github.com/ReubinAuthor/ClassicPlates-Plus/assets/82573908/9e5945fd-3baf-41b4-b2db-471c783db571)
 
 <br />
