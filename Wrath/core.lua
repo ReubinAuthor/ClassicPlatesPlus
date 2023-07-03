@@ -608,14 +608,14 @@ end
 -- Update combo points
 ----------------------------------------
 function func:Update_ComboPoints(unit)
-    if unit == "player" then
+    if unit == "player" or unit == "vehicle" then
         local nameplates = C_NamePlate.GetNamePlates();
 
         if nameplates then
             for k,v in pairs(nameplates) do
                 if k then
                     local unitFrame = v.unitFrame;
-                    local comboPoints = GetComboPoints("player", v.unitFrame.unit);
+                    local comboPoints = GetComboPoints(unit, v.unitFrame.unit);
 
                     if comboPoints > 0 then
                         for i = 1, 10 do

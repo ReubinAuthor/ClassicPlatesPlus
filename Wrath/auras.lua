@@ -72,7 +72,7 @@ function func:Update_Auras(unit)
 
                         if name then
                             local hidePassive = not (hidePassiveAuras and duration == 0);
-                            local show = (AurasShow == 1 and source == "player") or AurasShow == 2;
+                            local show = (AurasShow == 1 and (source == "player" or source == "vehicle")) or AurasShow == 2;
 
                             if (hidePassive and show or data.AurasImportantList[name]) and not data.AurasBlacklist[name] then
                                 if not unitFrame[auraType][i] then
