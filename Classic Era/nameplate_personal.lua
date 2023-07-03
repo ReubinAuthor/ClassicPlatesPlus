@@ -262,16 +262,24 @@ function func:PersonalNameplate()
         data.nameplate.druidsBarValue:SetScale(0.9 + scaleOffset);
 
         -- Animation
+        local function combatCheck()
+            if InCombatLockdown() then
+                return 1;
+            else
+                return 0.4;
+            end
+        end
+
         data.nameplate.animationShow = data.nameplate:CreateAnimationGroup();
         data.nameplate.animationShow.alpha = data.nameplate.animationShow:CreateAnimation("Alpha");
         data.nameplate.animationShow.alpha:SetDuration(0.18);
         data.nameplate.animationShow.alpha:SetFromAlpha(0);
-        data.nameplate.animationShow.alpha:SetToAlpha(1);
+        data.nameplate.animationShow.alpha:SetToAlpha(combatCheck());
 
         data.nameplate.animationHide = data.nameplate:CreateAnimationGroup();
         data.nameplate.animationHide.alpha = data.nameplate.animationHide:CreateAnimation("Alpha");
         data.nameplate.animationHide.alpha:SetDuration(0.18);
-        data.nameplate.animationHide.alpha:SetFromAlpha(1);
+        data.nameplate.animationHide.alpha:SetFromAlpha(combatCheck());
         data.nameplate.animationHide.alpha:SetToAlpha(0);
 
         data.nameplate:SetScript("OnShow", function(self)
@@ -365,48 +373,62 @@ end
 ----------------------------------------
 -- togle own nameplate
 ----------------------------------------
-function func:ToggleNameplatePersonal()
+function func:ToggleNameplatePersonal(event)
     if Config.PersonalNameplate then
         local _, _, classID = UnitClass("player");
         local powerType = UnitPowerType("player");
 
-        if UnitIsDeadOrGhost("player") then
-            data.nameplate.animationHide:Play();
-        elseif classID == 11 then
-            if powerType == 1 then
-                if UnitPower("player") == 0
-                and UnitHealth("player") == UnitHealthMax("player")
-                and UnitPower("player", 0) == UnitPowerMax("player", 0)
-                then
-                    data.nameplate.animationHide:Play();
-                else
-                    data.nameplate:Show();
-                end
-            elseif powerType == 3 then
-                if UnitPower("player") == UnitPowerMax("player")
-                and UnitHealth("player") == UnitHealthMax("player")
-                and UnitPower("player", 0) == UnitPowerMax("player", 0)
-                then
-                    data.nameplate.animationHide:Play();
-                else
-                    data.nameplate:Show();
-                end
-            else
-                if UnitPower("player") == UnitPowerMax("player")
-                and UnitHealth("player") == UnitHealthMax("player")
-                then
-                    data.nameplate.animationHide:Play();
-                else
-                    data.nameplate:Show();
-                end
-            end
+        if InCombatLockdown() or event == "PLAYER_REGEN_DISABLED" then
+            data.nameplate:SetAlpha(1);
+            data.nameplate:Show();
         else
-            if UnitPower("player") == UnitPowerMax("player")
-            and UnitHealth("player") == UnitHealthMax("player")
-            then
+            data.nameplate:SetAlpha(0.4);
+
+            if UnitIsDeadOrGhost("player") then
                 data.nameplate.animationHide:Play();
+            elseif classID == 11 then
+                if powerType == 1 then
+                    if UnitPower("player") == 0
+                    and UnitHealth("player") == UnitHealthMax("player")
+                    and UnitPower("player", 0) == UnitPowerMax("player", 0)
+                    then
+                        data.nameplate.animationHide:Play();
+                    else
+                        data.nameplate:Show();
+                    end
+                elseif powerType == 3 then
+                    if UnitPower("player") == UnitPowerMax("player")
+                    and UnitHealth("player") == UnitHealthMax("player")
+                    and UnitPower("player", 0) == UnitPowerMax("player", 0)
+                    then
+                        data.nameplate.animationHide:Play();
+                    else
+                        data.nameplate:Show();
+                    end
+                else
+                    if UnitPower("player") == UnitPowerMax("player")
+                    and UnitHealth("player") == UnitHealthMax("player")
+                    then
+                        data.nameplate.animationHide:Play();
+                    else
+                        data.nameplate:Show();
+                    end
+                end
+            elseif classID == 1 then
+                if UnitPower("player") <= 0
+                and UnitHealth("player") == UnitHealthMax("player") then
+                    data.nameplate.animationHide:Play();
+                else
+                    data.nameplate:Show();
+                end
             else
-                data.nameplate:Show();
+                if UnitPower("player") == UnitPowerMax("player")
+                and UnitHealth("player") == UnitHealthMax("player")
+                then
+                    data.nameplate.animationHide:Play();
+                else
+                    data.nameplate:Show();
+                end
             end
         end
     else

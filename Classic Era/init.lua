@@ -174,6 +174,11 @@ function core:init(event, ...)
         end
     end
 
+    if event == "PLAYER_REGEN_ENABLED"
+    or event == "PLAYER_REGEN_DISABLED" then
+        func:ToggleNameplatePersonal(event);
+    end
+
     if event == "MODIFIER_STATE_CHANGED" then
         local key, down = ...;
 
