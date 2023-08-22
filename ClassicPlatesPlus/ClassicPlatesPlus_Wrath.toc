@@ -1,0 +1,19 @@
+## Interface: 30402
+## Title: |TInterface/Addons/ClassicPlatesPlus/media/icons/ClassicPlatesPlus_icon:16:16|t ClassicPlates Plus
+## Notes: ClassicPlates Plus is an addon that adds additional features and new Classic-themed visuals to nameplates.
+## Author: Reubin
+## Version: 3.1.0
+## DefaultState: enabled
+## SavedVariables: ConfigAccount
+## SavedVariablesPerCharacter: Config
+
+core.lua
+init.lua
+nameplate_created.lua
+nameplate_added.lua
+nameplate_removed.lua
+nameplate_personal.lua
+auras.lua
+threat.lua
+settings_functions.lua
+settings.lua
