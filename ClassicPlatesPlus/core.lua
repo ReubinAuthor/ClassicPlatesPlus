@@ -47,9 +47,10 @@ function func:CVars(event)
         SetCVar("nameplateMaxScale", 1.0);
         SetCVar("nameplateMinScaleDistance", 10);
         SetCVar("nameplateMaxScaleDistance", 10);
+        SetCVar("nameplateMinAlpha", 1);
 
         -- Selected
-        SetCVar("nameplateNotSelectedAlpha", 0.5);
+        SetCVar("nameplateNotSelectedAlpha", 1.0);
         SetCVar("nameplateSelectedAlpha", 1.0);
         SetCVar("nameplateSelectedScale", 1.2);
 
@@ -70,6 +71,7 @@ function func:CVars(event)
         SetCVar("nameplateMaxScale", 1.0);
         SetCVar("nameplateMinScaleDistance", 10);
         SetCVar("nameplateMaxScaleDistance", 10);
+        SetCVar("nameplateMinAlpha", 0.6);
 
         -- Selected
         SetCVar("nameplateNotSelectedAlpha", 0.5);
@@ -387,24 +389,6 @@ function func:formatTime(value)
 end
 
 ----------------------------------------
--- Set Scale
-----------------------------------------
-function func:SetScaleFrom(frame, a, b)
-    if data.isClassic then
-        frame:SetFromScale(a,b);
-    else
-        frame:SetScaleFrom(a,b);
-    end
-end
-function func:SetScaleTo(frame, a, b)
-    if data.isClassic then
-        frame:SetToScale(a,b);
-    else
-        frame:SetScaleTo(a,b);
-    end
-end
-
-----------------------------------------
 -- Get unit color
 ----------------------------------------
 function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
@@ -417,30 +401,16 @@ function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
     local classColor = RAID_CLASS_COLORS[englishClass];
     local r,g,b = UnitSelectionColor(unit, true);
 
-    if not ThreatPercentageOfLead then
-        ThreatPercentageOfLead = UnitThreatPercentageOfLead("player", unit);
-    end
-
-    if not status then
-        status = UnitThreatSituation("player", unit);
-    end
+    ThreatPercentageOfLead = ThreatPercentageOfLead or UnitThreatPercentageOfLead("player", unit);
+    status = status or UnitThreatSituation("player", unit);
 
     local function getLighterColor(value, r,g,b)
         local percentage = 200 - value;
-
-        if percentage > 100 then
-            percentage = 100;
-        elseif percentage < 0 then
-            percentage = 0;
-        end
+        percentage = math.min(100, math.max(0, percentage))
 
         local function addPercentage(number, percentage)
             local result = number + (percentage / 150);
-            if result > 1 then
-                result = 1;
-            elseif result < 0 then
-                result = 0;
-            end
+            result = math.min(1, math.max(0, result))
 
             return result;
         end
@@ -467,12 +437,11 @@ function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
             return getDefault();
         else
             if status == 2 or status == 3 then
-                if not IsInGroup() and ThreatPercentageOfLead == 0 then
+                if ThreatPercentageOfLead == 0 then
                     return Config.ThreatAggroColor.r, Config.ThreatAggroColor.g, Config.ThreatAggroColor.b;
                 else
                     return getLighterColor(ThreatPercentageOfLead, Config.ThreatAggroColor.r, Config.ThreatAggroColor.g, Config.ThreatAggroColor.b);
                 end
-                return getLighterColor(ThreatPercentageOfLead, Config.ThreatAggroColor.r, Config.ThreatAggroColor.g, Config.ThreatAggroColor.b);
             elseif status == 1 or (ThreatPercentageOfLead and ThreatPercentageOfLead > Config.ThreatWarningThreshold) then
                 return Config.ThreatWarningColor.r, Config.ThreatWarningColor.g, Config.ThreatWarningColor.b;
             elseif GetPartyAssignment("MainTank", "player", true) and func:OtherTank(unit) then
@@ -495,6 +464,68 @@ function func:Update_Colors(unit)
     local function work(unitFrame, unit)
         local r,g,b = func:GetUnitColor(unit);
         local Rs,Gs,Bs = UnitSelectionColor(unit, true);
+        local Rb,Gb,Bb = data.colors.border.r, data.colors.border.g, data.colors.border.b;
+        local target = UnitIsUnit(unit, "target");
+
+        --[[if UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
+            if UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit) then
+                r,g,b = Rs, Gs, Bs;
+            else
+                r,g,b = color.r, color.g, color.b;
+            end
+        elseif UnitIsFriend(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
+            if UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit) then
+                r,g,b = Rs, Gs, Bs;
+            else
+                r,g,b = color.r, color.g, color.b;
+            end
+        else
+            r,g,b = color.r, color.g, color.b;
+        end
+
+        if (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) and (UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit)) then
+            local R2,G2,B2 = Rs,Gs,Bs;
+
+            if UnitIsFriend(unit, "player") and string.format("%.2f", Rs) ~= "0.38" then
+                R2,G2,B2 = 0, 0.85, 0;
+            end
+
+            unitFrame.portrait.highlight:SetVertexColor(R2,G2,B2);
+            unitFrame.healthbar.highlight:SetVertexColor(R2,G2,B2);
+            unitFrame.level.highlight:SetVertexColor(R2,G2,B2);
+            unitFrame.powerbar.highlight:SetVertexColor(R2,G2,B2);
+        else
+            unitFrame.portrait.highlight:SetVertexColor(Rb,Gb,Bb);
+            unitFrame.healthbar.highlight:SetVertexColor(Rb,Gb,Bb);
+            unitFrame.level.highlight:SetVertexColor(Rb,Gb,Bb);
+            unitFrame.powerbar.highlight:SetVertexColor(Rb,Gb,Bb);
+        end
+
+        if UnitIsEnemy(unit, "player") and UnitIsTapDenied(unit) then
+            unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
+            unitFrame.guild:SetTextColor(0.5, 0.5, 0.5);
+        else
+            unitFrame.name:SetTextColor(Rs, Gs, Bs);
+            unitFrame.guild:SetTextColor(Rs, Gs, Bs);
+        end
+
+        if Config.FadeUnselected then
+            if not UnitExists("target") then
+                unitFrame:SetAlpha(1);
+            elseif target then
+                unitFrame:SetAlpha(1);
+            else
+                unitFrame:SetAlpha(Config.FadeIntensity);
+            end
+        else
+            unitFrame:SetAlpha(1);
+        end
+
+        -- Toggling highlights:
+        unitFrame.portrait.highlight:SetShown(Config.ShowHighlight and target and unitFrame.portrait:IsShown());
+        unitFrame.healthbar.highlight:SetShown(Config.ShowHighlight and target);
+        unitFrame.level.highlight:SetShown(Config.ShowHighlight and target and unitFrame.level:IsShown());
+        unitFrame.powerbar.highlight:SetShown(Config.ShowHighlight and target and unitFrame.powerbar:IsShown());]]
 
         if UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
             if UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit) then
@@ -512,6 +543,15 @@ function func:Update_Colors(unit)
             r,g,b = color.r, color.g, color.b;
         end
 
+        -- Coloring name and guild
+        if UnitIsEnemy(unit, "player") and UnitIsTapDenied(unit) then
+            unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
+            unitFrame.guild:SetTextColor(0.5, 0.5, 0.5);
+        else
+            unitFrame.name:SetTextColor(Rs, Gs, Bs);
+            unitFrame.guild:SetTextColor(Rs, Gs, Bs);
+        end
+
         -- Coloring borders
         if UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) and (UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit)) then
             unitFrame.portrait.border:SetVertexColor(Rs, Gs, Bs);
@@ -527,12 +567,17 @@ function func:Update_Colors(unit)
             unitFrame.threatPercentage.border:SetVertexColor(r,g,b);
         end
 
-        if UnitIsEnemy(unit, "player") and UnitIsTapDenied(unit) then
-            unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
-            unitFrame.guild:SetTextColor(0.5, 0.5, 0.5);
+        -- Fade
+        if Config.FadeUnselected then
+            if not UnitExists("target") then
+                unitFrame:SetAlpha(1);
+            elseif target then
+                unitFrame:SetAlpha(1);
+            else
+                unitFrame:SetAlpha(Config.FadeIntensity);
+            end
         else
-            unitFrame.name:SetTextColor(Rs, Gs, Bs);
-            unitFrame.guild:SetTextColor(Rs, Gs, Bs);
+            unitFrame:SetAlpha(1);
         end
 
         -- Coloring healthbar background
@@ -561,6 +606,70 @@ function func:Update_Colors(unit)
 end
 
 ----------------------------------------
+-- Update Quests
+----------------------------------------
+function func:Update_quests(unit)
+    local function work(unit)
+        local TooltipData = C_TooltipInfo.GetUnit(unit);
+
+        local function getQuestTitle()
+            local count = 0;
+            local pattern1 = "(%d+)/(%d+)";
+            local pattern2 = "(%d+)%%";
+            local PatternThreat = "(%d+)%%%s*Threat";
+
+            for k,v in pairs(TooltipData) do
+                if k == "lines" then
+                    for k,v in ipairs(v) do
+                        if k and v.leftText then
+                            local match1, match2 = v.leftText:match(pattern1);
+                            local percentage = v.leftText:match(pattern2);
+                            local threat = v.leftText:match(PatternThreat);
+
+
+                            if match1 and match2 then
+                                if match1 ~= match2 then
+                                    count = count + 1;
+                                end
+                            elseif percentage and not threat then
+                                if tonumber(percentage) < 100 then
+                                    count = count + 1;
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            if count > 0 then
+                return true;
+            end
+        end
+
+        local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+
+        if nameplate then
+            nameplate.unitFrame.quest:SetShown(getQuestTitle());
+        end
+    end
+
+
+    if unit then
+        work(unit)
+    else
+        local nameplates = C_NamePlate.GetNamePlates();
+
+        if nameplates then
+            for k,v in pairs(nameplates) do
+                if k and v.unitFrame.unit then
+                    work(v.unitFrame.unit);
+                end
+            end
+        end
+    end
+end
+
+----------------------------------------
 -- Update health
 ----------------------------------------
 function func:Update_Health(unit)
@@ -569,7 +678,20 @@ function func:Update_Health(unit)
         local health = UnitHealth(unit);
         local healthPercent = string.format("%.0f", (health/healthMax)*100) .. "%";
         local percentageAsMainValue = Config.PercentageAsMainValue and Config.NumericValue and Config.Percentage;
+        local player = UnitIsPlayer(unit);
+        local otherPlayersPet = UnitIsOtherPlayersPet(unit);
         local hp = AbbreviateNumbers(health);
+        local showSecondary = true;
+
+        if data.isClassic then
+            if (not player and not otherPlayersPet) or UnitPlayerOrPetInParty(unit) then
+                showSecondary = true;
+                hp = AbbreviateNumbers(health);
+            else
+                showSecondary = false ;
+                hp = health .. "%";
+            end
+        end
 
         if UnitIsUnit(unit, "player") then
             local nameplate = data.nameplate;
@@ -608,10 +730,12 @@ function func:Update_Health(unit)
                     or Config.Percentage and healthPercent
                     or ""
                 );
-                unitFrame.healthSecondary:SetText(percentageAsMainValue and hp or healthPercent);
+                unitFrame.healthSecondary:SetText(
+                    percentageAsMainValue and hp or healthPercent
+                );
 
                 unitFrame.healthMain:SetShown(Config.NumericValue or Config.Percentage);
-                unitFrame.healthSecondary:SetShown(Config.NumericValue and Config.Percentage);
+                unitFrame.healthSecondary:SetShown(Config.NumericValue and Config.Percentage and showSecondary);
 
                 -- Updating Health bar
                 unitFrame.healthbar:SetMinMaxValues(0, healthMax);

@@ -8,8 +8,6 @@ local data = core.data;
 ----------------------------------------
 -- HANDLING EVENTS
 ----------------------------------------
-local UNIT_HEALTH = data.isClassic and "UNIT_HEALTH_FREQUENT" or "UNIT_HEALTH";
-
 function core:init(event, ...)
     local arg = ...;
 
@@ -127,7 +125,7 @@ function core:init(event, ...)
         func:Update_Classification(arg);
     end
 
-    if event == UNIT_HEALTH then
+    if event == "UNIT_HEALTH" then
         func:Update_Health(arg);
     end
 
@@ -220,6 +218,12 @@ function core:init(event, ...)
     if event == "RAID_TARGET_UPDATE" then
         func:RaidTargetIndex();
     end
+
+    if event == "QUEST_LOG_UPDATE" then
+        if data.isRetail then
+            func:Update_quests();
+        end
+    end
 end
 
 ----------------------------------------
@@ -246,11 +250,12 @@ events:RegisterEvent("PLAYER_UNGHOST");
 if data.isRetail then
     events:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED");
 end
+events:RegisterEvent("QUEST_LOG_UPDATE");
 
 -- Unit
 events:RegisterEvent("UNIT_NAME_UPDATE");
 events:RegisterEvent("UNIT_PORTRAIT_UPDATE");
-events:RegisterEvent(UNIT_HEALTH);
+events:RegisterEvent("UNIT_HEALTH");
 events:RegisterEvent("UNIT_MAXHEALTH");
 events:RegisterEvent("UNIT_HEAL_PREDICTION");
 events:RegisterEvent("UNIT_POWER_FREQUENT");

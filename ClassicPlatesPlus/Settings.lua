@@ -8,6 +8,7 @@ local data = core.data;
 -- Colors
 local yellow = "|cff" .. "ffd100";
 local white  = "|cff" .. "ffffff";
+local green  = "|cff" .. "7CFC00";
 
 -- Panels table
 data.settings = {
@@ -40,6 +41,9 @@ function func:Load_Settings()
         do
             local name = "Personal Nameplate";
             local tooltip = "";
+            if not data.isRetail then
+                tooltip = "To move the personal nameplate, hold " .. green .. "CTRL" .. yellow .. " and drag it with " .. green .. "Left Mouse Button";
+            end
             local cfg = "PersonalNameplate";
             local default = true;
 
@@ -104,6 +108,40 @@ function func:Load_Settings()
             local default = true;
 
             func:Create_CheckButton(panel, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        --[[do
+            local name = "Highlight Target";
+            local tooltip = "";
+            local cfg = "ShowHighlight";
+            local default = true;
+
+            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+        end]]
+
+        -- CheckButton
+        do
+            local name = "Fade Unselected Targets";
+            local tooltip = "";
+            local cfg = "FadeUnselected";
+            local default = true;
+
+            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+        end
+
+        -- Slider
+        do
+            local name = "Fade Intensity";
+            local tooltip = "";
+            local cfg = "FadeIntensity";
+            local default = 0.5;
+            local step = 0.01;
+            local minValue = 0.0;
+            local maxValue = 1.0;
+            local decimals = 2;
+
+            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -189,7 +227,7 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Switch Values Position";
+            local name = "Switch Values Positions";
             local tooltip = "Swap positions of numeric and percentage values";
             local cfg = "PercentageAsMainValue";
             local default = false;

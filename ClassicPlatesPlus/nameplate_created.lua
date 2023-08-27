@@ -14,20 +14,6 @@ function func:Nameplate_Created(nameplate)
         unitFrame:SetFrameStrata("low");
         nameplate.unitFrame = unitFrame;
 
-        -- unitFrame animation show group
-        unitFrame.animationShow = unitFrame:CreateAnimationGroup();
-
-        -- unitFrame animation show alpha
-        unitFrame.animationShow.alpha = unitFrame.animationShow:CreateAnimation("Alpha");
-        unitFrame.animationShow.alpha:SetDuration(0.15);
-        unitFrame.animationShow.alpha:SetFromAlpha(0);
-        unitFrame.animationShow.alpha:SetToAlpha(1);
-
-        -- Scripts: Playing animation
-        unitFrame:SetScript("OnShow", function(self)
-            unitFrame.animationShow:Play();
-        end);
-
         -- Main strata
         unitFrame:SetFrameStrata("low");
 
@@ -247,6 +233,15 @@ function func:Nameplate_Created(nameplate)
         unitFrame.level.highlight:SetDrawLayer("background", -1);
 
         --------------------------------
+        -- Quest
+        --------------------------------
+        unitFrame.quest = unitFrame:CreateTexture();
+        unitFrame.quest:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\quest");
+        unitFrame.quest:SetVertexColor(1, 0.77, 0);
+        unitFrame.quest:SetSize(32, 32);
+        unitFrame.quest:Hide();
+
+        --------------------------------
         -- Threat percentage
         --------------------------------
 
@@ -290,6 +285,7 @@ function func:Nameplate_Created(nameplate)
         unitFrame.threatPercentage.highlight:SetSize(64, 32);
         unitFrame.threatPercentage.highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\threat_new");
         unitFrame.threatPercentage.highlight:SetDrawLayer("background", -1);
+        unitFrame.threatPercentage.highlight:Hide();
 
         --------------------------------
         -- Classification
@@ -428,19 +424,15 @@ function func:Nameplate_Created(nameplate)
         -- Animation scale
         unitFrame.raidTarget.animation.scale1 = unitFrame.raidTarget.animation:CreateAnimation("Scale");
         unitFrame.raidTarget.animation.scale1:SetDuration(0.13);
-        --unitFrame.raidTarget.animation.scale1:SetScaleFrom(0,0);
-        --unitFrame.raidTarget.animation.scale1:SetScaleTo(1.15, 1.15);
-        func:SetScaleFrom(unitFrame.raidTarget.animation.scale1, 0, 0);
-        func:SetScaleTo(unitFrame.raidTarget.animation.scale1, 1.15, 1.15);
+        unitFrame.raidTarget.animation.scale1:SetScaleFrom(0,0);
+        unitFrame.raidTarget.animation.scale1:SetScaleTo(1.15, 1.15);
         unitFrame.raidTarget.animation.scale1:SetSmoothing("out");
 
         unitFrame.raidTarget.animation.scale2 = unitFrame.raidTarget.animation:CreateAnimation("Scale");
         unitFrame.raidTarget.animation.scale2:SetStartDelay(0.13);
         unitFrame.raidTarget.animation.scale2:SetDuration(0.13);
-        --unitFrame.raidTarget.animation.scale2:SetScaleFrom(1.15, 1.15);
-        --unitFrame.raidTarget.animation.scale2:SetScaleTo(1, 1);
-        func:SetScaleFrom(unitFrame.raidTarget.animation.scale2, 1.15, 1.15);
-        func:SetScaleTo(unitFrame.raidTarget.animation.scale2, 1, 1);
+        unitFrame.raidTarget.animation.scale2:SetScaleFrom(1.15, 1.15);
+        unitFrame.raidTarget.animation.scale2:SetScaleTo(1, 1);
         unitFrame.raidTarget.animation.scale2:SetSmoothing("in")
 
         -- Scrits: Animating raid target icon on show

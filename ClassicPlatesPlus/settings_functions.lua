@@ -192,6 +192,12 @@ local functionsTable = {
     AurasPersonalMaxDebuffs = function() func:Update_Auras("player"); end,
     AurasImportantList = function() updateAuras(); end,
     AurasBlacklist = function() updateAuras(); end,
+    ThreatWarningColor = function() updateNameplateVisuals(); end,
+    ThreatAggroColor = function() updateNameplateVisuals(); end,
+    ThreatOtherTankColor = function() updateNameplateVisuals(); end,
+    ShowHighlight = function() updateNameplateVisuals(); end,
+    FadeUnselected = function() updateNameplateVisuals(); end,
+    FadeIntensity = function() updateNameplateVisuals(); end,
 }
 
 -- Execute function by passed config name
@@ -289,11 +295,7 @@ function func:CreatePanel(mainPanelName, name)
 
     -- Addon icon
     panel.icon = panel.header:CreateTexture();
-    if data.isClassic then
-        panel.icon:SetPoint("left", 16, -6);
-    else
-        panel.icon:SetPoint("left", 8, -6);
-    end
+    panel.icon:SetPoint("left", 8, -6);
     panel.icon:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\ClassicPlatesPlus_icon");
     panel.icon:SetSize(20, 20);
 
@@ -377,40 +379,16 @@ function func:CreatePanel(mainPanelName, name)
     };
 
     -- Line Divider
-    if data.isClassic then
-        panel.divider = panel.header:CreateTexture();
-        panel.divider:SetPoint("bottomLeft", 16, -1);
-        panel.divider:SetPoint("bottomRight", -40, -1);
-        panel.divider:SetHeight(1);
-        panel.divider:SetColorTexture(0.5, 0.5, 0.5, 0.3);
-    else
-        panel.divider = panel.header:CreateTexture();
-        panel.divider:SetPoint("bottomLeft", 16, -1);
-        panel.divider:SetPoint("bottomRight", -40, -1);
-        panel.divider:SetHeight(1);
-        panel.divider:SetAtlas("Options_HorizontalDivider");
-    end
-
-
-    local scrollFrame;
-    if data.isClassic then
-        scrollFrame = 'UIPanelScrollFrameTemplate'
-    else
-        scrollFrame = "ScrollFrameTemplate"
-    end
+    panel.divider = panel.header:CreateTexture();
+    panel.divider:SetPoint("bottomLeft", 16, -1);
+    panel.divider:SetPoint("bottomRight", -40, -1);
+    panel.divider:SetHeight(1);
+    panel.divider:SetAtlas("Options_HorizontalDivider");
 
     -- Scroll Frame
-    panel.scrollFrame = CreateFrame("ScrollFrame", nil, panel, scrollFrame);
+    panel.scrollFrame = CreateFrame("ScrollFrame", nil, panel, "ScrollFrameTemplate");
     panel.scrollFrame:SetPoint("topLeft", 16, -52);
-    if data.isClassic then
-        panel.scrollFrame:SetPoint("bottomRight", -26, 4);
-        panel.scrollFrame.background = panel.scrollFrame:CreateTexture();
-        panel.scrollFrame.background:SetPoint("topRight", 22, 0);
-        panel.scrollFrame.background:SetPoint("bottomLeft", 587, 0);
-        panel.scrollFrame.background:SetColorTexture(0.03, 0.03, 0.03, 0.5);
-    else
-        panel.scrollFrame:SetPoint("bottomRight", -26, 0);
-    end
+    panel.scrollFrame:SetPoint("bottomRight", -26, 0);
 
     -- Scroll Child
     panel.scrollChild = CreateFrame("frame", nil, panel.scrollFrame);
@@ -853,13 +831,8 @@ function func:Create_AurasList(panel, name, cfg)
 
     -- Background
     frame_PopUp.background = CreateFrame("button", nil, frame_PopUp);
-    if data.isClassic then
-        frame_PopUp.background:SetPoint("topLeft", panel, "topLeft", 4, -4);
-        frame_PopUp.background:SetSize(615, 560);
-    else
-        frame_PopUp.background:SetPoint("topLeft", panel, "topLeft", -14, 8);
+    frame_PopUp.background:SetPoint("topLeft", panel, "topLeft", -14, 8);
         frame_PopUp.background:SetSize(680, 610);
-    end
     frame_PopUp.background:SetFrameLevel(frame_PopUp:GetFrameLevel() - 1);
     frame_PopUp.background:EnableMouse(true);
     frame_PopUp.background:EnableMouseWheel(true);
@@ -885,14 +858,7 @@ function func:Create_AurasList(panel, name, cfg)
     frame_PopUp.InputBox:SetBackdropColor(0, 0, 0, 0.5);
     frame_PopUp.InputBox:SetBackdropBorderColor(0.62, 0.62, 0.62);
 
-    local scrollFrame;
-    if data.isClassic then
-        scrollFrame = 'UIPanelScrollFrameTemplate'
-    else
-        scrollFrame = "ScrollFrameTemplate"
-    end
-
-    frame_PopUp.ScrollFrame = CreateFrame("ScrollFrame", myAddon .. "_" .. name .. "_PopUpScroll", frame_PopUp.InputBox, scrollFrame);
+    frame_PopUp.ScrollFrame = CreateFrame("ScrollFrame", myAddon .. "_" .. name .. "_PopUpScroll", frame_PopUp.InputBox, "ScrollFrameTemplate");
     frame_PopUp.ScrollFrame:SetPoint("topLeft", 8, -10);
     frame_PopUp.ScrollFrame:SetPoint("bottomRight", -28, 6);
 
@@ -1019,11 +985,7 @@ function func:Create_AurasList(panel, name, cfg)
                 if not panel.scrollChild.auras[k] then
                     panel.scrollChild.auras[k] = CreateFrame("frame", nil, panel.scrollChild);
                     panel.scrollChild.auras[k]:SetPoint(anchor(k));
-                    if data.isClassic then
-                        panel.scrollChild.auras[k]:SetSize(290, 30);
-                    else
-                        panel.scrollChild.auras[k]:SetSize(320, 30);
-                    end
+                    panel.scrollChild.auras[k]:SetSize(320, 30);
                     panel.scrollChild.auras[k].icon = panel.scrollChild:CreateTexture();
                     panel.scrollChild.auras[k].icon:SetParent(panel.scrollChild.auras[k]);
                     panel.scrollChild.auras[k].icon:SetPoint("left", 6, 0);

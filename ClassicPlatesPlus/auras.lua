@@ -18,11 +18,14 @@ function func:Update_Auras(unit)
 
         -- LibClassicDurations (for classic era client)
         local UnitAura = _G.UnitAura;
-        local LibClassicDurations = LibStub("LibClassicDurations", true)
 
-        if LibClassicDurations then
-            LibClassicDurations:Register(myAddon);
-            UnitAura = LibClassicDurations.UnitAuraWrapper;
+        if data.isClassic then
+            local LibClassicDurations = LibStub("LibClassicDurations", true)
+
+            if LibClassicDurations then
+                LibClassicDurations:Register(myAddon);
+                UnitAura = LibClassicDurations.UnitAuraWrapper;
+            end
         end
 
         if nameplate then

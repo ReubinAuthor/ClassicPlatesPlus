@@ -80,6 +80,9 @@ function func:Nameplate_Added(unit, visuals)
                 -- Name
                 unitFrame.name:SetPoint("top", nameplate.UnitFrame.name, "top"); -- Anchor frame
 
+                -- Quest
+                unitFrame.quest:ClearAllPoints();
+
                 -- Class Bar
                 unitFrame.ClassBarDummy:SetHeight(data.classBarHeight);
 
@@ -89,7 +92,7 @@ function func:Nameplate_Added(unit, visuals)
                 -- Classification
                 unitFrame.classification:SetTexCoord(0, 1, 0, 1) -- Undo Fliping horizontally
 
-                -- These frames depend on whether portraits and level are enabled or not !!!
+                -- These frames depend on whether portraits and level are enabled or not!
                 if Config.Portrait then
                     unitFrame.classification:SetParent(unitFrame.portrait);
                     unitFrame.classification:SetSize(48,48);
@@ -106,6 +109,7 @@ function func:Nameplate_Added(unit, visuals)
                         unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center");
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
                         unitFrame.classification:SetPoint("center", unitFrame.portrait.texture, "center", -5, -2);
+                        unitFrame.quest:SetPoint("left", unitFrame.level, "right", -14, 1);
                     else
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 0, -1.5);
                         unitFrame.castbar:SetPoint("top", unitFrame.healthbar.border, "bottom", -9.5, 8);
@@ -114,6 +118,7 @@ function func:Nameplate_Added(unit, visuals)
                         unitFrame.healthSecondary:SetPoint("right", unitFrame.healthbar, "right", -4, 0);
                         unitFrame.healthSecondary:SetJustifyH("right");
                         unitFrame.classification:SetPoint("center", unitFrame.portrait.texture, "center", -5, -2);
+                        unitFrame.quest:SetPoint("left", unitFrame.healthbar, "right", -6, 1);
                     end
                 else
                     unitFrame.classification:SetParent(unitFrame);
@@ -131,6 +136,7 @@ function func:Nameplate_Added(unit, visuals)
                         unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", 9.5, 0); --<
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
                         unitFrame.classification:SetPoint("center", unitFrame.level.border, "center", 7, 0);
+                        unitFrame.quest:SetPoint("left", unitFrame.level, "right", -14, 1);
                     else
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 0, -1.5);
                         unitFrame.castbar:SetPoint("top", unitFrame.healthbar.border, "bottom", 0, 8);
@@ -139,6 +145,31 @@ function func:Nameplate_Added(unit, visuals)
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
                         unitFrame.classification:SetPoint("left", unitFrame.healthbar, "left", -14, 0);
                         unitFrame.classification:SetTexCoord(1, 0, 0, 1) -- Fliping horizontally
+                        unitFrame.quest:SetPoint("left", unitFrame.healthbar, "right", -6, 1);
+                    end
+                end
+
+                -- Widget Container
+                if data.isRetail then
+                    local widget = nameplate.UnitFrame.WidgetContainer;
+                    if widget then
+                        widget:SetParent(unitFrame);
+                        widget:ClearAllPoints();
+                        widget:SetPoint("top", unitFrame.healthbar, "bottom", 0, -12);
+                        widget:Show();
+
+                        unitFrame.castbar:SetScript("OnShow", function()
+                            if widget then
+                                widget:ClearAllPoints();
+                                widget:SetPoint("top", unitFrame.castbar, "bottom", 0, 16);
+                            end
+                        end);
+                        unitFrame.castbar:SetScript("OnHide", function()
+                            if widget then
+                                widget:ClearAllPoints();
+                                widget:SetPoint("top", unitFrame.healthbar, "bottom", 0, -12);
+                            end
+                        end);
                     end
                 end
 
@@ -172,19 +203,22 @@ function func:Nameplate_Added(unit, visuals)
                 func:Castbar_Start(nil, unit);
                 func:RaidTargetIndex();
                 func:PredictHeal(unit);
+                if data.isRetail then
+                    func:Update_quests(unit);
+                end
 
                 -- Scripts
-                local timeElapsed = 0;
+                --[[local timeElapsed = 0;
                 unitFrame:SetScript("OnUpdate", function(self, elapsed)
                     timeElapsed = timeElapsed + elapsed;
                     if timeElapsed > 0.1 then
                         timeElapsed = 0;
                         func:Update_Threat(unit); -- Updating threat
                     end
-                end);
+                end);]]
 
                 -- Showing nameplate
-                nameplate.unitFrame:Show();
+                unitFrame:Show();
             end
 
             -- Hiding default nameplates
