@@ -11,9 +11,17 @@ ClassicPlates Plus is a nameplates addon that adds additional features and new u
 - Power bar (*mana, rage, energy, etc...*)
 - NPC Classification (*rare, elite, world boss, etc...*)
 
+To Do List:
+- Add Death Knight's runes to personal nameplate on Wrath client
+- Add Shaman's totems to personal nameplate
+
 <br />
 
 Grab it on [CurseForge](https://www.curseforge.com/wow/addons/classicplatesplus).
+
+<br />
+
+![pic8](https://github.com/ReubinAuthor/ClassicPlatesPlus/assets/82573908/816b44ea-b508-45c4-8c27-fe5a67f2a709)
 
 <br />
 
