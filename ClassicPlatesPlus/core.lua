@@ -646,10 +646,12 @@ function func:Update_quests(unit)
             end
         end
 
-        local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+        if TooltipData then
+            local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
-        if nameplate then
-            nameplate.unitFrame.quest:SetShown(getQuestTitle());
+            if nameplate then
+                nameplate.unitFrame.quest:SetShown(getQuestTitle());
+            end
         end
     end
 

@@ -147,7 +147,7 @@ function func:Load_Settings()
         -- Slider
         do
             local name = "Nameplates Scale";
-            local tooltip = "";
+            local tooltip = "Must be out of combat for the effect to take place";
             local cfg = "NameplatesScale";
             local default = 1.00;
             local step = 0.01;
@@ -170,6 +170,22 @@ function func:Load_Settings()
             local decimals = 2;
 
             func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Slider
+        if data.isRetail then
+            do
+                local name = "Max Nameplate Distance";
+                local tooltip = "Must be out of combat for the effect to take place";
+                local cfg = "MaxNameplateDistance";
+                local default = 60;
+                local step = 1;
+                local minValue = 10;
+                local maxValue = 60;
+                local decimals = 0;
+
+                func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            end
         end
 
         -- Sub-Category

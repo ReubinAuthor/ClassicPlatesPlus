@@ -91,6 +91,7 @@ local function updateNameplateScale()
         local nameplates = C_NamePlate.GetNamePlates();
 
         SetCVar("nameplateGlobalScale", Config.NameplatesScale);
+
         for k,v in pairs(nameplates) do
             if k then
                 v.unitFrame.name:SetIgnoreParentScale(false);
@@ -115,6 +116,27 @@ local function updateNameplateScale()
 
                     data.tickers.nameplatesUpdate:Cancel();
                     data.tickers.nameplatesUpdate = nil;
+                end
+            end)
+        end
+    end
+end
+
+local function updateNameplateDistance()
+    local function work()
+        SetCVar("nameplateMaxDistance", Config.MaxNameplateDistance);
+    end
+
+    if not InCombatLockdown() then
+        work();
+    else
+        if not data.tickers.MaxNameplateDistance then
+            data.tickers.MaxNameplateDistance = C_Timer.NewTicker(1, function()
+                if not InCombatLockdown() then
+                    work();
+
+                    data.tickers.MaxNameplateDistance:Cancel();
+                    data.tickers.MaxNameplateDistance = nil;
                 end
             end)
         end
@@ -198,6 +220,7 @@ local functionsTable = {
     ShowHighlight = function() updateNameplateVisuals(); end,
     FadeUnselected = function() updateNameplateVisuals(); end,
     FadeIntensity = function() updateNameplateVisuals(); end,
+    MaxNameplateDistance = function() updateNameplateDistance(); end,
 }
 
 -- Execute function by passed config name
