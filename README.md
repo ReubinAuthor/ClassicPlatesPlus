@@ -13,7 +13,11 @@ ClassicPlates Plus is a nameplates addon that adds additional features and new u
 
 <br />
 
-Grab it on [CurseForge](https://www.curseforge.com/wow/addons/classicplatesplus).
+Grab it on [**CurseForge**](https://www.curseforge.com/wow/addons/classicplatesplus).
+
+<br />
+
+[**Consider supporting this project**](https://boosty.to/reubin/donate)
 
 <br />
 
