@@ -288,6 +288,18 @@ function func:myTarget()
         data.myTarget.current = nil;
     end
 
+    local unitFramePrev = data.myTarget.previous;
+    local unitFrameCurr = data.myTarget.current;
+
+    -- Widget
+    if unitFramePrev and unitFramePrev.unit then
+        func:Nameplate_Added(unitFramePrev.unit);
+    end
+    if unitFrameCurr and unitFrameCurr.unit then
+        func:Nameplate_Added(unitFrameCurr.unit);
+    end
+
+    -- Sorting Auras
     if data.cvars.nameplateResourceOnTarget == "1" then
         if data.myTarget.previous then
             func:PositionAuras(data.myTarget.previous);

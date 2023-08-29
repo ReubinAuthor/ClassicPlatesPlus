@@ -149,14 +149,32 @@ function func:Nameplate_Added(unit, visuals)
                     end
                 end
 
+                -- Interract icon
+                local interactIcon = nameplate.UnitFrame.SoftTargetFrame.Icon;
+                if interactIcon then
+                    interactIcon:SetParent(unitFrame);
+                    interactIcon:ClearAllPoints();
+                    interactIcon:SetPoint("left", unitFrame.name, "right", 2, 0);
+                    interactIcon:SetScale(0.33);
+                end
+
                 -- Widget Container
+                local toggle = true;
                 if data.isRetail then
+                    local widgetOnly = UnitNameplateShowsWidgetsOnly(unit);
                     local widget = nameplate.UnitFrame.WidgetContainer;
+
                     if widget then
-                        widget:SetParent(unitFrame);
-                        widget:ClearAllPoints();
-                        widget:SetPoint("top", unitFrame.healthbar, "bottom", 0, -12);
-                        widget:Show();
+                        if widgetOnly then
+                            widget:SetParent(nameplate);
+                            widget:ClearAllPoints();
+                            widget:SetPoint("center");
+                            toggle = UnitExists("target")
+                        else
+                            widget:SetParent(unitFrame);
+                            widget:ClearAllPoints();
+                            widget:SetPoint("top", unitFrame.healthbar, "bottom", 0, -12);
+                        end
 
                         unitFrame.castbar:SetScript("OnShow", function()
                             if widget then
@@ -218,7 +236,7 @@ function func:Nameplate_Added(unit, visuals)
                 end);]]
 
                 -- Showing nameplate
-                unitFrame:Show();
+                unitFrame:SetShown(toggle and not UnitIsGameObject(unit));
             end
 
             -- Hiding default nameplates
