@@ -697,16 +697,6 @@ function func:Update_Health(unit)
         local hp = AbbreviateNumbers(health);
         local showSecondary = true;
 
-        if data.isClassic then
-            if (not player and not otherPlayersPet) or UnitPlayerOrPetInParty(unit) then
-                showSecondary = true;
-                hp = AbbreviateNumbers(health);
-            else
-                showSecondary = false ;
-                hp = health .. "%";
-            end
-        end
-
         if UnitIsUnit(unit, "player") then
             local nameplate = data.nameplate;
 
@@ -734,6 +724,16 @@ function func:Update_Health(unit)
             end
         else
             local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+
+            if data.isClassic then
+                if (not player and not otherPlayersPet) or UnitPlayerOrPetInParty(unit) then
+                    showSecondary = true;
+                    hp = AbbreviateNumbers(health);
+                else
+                    showSecondary = false ;
+                    hp = health .. "%";
+                end
+            end
 
             if nameplate then
                 local unitFrame = nameplate.unitFrame;
