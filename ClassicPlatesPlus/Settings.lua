@@ -247,17 +247,19 @@ function func:Load_Settings()
         end
 
         -- Slider
-        do
-            local name = "Class Power Scale";
-            local tooltip = "Class power: " .. white .. "Combo Points, Runes, Totems";
-            local cfg = "ClassPowerScale";
-            local default = 1;
-            local step = 0.01;
-            local minValue = 0.50;
-            local maxValue = 1.50;
-            local decimals = 2;
+        if not data.isRetail then
+            do
+                local name = "Class Power Scale";
+                local tooltip = "Class power: " .. white .. "Combo Points, Runes, Totems";
+                local cfg = "ClassPowerScale";
+                local default = 1;
+                local step = 0.01;
+                local minValue = 0.50;
+                local maxValue = 1.50;
+                local decimals = 2;
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+                func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            end
         end
 
         -- Sub-Category
