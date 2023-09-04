@@ -40,14 +40,12 @@ function func:Load_Settings()
         -- CheckButton
         do
             local name = "Personal Nameplate";
-            local tooltip = "";
-            if not data.isRetail then
-                tooltip = "To move the personal nameplate, hold " .. green .. "CTRL" .. yellow .. " and drag it with " .. green .. "Left Mouse Button";
-            end
+            local tooltip = not data.isRetail and "To move the personal nameplate, hold " .. green .. "CTRL" .. yellow .. " and drag it with " .. green .. "Left Mouse Button" or "";
             local cfg = "PersonalNameplate";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = false };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -56,8 +54,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "Portrait";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -66,8 +65,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "ClassIconsFriendly";
             local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -76,8 +76,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "ClassIconsEnemy";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -86,8 +87,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "ShowLevel";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -96,8 +98,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "ShowGuildName";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -106,8 +109,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "NameAndGuildOutline";
             local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -116,8 +120,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "LargeName";
             local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -126,8 +131,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "LargeGuildName";
             local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -136,19 +142,10 @@ function func:Load_Settings()
             local tooltip = "Creature class: " .. white .. "Elite, Rare, Rare Elite, World Boss";
             local cfg = "Classification";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
-
-        -- CheckButton
-        --[[do
-            local name = "Highlight Target";
-            local tooltip = "";
-            local cfg = "ShowHighlight";
-            local default = true;
-
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
-        end]]
 
         -- CheckButton
         do
@@ -156,8 +153,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "FadeUnselected";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Slider
@@ -170,8 +168,9 @@ function func:Load_Settings()
             local minValue = 0.0;
             local maxValue = 1.0;
             local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -184,8 +183,9 @@ function func:Load_Settings()
             local minValue = 0.75;
             local maxValue = 1.25;
             local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -198,24 +198,24 @@ function func:Load_Settings()
             local minValue = 0.75;
             local maxValue = 1.25;
             local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
-        if data.isRetail then
-            do
-                local name = "Max Nameplate Distance";
-                local tooltip = "Must be out of combat for the effect to take place";
-                local cfg = "MaxNameplateDistance";
-                local default = 60;
-                local step = 1;
-                local minValue = 10;
-                local maxValue = 60;
-                local decimals = 0;
+        do
+            local name = "Max Nameplate Distance";
+            local tooltip = "Must be out of combat for the effect to take place";
+            local cfg = "MaxNameplateDistance";
+            local default = 60;
+            local step = 1;
+            local minValue = 10;
+            local maxValue = 60;
+            local decimals = 0;
+            local flair = { classicEra = false, wrath = false, retail = true };
 
-                func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
-            end
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -228,8 +228,9 @@ function func:Load_Settings()
             local minValue = 0.75;
             local maxValue = 1.25;
             local decimals = 2;
+            local flair = { classicEra = false, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -242,24 +243,24 @@ function func:Load_Settings()
             local minValue = 0;
             local maxValue = 50;
             local decimals = 0;
+            local flair = { classicEra = false, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
-        if not data.isRetail then
-            do
-                local name = "Class Power Scale";
-                local tooltip = "Class power: " .. white .. "Combo Points, Runes, Totems";
-                local cfg = "ClassPowerScale";
-                local default = 1;
-                local step = 0.01;
-                local minValue = 0.50;
-                local maxValue = 1.50;
-                local decimals = 2;
+        do
+            local name = "Class Power Scale";
+            local tooltip = "Class power: " .. white .. "Combo Points, Runes, Totems";
+            local cfg = "ClassPowerScale";
+            local default = 1;
+            local step = 0.01;
+            local minValue = 0.50;
+            local maxValue = 1.50;
+            local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = false };
 
-                func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
-            end
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Sub-Category
@@ -271,8 +272,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "Powerbar";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -281,8 +283,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "HealthBarClassColorsFriendly";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -291,8 +294,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "HealthBarClassColorsEnemy";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -301,8 +305,9 @@ function func:Load_Settings()
             local tooltip = "Dispaly health and power numeric values";
             local cfg = "NumericValue";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -311,8 +316,9 @@ function func:Load_Settings()
             local tooltip = "Dispaly Health and Power percentage values";
             local cfg = "Percentage";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -321,8 +327,9 @@ function func:Load_Settings()
             local tooltip = "Swap positions of numeric and percentage values";
             local cfg = "PercentageAsMainValue";
             local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -331,8 +338,9 @@ function func:Load_Settings()
             local tooltip = "Display Total amount of your health\n(Displayed on personal nameplate only)";
             local cfg = "PersonalNameplateTotalHealth";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -341,8 +349,9 @@ function func:Load_Settings()
             local tooltip = "Display Total amount of your power\n" .. white .. "Example: " .. yellow .. "Mana, Rage, Energy, etc...\n(Displayed on personal nameplate only)";
             local cfg = "PersonalNameplateTotalPower";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -351,8 +360,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "LargeMainValue";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- ColorPicker
@@ -361,8 +371,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "HealthFontColor";
             local default = {r = 1, g = 0.82, b = 0, a = 1};
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_ColorPicker(panel, name, tooltip, cfg, default);
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Sub-Category
@@ -374,8 +385,9 @@ function func:Load_Settings()
             local tooltip = "Display the amount of threat generated";
             local cfg = "ThreatPercentage";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -384,8 +396,9 @@ function func:Load_Settings()
             local tooltip = "Highlight nameplates depending on threat situation";
             local cfg = "ThreatHighlight";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Slider
@@ -398,8 +411,9 @@ function func:Load_Settings()
             local minValue = 1;
             local maxValue = 100;
             local decimals = 0;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- ColorPicker
@@ -408,8 +422,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "ThreatWarningColor";
             local default = {r = 1, g = 0.6, b = 0, a = 1};
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_ColorPicker(panel, name, tooltip, cfg, default);
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
         end
 
         -- ColorPicker
@@ -418,8 +433,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "ThreatAggroColor";
             local default = {r = 1, g = 0, b = 1, a = 1};
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_ColorPicker(panel, name, tooltip, cfg, default);
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
         end
 
         -- ColorPicker
@@ -428,8 +444,9 @@ function func:Load_Settings()
             local tooltip = "Color for when another tank is tanking";
             local cfg = "ThreatOtherTankColor";
             local default = {r = 0, g = 0.58, b = 1, a = 1};
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_ColorPicker(panel, name, tooltip, cfg, default);
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Spacer
@@ -457,8 +474,9 @@ function func:Load_Settings()
                 [1] = "You",
                 [2] = "All"
             }
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_DropDownMenu(panel, name, tooltip, cfg, default, options);
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
         -- CheckButton
@@ -467,8 +485,9 @@ function func:Load_Settings()
             local tooltip = "Hide auras without expiration time";
             local cfg = "HidePassiveAuras";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -477,8 +496,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "AurasCountdown";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- DropDownMenu
@@ -491,8 +511,9 @@ function func:Load_Settings()
                 [1] = "Top Right",
                 [2] = "Center"
             }
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_DropDownMenu(panel, name, tooltip, cfg, default, options);
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
         -- CheckButton
@@ -501,8 +522,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "AurasReverseAnimation";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -511,8 +533,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "BuffsFriendly";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -521,8 +544,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "BuffsEnemy";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -531,8 +555,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "DebuffsEnemy";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -541,8 +566,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "DebuffsFriendly";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Slider
@@ -555,8 +581,9 @@ function func:Load_Settings()
             local minValue = 1;
             local maxValue = 16;
             local decimals = 0;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -569,8 +596,9 @@ function func:Load_Settings()
             local minValue = 1;
             local maxValue = 16;
             local decimals = 0;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -583,8 +611,9 @@ function func:Load_Settings()
             local minValue = 1;
             local maxValue = 16;
             local decimals = 0;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -597,8 +626,9 @@ function func:Load_Settings()
             local minValue = 1;
             local maxValue = 16;
             local decimals = 0;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -611,8 +641,9 @@ function func:Load_Settings()
             local minValue = 0.75;
             local maxValue = 1.25;
             local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- CheckButton
@@ -621,8 +652,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "AurasOverFlowCounter";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Sub-Category
@@ -638,8 +670,9 @@ function func:Load_Settings()
                 [1] = "You",
                 [2] = "All"
             }
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_DropDownMenu(panel, name, tooltip, cfg, default, options);
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
         -- CheckButton
@@ -648,8 +681,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "BuffsPersonal";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -658,8 +692,9 @@ function func:Load_Settings()
             local tooltip = "";
             local cfg = "DebuffsPersonal";
             local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Slider
@@ -672,8 +707,9 @@ function func:Load_Settings()
             local minValue = 1;
             local maxValue = 16;
             local decimals = 0;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Slider
@@ -686,8 +722,9 @@ function func:Load_Settings()
             local minValue = 1;
             local maxValue = 16;
             local decimals = 0;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Spacer

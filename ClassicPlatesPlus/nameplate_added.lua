@@ -98,7 +98,9 @@ function func:Nameplate_Added(unit, visuals)
                 unitFrame.ClassBarDummy:SetHeight(data.classBarHeight);
 
                 -- Class power
-                unitFrame.classPower:SetScale(Config.ClassPowerScale);
+                --if not data.isRetail then
+                    unitFrame.classPower:SetScale(Config.ClassPowerScale);
+                --end
 
                 -- Health Value Secondary
                 unitFrame.healthSecondary:SetJustifyH("left");

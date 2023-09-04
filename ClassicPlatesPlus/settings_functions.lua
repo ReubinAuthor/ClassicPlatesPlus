@@ -503,7 +503,7 @@ end
 ----------------------------------------
 -- Create CheckButton
 ----------------------------------------
-function func:Create_CheckButton(panel, name, tooltip, cfg, default)
+function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default)
     local frameName = myAddon .. "_" .. panel.name .. "_CheckButton_" .. name;
 
     -- Adding Config
@@ -552,13 +552,17 @@ function func:Create_CheckButton(panel, name, tooltip, cfg, default)
     data.settings.configs.panels[panel.name][cfg] = config;
 
     -- Adding frame to the settings list
-    table.insert(panel.list, parent);
+    if data.isClassic and flair.classicEra
+    or data.isWrath   and flair.wrath
+    or data.isRetail  and flair.retail then
+        table.insert(panel.list, parent);
+    end
 end
 
 ----------------------------------------
 -- Create DropDown Menu
 ----------------------------------------
-function func:Create_DropDownMenu(panel, name, tooltip, cfg, default, options)
+function func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options)
     local frameName = myAddon .. "_" .. panel.name .. "_DropDownMenu_" .. name;
 
     -- Adding Config
@@ -643,13 +647,17 @@ function func:Create_DropDownMenu(panel, name, tooltip, cfg, default, options)
     data.settings.configs.panels[panel.name][cfg] = config;
 
     -- Adding frame to the settings list
-    table.insert(panel.list, parent);
+    if data.isClassic and flair.classicEra
+    or data.isWrath   and flair.wrath
+    or data.isRetail  and flair.retail then
+        table.insert(panel.list, parent);
+    end
 end
 
 ----------------------------------------
 -- Create Slider
 ----------------------------------------
-function func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals)
+function func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals)
     local frameName = myAddon .. "_" .. panel.name .. "_Slider_" .. name;
     local format = "%." .. decimals .. "f";
 
@@ -713,13 +721,17 @@ function func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, 
     data.settings.configs.panels[panel.name][cfg] = config;
 
     -- Adding frame to the settings list
-    table.insert(panel.list, parent);
+    if data.isClassic and flair.classicEra
+    or data.isWrath   and flair.wrath
+    or data.isRetail  and flair.retail then
+        table.insert(panel.list, parent);
+    end
 end
 
 ----------------------------------------
 -- Create Color Picker
 ----------------------------------------
-function func:Create_ColorPicker(panel, name, tooltip, cfg, default)
+function func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default)
     local frameName = myAddon .. "_" .. panel.name .. "_ColorPicker_" .. name;
 
     -- Adding Config
@@ -846,7 +858,11 @@ function func:Create_ColorPicker(panel, name, tooltip, cfg, default)
     data.settings.configs.panels[panel.name][cfg] = config;
 
     -- Adding frame to the settings list
-    table.insert(panel.list, parent);
+    if data.isClassic and flair.classicEra
+    or data.isWrath   and flair.wrath
+    or data.isRetail  and flair.retail then
+        table.insert(panel.list, parent);
+    end
 end
 
 ----------------------------------------

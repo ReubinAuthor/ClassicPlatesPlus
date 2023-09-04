@@ -43,7 +43,8 @@ function func:CVars(event)
         data.cvars.nameplateShowSelf = tostring(GetCVar("nameplateShowSelf"));
 
         -- Distance
-        SetCVar("nameplateMinScale", 0.8);
+        local minScale = not data.isClassic and 0.8 or 1;
+        SetCVar("nameplateMinScale", minScale);
         SetCVar("nameplateMaxScale", 1.0);
         SetCVar("nameplateMinScaleDistance", 10);
         SetCVar("nameplateMaxScaleDistance", 10);
@@ -55,7 +56,8 @@ function func:CVars(event)
         SetCVar("nameplateSelectedScale", 1.2);
 
         -- Inset
-        SetCVar("nameplateOtherTopInset", .08 * Config.NameplatesScale + (.024 * Config.AurasScale) + (0.018 * Config.ClassPowerScale));
+        local classPowerScale = data.isRetail and 0 or Config.ClassPowerScale;
+        SetCVar("nameplateOtherTopInset", .08 * Config.NameplatesScale + (.024 * Config.AurasScale) + (0.018 * classPowerScale));
 
         -- Nameplates size
         SetCVar("nameplateGlobalScale", Config.NameplatesScale);
