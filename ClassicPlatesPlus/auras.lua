@@ -10,7 +10,7 @@ local data = core.data;
 ----------------------------------------
 function func:Update_Auras(unit)
     if unit and (string.match(unit, "nameplate") or unit == "player") then
-        local scaleOffset = unit == "player" and -0.2 or 0.15;
+        local scaleOffset = unit == "player" and 0.15 or 0.15;
         local nameplate = unit == "player" and data.nameplate or C_NamePlate.GetNamePlateForUnit(unit);
 
         local scale = Config.AurasScale - scaleOffset;
@@ -60,17 +60,18 @@ function func:Update_Auras(unit)
                     for i = 1, 40 do
                         local name, icon, stacks, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod = UnitAura(unit, i, filter);
 
-                        --[[ Test Auras
-                        local name, icon, stacks, duration, expirationTime, source;
-                        if i < 17 then --and auraType == "debuffs" then
-                            name = "Test Aura 1"
-                            icon = 136243
-                            stacks = i
-                            duration = 1
-                            expirationTime = duration + GetTime()
-                            source = "player"
-                        end]]
-
+                        -- Test Auras
+                        local test = false;
+                        if test then
+                            if i < 17 then --and auraType == "debuffs" then
+                                name = "Test Aura 1"
+                                icon = 136243
+                                stacks = i
+                                duration = 1
+                                expirationTime = duration + GetTime()
+                                source = "player"
+                            end
+                        end
 
                         if name then
                             local hidePassiveCheck = data.isClassic and true or not (hidePassiveAuras and duration == 0);
@@ -92,6 +93,7 @@ function func:Update_Auras(unit)
                                     unitFrame[auraType]["auras"][i] = CreateFrame("frame", nil, unitFrame);
                                     unitFrame[auraType]["auras"][i]:SetSize(28, 24);
                                     unitFrame[auraType]["auras"][i]:SetFrameLevel(1);
+                                    unitFrame[auraType]["auras"][i]:SetIgnoreParentScale(true);
                                     unitFrame[auraType]["auras"][i]:SetScale(scale);
 
                                     ------------------------------------
@@ -164,10 +166,15 @@ function func:Update_Auras(unit)
 
                                     -- Countdown
                                     unitFrame[auraType]["auras"][i].countdown = unitFrame[auraType]["auras"][i].second:CreateFontString(nil, nil, "GameFontNormalOutline");
-                                    unitFrame[auraType]["auras"][i].countdown:SetPoint("right", unitFrame[auraType]["auras"][i].second, "topRight", 5, -2.5);
+                                    if Config.AurasCountdownPosition == 1 then
+                                        unitFrame[auraType]["auras"][i].countdown:SetPoint("right", unitFrame[auraType]["auras"][i].second, "topRight", 5, -2.5);
+                                        unitFrame[auraType]["auras"][i].countdown:SetJustifyH("right");
+                                    elseif Config.AurasCountdownPosition == 2 then
+                                        unitFrame[auraType]["auras"][i].countdown:SetPoint("center", unitFrame[auraType]["auras"][i].second, "center");
+                                        unitFrame[auraType]["auras"][i].countdown:SetJustifyH("center");
+                                    end
                                     unitFrame[auraType]["auras"][i].countdown:SetScale(0.9);
                                     unitFrame[auraType]["auras"][i].countdown:SetText(func:formatTime(expirationTime - GetTime()));
-                                    unitFrame[auraType]["auras"][i].countdown:SetJustifyH("right");
                                     unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
 
                                     -- Stacks
@@ -190,7 +197,6 @@ function func:Update_Auras(unit)
 
                                     -- Countdown
                                     unitFrame[auraType]["auras"][i].countdown:SetText(func:formatTime(expirationTime - GetTime()));
-                                    unitFrame[auraType]["auras"][i].countdown:SetJustifyH("right");
                                     unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
 
                                     -- Stacks
@@ -354,6 +360,9 @@ function func:Update_Auras(unit)
                 processAuras(unitFrame.buffsCounter, "buffs", Config.AurasMaxBuffsEnemy, "right", "left", -5);
                 processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasMaxDebuffsEnemy, "left", "right", 5);
             end
+
+            -- Interact Icon
+            func:InteractIcon(nameplate);
         end
     end
 end
@@ -374,8 +383,8 @@ function func:PositionAuras(unitFrame, unit)
         local anchor, y, pos1, pos2, totalAuras, totalGaps;
 
         -- Get Anchor
-        if resourceOnTarget == "1" and unitFrame.unit and UnitIsUnit(unitFrame.unit, "target") and class then
-            anchor = unitFrame.ClassBarDummy;
+        if unitFrame.unit and (UnitIsUnit(unitFrame.unit, "target") and class and resourceOnTarget == "1" or not data.isRetail and unitFrame.classPower and unitFrame.classPower:IsShown()) then
+            anchor = data.isRetail and unitFrame.ClassBarDummy or unitFrame.classPower;
         else
             anchor = unitFrame.name;
         end

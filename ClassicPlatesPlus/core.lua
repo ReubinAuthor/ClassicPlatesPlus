@@ -55,7 +55,7 @@ function func:CVars(event)
         SetCVar("nameplateSelectedScale", 1.2);
 
         -- Inset
-        SetCVar("nameplateOtherTopInset", .08 * Config.NameplatesScale + (.024 * Config.AurasScale));
+        SetCVar("nameplateOtherTopInset", .08 * Config.NameplatesScale + (.024 * Config.AurasScale) + (0.018 * Config.ClassPowerScale));
 
         -- Nameplates size
         SetCVar("nameplateGlobalScale", Config.NameplatesScale);
@@ -113,37 +113,41 @@ end
 -- Resize nameplates clickable base
 ----------------------------------------
 function func:ResizeNameplates()
-    local function resize()
+    local function work()
         local inInstance, instanceType = IsInInstance();
-        local width, height;
 
-        if Config.Portrait then
-            width = 160;
-        else
-            width = 155;
-        end
+        -- Width
+        local portrait = Config.Portrait and 18 or 0;
+        local level = Config.ShowLevel and 18 or 0;
 
-        if Config.ShowGuildName then
-            height = 46;
-        else
-            height = 36;
-        end
+        -- Height
+        local portraitY = Config.Portrait and 2 or 0;
+        local powerbarY = Config.Powerbar and 6 or 0;
+        local inverseScale = 1 - Config.NameplatesScale;
 
+        local width = 128 + portrait + level;
+        local height = 16 + portraitY + powerbarY
+            + ((Config.LargeName and 14 or 10) * (Config.NameplatesScale + inverseScale))
+            + (Config.ShowGuildName and ((Config.LargeGuildName and 13 or 10) * (Config.NameplatesScale + inverseScale)) or Config.ThreatPercentage and 10 or 0);
+
+        -- Friendly Nameplates
         if inInstance and (instanceType == "party" or instanceType == "raid") then
             C_NamePlate.SetNamePlateFriendlySize(128, 30);
         else
             C_NamePlate.SetNamePlateFriendlySize(width, height);
         end
+
+        -- Enemy Nameplates
         C_NamePlate.SetNamePlateEnemySize(width, height);
     end
 
     if not InCombatLockdown() then
-        resize();
+        work();
     else
         if not data.tickers.frameOptions then
             data.tickers.frameOptions = C_Timer.NewTicker(1, function()
                 if not InCombatLockdown() then
-                    resize();
+                    work();
 
                     data.tickers.frameOptions:Cancel();
                     data.tickers.frameOptions = nil;
@@ -234,7 +238,7 @@ end
 ----------------------------------------
 -- Class Bar Height
 ----------------------------------------
-function func:ClassBarHeight() --print(NamePlateDriverFrame.classNamePlateMechanicFrame:GetHeight() * NamePlateDriverFrame.classNamePlateMechanicFrame:GetEffectiveScale())
+function func:ClassBarHeight()
     local classID = select(3, UnitClass("player"));
 
     if classID == 2 then -- Paladin
@@ -279,6 +283,8 @@ function func:myTarget()
         if nameplate then
             data.myTarget.previous = data.myTarget.current;
             data.myTarget.current = nameplate.unitFrame;
+
+            func:InteractIcon(nameplate);
         else
             data.myTarget.previous = data.myTarget.current;
             data.myTarget.current = nil;
@@ -299,8 +305,7 @@ function func:myTarget()
         func:Nameplate_Added(unitFrameCurr.unit);
     end
 
-    -- Sorting Auras
-    if data.cvars.nameplateResourceOnTarget == "1" then
+    if data.cvars.nameplateResourceOnTarget == "1" or not data.isRetail then
         if data.myTarget.previous then
             func:PositionAuras(data.myTarget.previous);
         end
@@ -400,6 +405,31 @@ function func:formatTime(value)
     end
 end
 
+-- Interract icon
+function func:InteractIcon(nameplate)
+    if nameplate and data.isRetail then
+        local unitFrame = nameplate.unitFrame;
+        local interactIcon = nameplate.UnitFrame and nameplate.UnitFrame.SoftTargetFrame and nameplate.UnitFrame.SoftTargetFrame.Icon;
+        local auras = unitFrame and unitFrame.buffs["auras"] and (unitFrame.buffs["auras"][1] or unitFrame.debuffs["auras"][1]);
+        local resourceOnTarget = data.cvars.nameplateResourceOnTarget;
+
+        if interactIcon then
+            interactIcon:SetParent(unitFrame);
+            interactIcon:SetScale(0.5);
+            interactIcon:ClearAllPoints();
+
+            if auras and auras:IsShown() then
+                interactIcon:SetPoint("bottom", auras, "top", 0, 8);
+                interactIcon:SetPoint("center", unitFrame.name, "center");
+            elseif resourceOnTarget == "1" and unitFrame.ClassBarDummy then
+                interactIcon:SetPoint("bottom", unitFrame.ClassBarDummy, "top", 0, 4);
+            else
+                interactIcon:SetPoint("bottom", unitFrame.name, "top", 0, 4);
+            end
+        end
+    end
+end
+
 ----------------------------------------
 -- Get unit color
 ----------------------------------------
@@ -432,10 +462,18 @@ function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
 
     local function getDefault()
         if isPlayer then
-            if Config.HealthBarClassColorsEnemy then
-                return classColor.r, classColor.g, classColor.b;
+            if canAttackUnit then
+                if Config.HealthBarClassColorsEnemy then
+                    return classColor.r, classColor.g, classColor.b;
+                else
+                    return r, g, b;
+                end
             else
-                return r, g, b;
+                if Config.HealthBarClassColorsFriendly then
+                    return classColor.r, classColor.g, classColor.b;
+                else
+                    return r, g, b;
+                end
             end
         elseif canAttackUnit and isTapped then
             return 0.9, 0.9, 0.9;
@@ -476,68 +514,7 @@ function func:Update_Colors(unit)
     local function work(unitFrame, unit)
         local r,g,b = func:GetUnitColor(unit);
         local Rs,Gs,Bs = UnitSelectionColor(unit, true);
-        local Rb,Gb,Bb = data.colors.border.r, data.colors.border.g, data.colors.border.b;
         local target = UnitIsUnit(unit, "target");
-
-        --[[if UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
-            if UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit) then
-                r,g,b = Rs, Gs, Bs;
-            else
-                r,g,b = color.r, color.g, color.b;
-            end
-        elseif UnitIsFriend(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
-            if UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit) then
-                r,g,b = Rs, Gs, Bs;
-            else
-                r,g,b = color.r, color.g, color.b;
-            end
-        else
-            r,g,b = color.r, color.g, color.b;
-        end
-
-        if (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) and (UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit)) then
-            local R2,G2,B2 = Rs,Gs,Bs;
-
-            if UnitIsFriend(unit, "player") and string.format("%.2f", Rs) ~= "0.38" then
-                R2,G2,B2 = 0, 0.85, 0;
-            end
-
-            unitFrame.portrait.highlight:SetVertexColor(R2,G2,B2);
-            unitFrame.healthbar.highlight:SetVertexColor(R2,G2,B2);
-            unitFrame.level.highlight:SetVertexColor(R2,G2,B2);
-            unitFrame.powerbar.highlight:SetVertexColor(R2,G2,B2);
-        else
-            unitFrame.portrait.highlight:SetVertexColor(Rb,Gb,Bb);
-            unitFrame.healthbar.highlight:SetVertexColor(Rb,Gb,Bb);
-            unitFrame.level.highlight:SetVertexColor(Rb,Gb,Bb);
-            unitFrame.powerbar.highlight:SetVertexColor(Rb,Gb,Bb);
-        end
-
-        if UnitIsEnemy(unit, "player") and UnitIsTapDenied(unit) then
-            unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
-            unitFrame.guild:SetTextColor(0.5, 0.5, 0.5);
-        else
-            unitFrame.name:SetTextColor(Rs, Gs, Bs);
-            unitFrame.guild:SetTextColor(Rs, Gs, Bs);
-        end
-
-        if Config.FadeUnselected then
-            if not UnitExists("target") then
-                unitFrame:SetAlpha(1);
-            elseif target then
-                unitFrame:SetAlpha(1);
-            else
-                unitFrame:SetAlpha(Config.FadeIntensity);
-            end
-        else
-            unitFrame:SetAlpha(1);
-        end
-
-        -- Toggling highlights:
-        unitFrame.portrait.highlight:SetShown(Config.ShowHighlight and target and unitFrame.portrait:IsShown());
-        unitFrame.healthbar.highlight:SetShown(Config.ShowHighlight and target);
-        unitFrame.level.highlight:SetShown(Config.ShowHighlight and target and unitFrame.level:IsShown());
-        unitFrame.powerbar.highlight:SetShown(Config.ShowHighlight and target and unitFrame.powerbar:IsShown());]]
 
         if UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
             if UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit) then
@@ -619,7 +596,7 @@ end
 
 ----------------------------------------
 -- Update Quests
-----------------------------------------
+----------------    `------------------------
 function func:Update_quests(unit)
     local function work(unit)
         local TooltipData = C_TooltipInfo.GetUnit(unit);
@@ -696,6 +673,16 @@ function func:Update_Health(unit)
         local otherPlayersPet = UnitIsOtherPlayersPet(unit);
         local hp = AbbreviateNumbers(health);
         local showSecondary = true;
+
+        if data.isClassic then
+            if (not player and not otherPlayersPet) or UnitPlayerOrPetInParty(unit) then
+                showSecondary = true;
+                hp = AbbreviateNumbers(health);
+            else
+                showSecondary = false ;
+                hp = health .. "%";
+            end
+        end
 
         if UnitIsUnit(unit, "player") then
             local nameplate = data.nameplate;
@@ -990,75 +977,56 @@ function func:Update_ExtraBar()
 end
 
 ----------------------------------------
--- Update combo points
+-- Updating Class Power
 ----------------------------------------
-function func:Update_ComboPoints(unit)
-    if not data.isRetail then
-        if unit == "player" or unit == "vehicle" then
-            local nameplates = C_NamePlate.GetNamePlates();
+function func:Update_ClassPower(unit)
+    local player = UnitInVehicle("player") and "vehicle" or "player";
 
-            if nameplates then
-                for k,v in pairs(nameplates) do
-                    if k then
-                        local unitFrame = v.unitFrame;
+    for _, nameplate in ipairs(C_NamePlate.GetNamePlates(false)) do
+        local unitFrame = nameplate.unitFrame;
 
-                        if v.unitFrame.unit then
-                            local comboPoints = GetComboPoints(unit, v.unitFrame.unit);
+        if nameplate.unitFrame.unit then
+            local comboPoints = GetComboPoints(player, nameplate.unitFrame.unit);
 
-                            if comboPoints > 0 then
-                                for i = 1, 10 do
-                                    if i > comboPoints and unitFrame.comboPoints[i] then
-                                        unitFrame.comboPoints[i]:Hide();
-                                    else
-                                        if not unitFrame.comboPoints[i] then
-                                            unitFrame.comboPoints[i] = CreateFrame("frame", nil, unitFrame.comboPoints);
-                                            unitFrame.comboPoints[i]:SetSize(14, 14);
-                                            unitFrame.comboPoints[i].center = unitFrame.comboPoints[i]:CreateTexture();
-                                            unitFrame.comboPoints[i].center:SetAllPoints();
-                                            unitFrame.comboPoints[i].center:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\comboPoints");
-                                            unitFrame.comboPoints[i].border = unitFrame.comboPoints[i]:CreateTexture();
-                                            unitFrame.comboPoints[i].border:SetAllPoints();
-                                            unitFrame.comboPoints[i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\comboPointsBorder");
-                                        else
-                                            unitFrame.comboPoints[i].border:SetVertexColor(
-                                                data.colors.border.r,
-                                                data.colors.border.g,
-                                                data.colors.border.b
-                                            );
+            if comboPoints > 0 then
+                for i = 1, comboPoints do
+                    if not unitFrame.classPower[i] then
+                        unitFrame.classPower[i] = CreateFrame("frame", nil, unitFrame.classPower);
+                        unitFrame.classPower[i]:SetSize(14, 14);
 
-                                            if i > 1 then
-                                                unitFrame.comboPoints[i]:SetPoint("left", unitFrame.comboPoints[i - 1], "right");
-                                            end
-                                        end
+                        unitFrame.classPower[i].center = unitFrame.classPower[i]:CreateTexture();
+                        unitFrame.classPower[i].center:SetPoint("center");
+                        unitFrame.classPower[i].center:SetSize(18, 18);
+                        unitFrame.classPower[i].center:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\comboPoints");
 
-                                        unitFrame.comboPoints[i]:Show();
-                                    end
-                                end
-
-                                unitFrame.comboPoints[1]:ClearAllPoints();
-
-                                if Config.Portrait then
-                                    if unitFrame.powerbar:IsShown() then
-                                        unitFrame.comboPoints[1]:SetPoint("top", unitFrame.healthbar, "bottom", (-(comboPoints -1) * 7), -7);
-                                    else
-                                        unitFrame.comboPoints[1]:SetPoint("top", unitFrame.healthbar, "bottom", (-(comboPoints -1) * 7), -2);
-                                    end
-                                else
-                                    if unitFrame.powerbar:IsShown() then
-                                        unitFrame.comboPoints[1]:SetPoint("top", unitFrame.healthbar, "bottom", ((-(comboPoints -1) * 7)) + 9, -7);
-                                    else
-                                        unitFrame.comboPoints[1]:SetPoint("top", unitFrame.healthbar, "bottom", ((-(comboPoints -1) * 7)) + 9, -2);
-                                    end
-                                end
-
-                                unitFrame.comboPoints:Show();
-                            else
-                                unitFrame.comboPoints:Hide();
-                            end
-                        end
+                        unitFrame.classPower[i].border = unitFrame.classPower[i]:CreateTexture();
+                        unitFrame.classPower[i].border:SetPoint("center");
+                        unitFrame.classPower[i].border:SetSize(18, 18);
+                        unitFrame.classPower[i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\comboPointsBorder");
+                        unitFrame.classPower[i].border:SetVertexColor(data.colors.border.r, data.colors.border.g, data.colors.border.b);
                     end
                 end
+
+                for i in ipairs(unitFrame.classPower) do
+                    if i == 1 then
+                        unitFrame.classPower[i]:SetPoint("center", unitFrame.classPower, "center", -(comboPoints -1) * 7, 0);
+                    elseif i > 1 then
+                        unitFrame.classPower[i]:SetPoint("left", unitFrame.classPower[i - 1], "right");
+                    end
+
+                    unitFrame.classPower[i]:SetShown(i <= comboPoints);
+                end
             end
+
+            unitFrame.classPower:SetScript("OnShow", function()
+                func:PositionAuras(unitFrame);
+            end);
+            unitFrame.classPower:SetScript("OnHide", function()
+                func:PositionAuras(unitFrame);
+            end);
+
+            unitFrame.classPower:SetWidth(18 * comboPoints);
+            unitFrame.classPower:SetShown(comboPoints > 0);
         end
     end
 end
@@ -1078,40 +1046,41 @@ end
 -- Spell cost
 ----------------------------------------
 function func:SpellCost(unit, spellID)
-    --[[if UnitIsUnit(unit, "player") then
-        local costTable = GetSpellPowerCost(spellID);
-        local powerType, powerToken = UnitPowerType(unit);
+    --[[if not data.isRetail then
+        if UnitIsUnit(unit, "player") then
+            local costTable = GetSpellPowerCost(spellID);
 
-        local function cost(cost, costType)
-            local powerMax = UnitPowerMax("player", costType);
+            local function cost(cost, costType)
+                local powerMax = UnitPowerMax("player", costType);
 
-            if cost > 0 then
-                data.nameplate.powerbarCost:SetWidth(cost / powerMax * data.nameplate.powerbar:GetWidth());
-                data.nameplate.powerbarCost:Show();
-                data.nameplate.powerbarCostSpark:Show();
-            end
-        end
-
-        if next(costTable) ~= nil then
-            for k,v in pairs(costTable) do
-                for k,v in pairs(v) do
-                    print(k,v)
+                if cost > 0 then
+                    data.nameplate.powerbarCost:SetWidth(cost / powerMax * data.nameplate.powerbar:GetWidth());
+                    data.nameplate.powerbarCost:Show();
+                    data.nameplate.powerbarCostSpark:Show();
                 end
             end
-        end
 
-        if next(costTable) ~= nil then
-            if type(costTable[1]["cost"]) == "table" then
-                local costType = costTable[1].cost[1].type;
-                local cost2Type = costTable[1].cost[2].type;
-
-                if costType == 0 or costType == 1 or costType == 3 then print("1")
-                    cost(costTable[1].cost[1].cost, costType);
-                elseif cost2Type == 0 or cost2Type == 1 or cost2Type == 3 then print("2")
-                    cost(costTable[1].cost[2].cost, cost2Type);
+            if next(costTable) ~= nil then
+                for k,v in pairs(costTable) do
+                    for k,v in pairs(v) do
+                        --print(k,v)
+                    end
                 end
-            else
-                cost(costTable[1].cost, costTable[1].type);
+            end
+
+            if next(costTable) ~= nil then
+                if type(costTable[1]["cost"]) == "table" then
+                    local costType = costTable[1].cost[1].type;
+                    local cost2Type = costTable[1].cost[2].type;
+
+                    if costType == 0 or costType == 1 or costType == 3 then print("1")
+                        cost(costTable[1].cost[1].cost, costType);
+                    elseif cost2Type == 0 or cost2Type == 1 or cost2Type == 3 then print("2")
+                        cost(costTable[1].cost[2].cost, cost2Type);
+                    end
+                else
+                    cost(costTable[1].cost, costTable[1].type);
+                end
             end
         end
     end]]
@@ -1211,33 +1180,24 @@ end
 function func:Update_NameAndGuildPositions(nameplate)
     if nameplate then
         local unitFrame = nameplate.unitFrame;
-        local portrait, level = 0, 0;
-        local threatOffset = 0;
-        local DefaultNameY = 0;
-
-        if not Config.Portrait then
-            portrait = 9.5;
-        end
-
-        if not Config.ShowLevel then
-            level = 9.5;
-        end
-
-        if unitFrame.threatPercentage:IsShown() then
-            threatOffset = 9;
-            DefaultNameY = 8;
-        end
+        local portrait = Config.Portrait and 0 or -9;
+        local level = Config.ShowLevel and 0 or 9;
+        local powerbarToggle = unitFrame.unit and UnitPower(unitFrame.unit) and UnitPowerMax(unitFrame.unit) > 0;
+        local DefaultNameY = (unitFrame.threatPercentage:IsShown() or unitFrame.guild:IsShown()) and 0
+            or (Config.ShowGuildName or Config.ThreatPercentage) and not powerbarToggle and -6
+            or (Config.ShowGuildName or Config.ThreatPercentage) and powerbarToggle and -4
+            or not powerbarToggle and -2
+            or powerbarToggle and 0 or -6;
+        local x = portrait + level;
+        local y = unitFrame.threatPercentage:IsShown() and -17 or -8;
+        local anchor = Config.ShowGuildName and unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name;
 
         if nameplate.UnitFrame then
-            if Config.ShowGuildName and unitFrame.guild:IsShown() then
-                nameplate.UnitFrame.name:SetPoint("top", 0, 0 + DefaultNameY);
-                unitFrame.healthbar:ClearAllPoints();
-                unitFrame.healthbar:SetPoint("top", unitFrame.guild, "bottom", 0 - portrait + level, -8 - threatOffset);
-            else
-                nameplate.UnitFrame.name:SetPoint("top", 0, -8 + DefaultNameY);
-                unitFrame.healthbar:ClearAllPoints();
-                unitFrame.healthbar:SetPoint("top", unitFrame.name, "bottom", 0 - portrait + level, -8 - threatOffset);
-            end
+            nameplate.UnitFrame.name:ClearAllPoints();
+            nameplate.UnitFrame.name:SetPoint("top", 0, DefaultNameY);
+
+            unitFrame.healthbar:ClearAllPoints();
+            unitFrame.healthbar:SetPoint("top", anchor, "bottom", x, y);
         end
     end
 end

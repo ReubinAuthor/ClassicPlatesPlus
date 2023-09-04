@@ -102,6 +102,36 @@ function func:Load_Settings()
 
         -- CheckButton
         do
+            local name = "Name & Guild Outline";
+            local tooltip = "";
+            local cfg = "NameAndGuildOutline";
+            local default = false;
+
+            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Large Name";
+            local tooltip = "";
+            local cfg = "LargeName";
+            local default = false;
+
+            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Large Guild Name";
+            local tooltip = "";
+            local cfg = "LargeGuildName";
+            local default = false;
+
+            func:Create_CheckButton(panel, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
             local name = "Classification";
             local tooltip = "Creature class: " .. white .. "Elite, Rare, Rare Elite, World Boss";
             local cfg = "Classification";
@@ -186,6 +216,48 @@ function func:Load_Settings()
 
                 func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
             end
+        end
+
+        -- Slider
+        do
+            local name = "Castbar Scale";
+            local tooltip = "";
+            local cfg = "CastbarScale";
+            local default = 1;
+            local step = 0.01;
+            local minValue = 0.75;
+            local maxValue = 1.25;
+            local decimals = 2;
+
+            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Slider
+        do
+            local name = "Castbar Position";
+            local tooltip = "";
+            local cfg = "CastbarPositionY";
+            local default = 0;
+            local step = 1;
+            local minValue = 0;
+            local maxValue = 50;
+            local decimals = 0;
+
+            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Slider
+        do
+            local name = "Class Power Scale";
+            local tooltip = "Class power: " .. white .. "Combo Points, Runes, Totems";
+            local cfg = "ClassPowerScale";
+            local default = 1;
+            local step = 0.01;
+            local minValue = 0.50;
+            local maxValue = 1.50;
+            local decimals = 2;
+
+            func:Create_Slider(panel, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
         -- Sub-Category
@@ -405,6 +477,20 @@ function func:Load_Settings()
             local default = true;
 
             func:Create_CheckButton(panel, name, tooltip, cfg, default);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Countdown position";
+            local tooltip = "";
+            local cfg = "AurasCountdownPosition";
+            local default = 1;
+            local options = {
+                [1] = "Top Right",
+                [2] = "Center"
+            }
+
+            func:Create_DropDownMenu(panel, name, tooltip, cfg, default, options);
         end
 
         -- CheckButton

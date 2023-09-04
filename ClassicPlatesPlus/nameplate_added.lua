@@ -31,8 +31,12 @@ function func:Nameplate_Added(unit, visuals)
                 unitFrame.level:SetShown(Config.ShowLevel);
 
                 -- Name and Guild
-                unitFrame.name:SetScale(Config.NameplatesScale - func:GetPercent(Config.NameplatesScale, 10));
-                unitFrame.guild:SetScale(Config.NameplatesScale - func:GetPercent(Config.NameplatesScale, 20));
+                unitFrame.name:SetFontObject(Config.NameAndGuildOutline and "GameFontNormalOutline" or "GameFontNormal");
+                unitFrame.guild:SetFontObject(Config.NameAndGuildOutline and "GameFontNormalOutline" or "GameFontNormal");
+                unitFrame.name:SetScale(Config.LargeName and 0.95 or 0.75);
+                unitFrame.guild:SetScale(Config.LargeGuildName and 0.95 or 0.75);
+
+                --print(unitFrame.name:GetHeight() * unitFrame.name:GetEffectiveScale());
 
                 -- Threat percentage
                 unitFrame.threatPercentage:ClearAllPoints();
@@ -69,15 +73,22 @@ function func:Nameplate_Added(unit, visuals)
                 );
 
                 -- Castbar
+                unitFrame.castbar:SetScale(Config.CastbarScale);
                 unitFrame.castbar:ClearAllPoints();
 
                 -- Raid target
                 unitFrame.raidTarget.icon:ClearAllPoints();
 
+                -- Auras counters
                 unitFrame.buffsCounter:SetScale(Config.AurasScale);
                 unitFrame.debuffsCounter:SetScale(Config.AurasScale);
 
+                -- powerbar
+                unitFrame.powerbar:ClearAllPoints();
+                local powerbarToggle = Config.Powerbar and UnitPower(unit) and UnitPowerMax(unit) > 0;
+
                 -- Name
+                unitFrame.name:ClearAllPoints();
                 unitFrame.name:SetPoint("top", nameplate.UnitFrame.name, "top"); -- Anchor frame
 
                 -- Quest
@@ -85,6 +96,9 @@ function func:Nameplate_Added(unit, visuals)
 
                 -- Class Bar
                 unitFrame.ClassBarDummy:SetHeight(data.classBarHeight);
+
+                -- Class power
+                unitFrame.classPower:SetScale(Config.ClassPowerScale);
 
                 -- Health Value Secondary
                 unitFrame.healthSecondary:SetJustifyH("left");
@@ -104,17 +118,17 @@ function func:Nameplate_Added(unit, visuals)
 
                     if Config.ShowLevel then
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 0, -1.5);
-                        unitFrame.castbar:SetPoint("top", unitFrame.healthbar.border, "bottom", 0, 8);
-                        unitFrame.powerbar.statusbar:SetPoint("top", unitFrame.healthbar, "bottom", 0, -1);
+                        unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or -3) - Config.CastbarPositionY);
+                        unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 0, -1);
                         unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center");
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
                         unitFrame.classification:SetPoint("center", unitFrame.portrait.texture, "center", -5, -2);
                         unitFrame.quest:SetPoint("left", unitFrame.level, "right", -14, 1);
                     else
-                        unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 0, -1.5);
-                        unitFrame.castbar:SetPoint("top", unitFrame.healthbar.border, "bottom", -9.5, 8);
-                        unitFrame.powerbar.statusbar:SetPoint("top", unitFrame.healthbar, "bottom", -6.33, -1); --<
-                        unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", -9.5, 0); --<
+                        unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", -9, -1.5);
+                        unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and -2 or -9, (powerbarToggle and 4 or -3) - Config.CastbarPositionY);
+                        unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", -6.33, -1); --<
+                        unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", -9, 0); --<
                         unitFrame.healthSecondary:SetPoint("right", unitFrame.healthbar, "right", -4, 0);
                         unitFrame.healthSecondary:SetJustifyH("right");
                         unitFrame.classification:SetPoint("center", unitFrame.portrait.texture, "center", -5, -2);
@@ -130,17 +144,17 @@ function func:Nameplate_Added(unit, visuals)
                     unitFrame.raidTarget.icon:SetPoint("right", unitFrame.healthbar, "left", -6, 0);
 
                     if Config.ShowLevel then
-                        unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 9.5, -1.5);
-                        unitFrame.castbar:SetPoint("top", unitFrame.healthbar.border, "bottom", 9.5, 8);
-                        unitFrame.powerbar.statusbar:SetPoint("top", unitFrame.healthbar, "bottom", 7.12, -1); --<
-                        unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", 9.5, 0); --<
+                        unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 9, -1.5);
+                        unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and 2.67 or 9, (powerbarToggle and 4 or 0) - Config.CastbarPositionY);
+                        unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 6.33, -1); --<
+                        unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", 9, 0); --<
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
                         unitFrame.classification:SetPoint("center", unitFrame.level.border, "center", 7, 0);
                         unitFrame.quest:SetPoint("left", unitFrame.level, "right", -14, 1);
                     else
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 0, -1.5);
-                        unitFrame.castbar:SetPoint("top", unitFrame.healthbar.border, "bottom", 0, 8);
-                        unitFrame.powerbar.statusbar:SetPoint("top", unitFrame.healthbar, "bottom", 0, -1);
+                        unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or 0) - Config.CastbarPositionY);
+                        unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 0, -1);
                         unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", 0, 0);
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
                         unitFrame.classification:SetPoint("left", unitFrame.healthbar, "left", -14, 0);
@@ -149,16 +163,6 @@ function func:Nameplate_Added(unit, visuals)
                     end
                 end
 
-                -- Interract icon
-                local interactIcon = nameplate.UnitFrame.SoftTargetFrame.Icon;
-                if interactIcon then
-                    interactIcon:SetParent(unitFrame);
-                    interactIcon:ClearAllPoints();
-                    interactIcon:SetPoint("left", unitFrame.name, "right", 2, 0);
-                    interactIcon:SetScale(0.33);
-                end
-
-                -- Widget Container
                 local toggle = true;
                 if data.isRetail then
                     local widgetOnly = UnitNameplateShowsWidgetsOnly(unit);
@@ -212,7 +216,9 @@ function func:Nameplate_Added(unit, visuals)
                 func:Update_Health(unit);
                 func:Update_healthbar(unit);
                 func:Update_Power(unit);
-                func:Update_ComboPoints(unit);
+                if not data.isRetail then
+                    func:Update_ClassPower(unit);
+                end
                 func:Update_Threat(unit);
                 if not visuals then
                     func:Update_Auras(unit);
@@ -225,6 +231,9 @@ function func:Nameplate_Added(unit, visuals)
                     func:Update_quests(unit);
                 end
 
+                -- Interact Icon
+                func:InteractIcon(nameplate);
+
                 -- Scripts
                 --[[local timeElapsed = 0;
                 unitFrame:SetScript("OnUpdate", function(self, elapsed)
@@ -236,7 +245,7 @@ function func:Nameplate_Added(unit, visuals)
                 end);]]
 
                 -- Showing nameplate
-                unitFrame:SetShown(toggle and not UnitIsGameObject(unit));
+                unitFrame:SetShown(toggle and not UnitIsGameObject(unit) and (data.isRetail and not UnitNameplateShowsWidgetsOnly(unit) or not data.isRetail));
             end
 
             -- Hiding default nameplates

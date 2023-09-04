@@ -37,7 +37,7 @@ function func:Nameplate_Removed(unit)
             unitFrame.threatPercentage:Hide();
 
             -- Combo points
-            unitFrame.comboPoints:Hide();
+            unitFrame.classPower:Hide();
 
             -- Removing nameplate
             unitFrame.unit = nil;

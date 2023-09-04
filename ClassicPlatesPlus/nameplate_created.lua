@@ -26,11 +26,11 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
         -- Name & Guild
         --------------------------------
-        unitFrame.name = unitFrame:CreateFontString(nil, nil, "GameFontNormalSmall");
+        unitFrame.name = unitFrame:CreateFontString(nil, nil, "GameFontNormalOutline");
         unitFrame.name:SetIgnoreParentScale(true);
         unitFrame.name:SetJustifyH("center");
 
-        unitFrame.guild = unitFrame:CreateFontString(nil, nil, "GameFontNormalSmall");
+        unitFrame.guild = unitFrame:CreateFontString(nil, nil, "GameFontNormal");
         unitFrame.guild:SetPoint("top", unitFrame.name, "bottom", 0, -1);
         unitFrame.guild:SetIgnoreParentScale(true);
         unitFrame.guild:SetJustifyH("center");
@@ -109,12 +109,14 @@ function func:Nameplate_Created(nameplate)
 
         -- Parent
         unitFrame.powerbar = CreateFrame("Frame", nil, unitFrame);
+        unitFrame.powerbar:SetSize(100, 10);
         unitFrame.powerbar:SetFrameLevel(3);
 
         -- Statusbar
         unitFrame.powerbar.statusbar = CreateFrame("StatusBar", nil, unitFrame.powerbar);
-        unitFrame.powerbar.statusbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar");
+        unitFrame.powerbar.statusbar:SetPoint("top");
         unitFrame.powerbar.statusbar:SetSize(72, 5);
+        unitFrame.powerbar.statusbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar");
         unitFrame.powerbar.statusbar:SetFrameLevel(1);
 
         -- Border
@@ -149,7 +151,9 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
         -- Combo points
         --------------------------------
-        unitFrame.comboPoints = CreateFrame("frame", nil, unitFrame);
+        unitFrame.classPower = CreateFrame("frame", nil, unitFrame);
+        unitFrame.classPower:SetPoint("bottom", unitFrame.name, "top", 0, 2);
+        unitFrame.classPower:SetSize(14, 14);
 
         --------------------------------
         -- Portrait
@@ -328,11 +332,13 @@ function func:Nameplate_Created(nameplate)
 
         -- Parent
         unitFrame.castbar = CreateFrame("frame", nil, unitFrame);
-        unitFrame.castbar:SetSize(256, 64);
+        unitFrame.castbar:SetSize(134, 18);
+        unitFrame.castbar:SetIgnoreParentScale(true);
 
         -- Border
         unitFrame.castbar.border = unitFrame.castbar:CreateTexture();
-        unitFrame.castbar.border:SetAllPoints();
+        unitFrame.castbar.border:SetPoint("center");
+        unitFrame.castbar.border:SetSize(256, 64);
         unitFrame.castbar.border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbarUI");
         unitFrame.castbar.border:SetVertexColor(0.75, 0.75, 0.75);
         unitFrame.castbar.border:SetDrawLayer("artwork", 2);
@@ -369,7 +375,7 @@ function func:Nameplate_Created(nameplate)
         unitFrame.castbar.name = unitFrame.castbar:CreateFontString(nil, nil, "GameFontNormalSmall");
         unitFrame.castbar.name:SetPoint("left", unitFrame.castbar.statusbar, "left", 5, 0);
         unitFrame.castbar.name:SetJustifyH("left");
-        unitFrame.castbar.name:SetScale(0.8);
+        unitFrame.castbar.name:SetScale(0.7);
 
         -- Spark
         unitFrame.castbar.spark = unitFrame.castbar:CreateTexture();

@@ -142,7 +142,7 @@ function core:init(event, ...)
         func:Update_Power(arg);
 
         if not data.isRetail then
-            func:Update_ComboPoints(arg);
+            func:Update_ClassPower(arg);
         end
     end
 

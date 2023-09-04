@@ -58,7 +58,7 @@ local function updateAurasVisuals()
     local nameplates = C_NamePlate.GetNamePlates();
 
     local function work(unitFrame, auraType)
-        local scaleOffset = unitFrame.unit == "player" and -0.2 or 0.15;
+        local scaleOffset = unitFrame.unit == "player" and 0.15 or 0.15;
         local scale = Config.AurasScale - scaleOffset;
         if scale <= 0 then scale = 0.1 end
 
@@ -67,6 +67,14 @@ local function updateAurasVisuals()
                 unitFrame[auraType]["auras"][i]:SetScale(scale);
                 unitFrame[auraType]["auras"][i].cooldown:SetReverse(Config.AurasReverseAnimation);
                 unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
+                unitFrame[auraType]["auras"][i].countdown:ClearAllPoints();
+                if Config.AurasCountdownPosition == 1 then
+                    unitFrame[auraType]["auras"][i].countdown:SetPoint("right", unitFrame[auraType]["auras"][i].second, "topRight", 5, -2.5);
+                    unitFrame[auraType]["auras"][i].countdown:SetJustifyH("right");
+                elseif Config.AurasCountdownPosition == 2 then
+                    unitFrame[auraType]["auras"][i].countdown:SetPoint("center", unitFrame[auraType]["auras"][i].second, "center");
+                    unitFrame[auraType]["auras"][i].countdown:SetJustifyH("center");
+                end
             end
         end
 
@@ -84,6 +92,11 @@ local function updateAurasVisuals()
             end
         end
     end
+
+    if data.nameplate then
+        work(data.nameplate, "buffs");
+        work(data.nameplate, "debuffs");
+    end
 end
 
 local function updateNameplateScale()
@@ -97,8 +110,8 @@ local function updateNameplateScale()
                 v.unitFrame.name:SetIgnoreParentScale(false);
                 v.unitFrame.guild:SetIgnoreParentScale(false);
 
-                v.unitFrame.name:SetScale(Config.NameplatesScale - func:GetPercent(Config.NameplatesScale, 10));
-                v.unitFrame.guild:SetScale(Config.NameplatesScale - func:GetPercent(Config.NameplatesScale, 20));
+                v.unitFrame.name:SetScale(Config.LargeName and 0.95 or 0.75);
+                v.unitFrame.guild:SetScale(Config.LargeGuildName and 0.95 or 0.75);
 
                 v.unitFrame.name:SetIgnoreParentScale(true);
                 v.unitFrame.guild:SetIgnoreParentScale(true);
@@ -146,15 +159,30 @@ end
 -- Storing functions defined by config names
 local functionsTable = {
     PersonalNameplate = function() func:ToggleNameplatePersonal(); end,
-    Portrait = function() updateNameplateVisuals(); end,
+    Portrait = function()
+        updateNameplateVisuals();
+        func:ResizeNameplates();
+    end,
     ClassIconsFriendly = function() updateNameplateVisuals(); end,
     ClassIconsEnemy = function() updateNameplateVisuals(); end,
-    ShowLevel = function() updateNameplateVisuals(); end,
-    ShowGuildName = function() updateNameplateVisuals(); end,
+    ShowLevel = function()
+        updateNameplateVisuals();
+        func:ResizeNameplates();
+    end,
+    ShowGuildName = function()
+        updateNameplateVisuals();
+        func:ResizeNameplates();
+    end,
     Classification = function() updateNameplateVisuals(); end,
-    NameplatesScale = function() updateNameplateScale(); end,
+    NameplatesScale = function()
+        updateNameplateScale();
+        func:ResizeNameplates();
+    end,
     PersonalNameplatesScale = function() func:PersonalNameplateAdd(); end,
-    Powerbar = function() updateNameplateVisuals(); end,
+    Powerbar = function()
+        updateNameplateVisuals();
+        func:ResizeNameplates();
+    end,
     HealthBarClassColorsFriendly = function() updateNameplateVisuals(); end,
     HealthBarClassColorsEnemy = function() updateNameplateVisuals(); end,
     NumericValue = function()
@@ -179,7 +207,10 @@ local functionsTable = {
         updateNameplateVisuals();
         func:PersonalNameplateAdd();
     end,
-    ThreatPercentage = function() updateNameplateVisuals(); end,
+    ThreatPercentage = function()
+        updateNameplateVisuals();
+        func:ResizeNameplates();
+    end,
     ThreatHighlight = function() updateNameplateVisuals(); end,
 
     -- Auras
@@ -221,6 +252,21 @@ local functionsTable = {
     FadeUnselected = function() updateNameplateVisuals(); end,
     FadeIntensity = function() updateNameplateVisuals(); end,
     MaxNameplateDistance = function() updateNameplateDistance(); end,
+    CastbarScale = function() updateNameplateVisuals(); end,
+    CastbarPositionY = function() updateNameplateVisuals(); end,
+    ClassPowerScale = function() updateNameplateVisuals(); end,
+    AurasCountdownPosition = function() updateAurasVisuals(); end,
+    NameAndGuildOutline = function()
+        updateNameplateVisuals();
+    end,
+    LargeName = function()
+        updateNameplateScale();
+        func:ResizeNameplates();
+    end,
+    LargeGuildName = function()
+        updateNameplateScale();
+        func:ResizeNameplates();
+    end,
 }
 
 -- Execute function by passed config name
