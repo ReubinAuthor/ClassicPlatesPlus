@@ -22,8 +22,9 @@ Grab it on [**CurseForge**](https://www.curseforge.com/wow/addons/classicplatesp
 <br />
 
 You can also support the project with gold if you are paying on **Pyrewood Village (EU)** - *Wrath of the Lich King*
-Alliance character name: **Platesally**
-Horder character name: **Plateshorde**
+<br />
+- Alliance character name: **Platesally**
+- Horder character name: **Plateshorde**
 
 *All gold will go towards subscription (Tokens)*
 
