@@ -3,7 +3,7 @@
 # **ClassicPlates Plus**
 ClassicPlates Plus is a nameplates addon that adds additional features and new updated Classic-themed visuals.
 
-**Features:**
+## Features
 - Buffs and Debuffs tracking
 - Threat status
 - Class colors and Icons
@@ -13,11 +13,31 @@ ClassicPlates Plus is a nameplates addon that adds additional features and new u
 
 <br />
 
+## How to move Personal Nameplate
+You can move personal nameplate in Classic Era and Wrath by holding down CTRL and dragging it with Left Mouse Button.
+
+<br />
+
+## Consider supporting this project
+You can support this project with [**one time donation**](https://boosty.to/reubin/donate) or a [**subscription**](https://boosty.to/reubin)
+
+<br />
+
+You can also support the project with gold if you are paying on **Pyrewood Village (EU)** - *Wrath of the Lich King*
+- Alliance character name: **Platesally**
+- Horder character name: **Plateshorde**
+
+*All gold will go towards subscription (Tokens)*
+
+<br />
+
+## Download
+
 Grab it on [**CurseForge**](https://www.curseforge.com/wow/addons/classicplatesplus).
 
 <br />
 
-[**Consider supporting this project**](https://boosty.to/reubin/donate)
+## Screenshots
 
 <br />
 
