@@ -41,10 +41,10 @@ function func:CVars(event)
         data.cvars.nameplateShowFriendlyBuffs = tostring(GetCVar("nameplateShowFriendlyBuffs"));
         data.cvars.nameplateResourceOnTarget = tostring(GetCVar("nameplateResourceOnTarget"));
         data.cvars.nameplateShowSelf = tostring(GetCVar("nameplateShowSelf"));
+        data.cvars.NamePlateVerticalScale = tostring(GetCVar("NamePlateVerticalScale"));
 
         -- Distance
-        local minScale = not data.isClassic and 0.8 or 1;
-        SetCVar("nameplateMinScale", minScale);
+        SetCVar("nameplateMinScale", data.isClassic and 1 or Config.ScaleWithDistance and 0.8 or 1);
         SetCVar("nameplateMaxScale", 1.0);
         SetCVar("nameplateMinScaleDistance", 10);
         SetCVar("nameplateMaxScaleDistance", 10);
@@ -53,7 +53,7 @@ function func:CVars(event)
         -- Selected
         SetCVar("nameplateNotSelectedAlpha", 1.0);
         SetCVar("nameplateSelectedAlpha", 1.0);
-        SetCVar("nameplateSelectedScale", 1.2);
+        SetCVar("nameplateSelectedScale", Config.EnlargeSelected and 1.2 or not Config.EnlargeSelected and 1);
 
         -- Inset
         local classPowerScale = data.isRetail and 0 or Config.ClassPowerScale;
@@ -159,16 +159,8 @@ function func:ResizeNameplates()
     end
 end
 
-----------------------------------------
--- Hiding default nameplates
-----------------------------------------
-hooksecurefunc(NamePlateDriverFrame,"OnNamePlateAdded", function(_, nameplateUnitToken)
-    local nameplate = C_NamePlate.GetNamePlateForUnit(nameplateUnitToken, false);
-
-    if nameplate then
-        nameplate.UnitFrame:Hide();
-        nameplate.UnitFrame:UnregisterAllEvents();
-    end
+hooksecurefunc(NamePlateDriverFrame,"ApplyFrameOptions", function(_, nameplateFrame)
+    func:ResizeNameplates();
 end);
 
 ----------------------------------------
@@ -259,13 +251,6 @@ function func:ClassBarHeight()
 end
 
 ----------------------------------------
--- Resizing clickable base
-----------------------------------------
-hooksecurefunc(NamePlateDriverFrame,"ApplyFrameOptions", function(_, nameplateFrame)
-    func:ResizeNameplates();
-end);
-
-----------------------------------------
 -- Hiding default personal friendly buffs
 ----------------------------------------
 if PersonalFriendlyBuffFrame then
@@ -325,6 +310,19 @@ function func:GetPercent(maxValue, percent)
         return (maxValue * percent) / 100;
     else
         return false;
+    end
+end
+
+----------------------------------------
+-- Unit in your party (not raid, just your party)
+----------------------------------------
+function func:UnitInYourParty(unit)
+    for i = 1, 5 do
+        local member = "party" .. i;
+
+        if UnitIsUnit(member, unit) then
+            return true;
+        end
     end
 end
 
@@ -516,6 +514,8 @@ function func:Update_Colors(unit)
     local function work(unitFrame, unit)
         local r,g,b = func:GetUnitColor(unit);
         local Rs,Gs,Bs = UnitSelectionColor(unit, true);
+        local _, englishClass = UnitClass(unit);
+        local classColor = RAID_CLASS_COLORS[englishClass];
         local target = UnitIsUnit(unit, "target");
 
         if UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
@@ -539,8 +539,16 @@ function func:Update_Colors(unit)
             unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
             unitFrame.guild:SetTextColor(0.5, 0.5, 0.5);
         else
-            unitFrame.name:SetTextColor(Rs, Gs, Bs);
-            unitFrame.guild:SetTextColor(Rs, Gs, Bs);
+            if Config.FriendlyClassColorNamesAndGuild and UnitIsFriend(unit, "player") and UnitIsPlayer(unit) then
+                unitFrame.name:SetTextColor(classColor.r, classColor.g, classColor.b);
+                unitFrame.guild:SetTextColor(classColor.r, classColor.g, classColor.b);
+            elseif Config.EnemyClassColorNamesAndGuild and UnitIsEnemy(unit, "player") and UnitIsPlayer(unit) then
+                unitFrame.name:SetTextColor(classColor.r, classColor.g, classColor.b);
+                unitFrame.guild:SetTextColor(classColor.r, classColor.g, classColor.b);
+            else
+                unitFrame.name:SetTextColor(Rs, Gs, Bs);
+                unitFrame.guild:SetTextColor(Rs, Gs, Bs);
+            end
         end
 
         -- Coloring borders
@@ -598,12 +606,12 @@ end
 
 ----------------------------------------
 -- Update Quests
-----------------    `------------------------
+----------------------------------------
 function func:Update_quests(unit)
     local function work(unit)
         local TooltipData = C_TooltipInfo.GetUnit(unit);
 
-        local function getQuestTitle()
+        local function getQuestProgress()
             local count = 0;
             local pattern1 = "(%d+)/(%d+)";
             local pattern2 = "(%d+)%%";
@@ -641,21 +649,22 @@ function func:Update_quests(unit)
             local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
             if nameplate then
-                nameplate.unitFrame.quest:SetShown(getQuestTitle());
+                nameplate.unitFrame.quest:SetShown(Config.QuestMark and getQuestProgress());
             end
         end
     end
 
+    if data.isRetail then
+        if unit then
+            work(unit);
+        else
+            local nameplates = C_NamePlate.GetNamePlates();
 
-    if unit then
-        work(unit)
-    else
-        local nameplates = C_NamePlate.GetNamePlates();
-
-        if nameplates then
-            for k,v in pairs(nameplates) do
-                if k and v.unitFrame.unit then
-                    work(v.unitFrame.unit);
+            if nameplates then
+                for k,v in pairs(nameplates) do
+                    if k and v.unitFrame.unit then
+                        work(v.unitFrame.unit);
+                    end
                 end
             end
         end
@@ -1169,27 +1178,55 @@ end
 ----------------------------------------
 -- Update name and guild positions
 ----------------------------------------
-function func:Update_NameAndGuildPositions(nameplate)
+function func:Update_NameAndGuildPositions(nameplate, hook)
     if nameplate then
-        local unitFrame = nameplate.unitFrame;
-        local portrait = Config.Portrait and 0 or -9;
-        local level = Config.ShowLevel and 0 or 9;
-        local powerbarToggle = unitFrame.unit and UnitPower(unitFrame.unit) and UnitPowerMax(unitFrame.unit) > 0;
-        local DefaultNameY = (unitFrame.threatPercentage:IsShown() or unitFrame.guild:IsShown()) and 0
-            or (Config.ShowGuildName or Config.ThreatPercentage) and not powerbarToggle and -6
-            or (Config.ShowGuildName or Config.ThreatPercentage) and powerbarToggle and -4
-            or not powerbarToggle and -2
-            or powerbarToggle and 0 or -6;
-        local x = portrait + level;
-        local y = unitFrame.threatPercentage:IsShown() and -17 or -8;
-        local anchor = Config.ShowGuildName and unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name;
+        local unit = nameplate.namePlateUnitToken;
 
-        if nameplate.UnitFrame then
-            nameplate.UnitFrame.name:ClearAllPoints();
-            nameplate.UnitFrame.name:SetPoint("top", 0, DefaultNameY);
+        if unit then
+            local unitFrame = nameplate.unitFrame;
 
-            unitFrame.healthbar:ClearAllPoints();
-            unitFrame.healthbar:SetPoint("top", anchor, "bottom", x, y);
+            local function work()
+                local portrait = Config.Portrait and 0 or -9;
+                local level = Config.ShowLevel and 0 or 9;
+                local powerbarToggle = unitFrame.unit and UnitPower(unitFrame.unit) and UnitPowerMax(unitFrame.unit) > 0;
+                local DefaultNameY = (unitFrame.threatPercentage:IsShown() or unitFrame.guild:IsShown()) and 0
+                    or (Config.ShowGuildName or Config.ThreatPercentage) and not powerbarToggle and -6
+                    or (Config.ShowGuildName or Config.ThreatPercentage) and powerbarToggle and -4
+                    or not powerbarToggle and -2
+                    or powerbarToggle and 0 or -6;
+                local x = portrait + level;
+                local y = unitFrame.threatPercentage:IsShown() and -17 or -8;
+                local anchor = Config.ShowGuildName and unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name;
+
+                nameplate.UnitFrame.name:ClearAllPoints();
+                nameplate.UnitFrame.name:SetPoint("top", 0, DefaultNameY);
+                unitFrame.healthbar:ClearAllPoints();
+                unitFrame.healthbar:SetPoint("top", anchor, "bottom", x, y);
+            end
+
+            local canAttack = UnitCanAttack("player", unit);
+            local showParent = UnitIsUnit("target", unit)
+                or Config.NamesOnly == 1
+                or Config.NamesOnly == 2 and canAttack
+                or Config.NamesOnly == 3 and not canAttack
+                or Config.NamesOnly == 4 and false
+
+            if not showParent then
+                local exclude = Config.NamesOnlyExcludeNPC and not (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit))
+                             or Config.NamesOnlyExcludeFriends and func:isFriend(unit)
+                             or Config.NamesOnlyExcludeGuild   and IsGuildMember(unit)
+                             or Config.NamesOnlyExcludeParty   and func:UnitInYourParty(unit)
+                             or Config.NamesOnlyExcludeRaid    and UnitPlayerOrPetInRaid(unit)
+
+                if not exclude then
+                    nameplate.UnitFrame.name:ClearAllPoints();
+                    nameplate.UnitFrame.name:SetPoint("center", nameplate, "center", 0, unitFrame.guild:IsShown() and 8 or 0);
+                else
+                    work();
+                end
+            elseif not hook then
+                work();
+            end
         end
     end
 end
@@ -1261,21 +1298,95 @@ function func:Update_PVP_Flag(unit)
             local unitFrame = nameplate.unitFrame;
             local isFreeForAll = UnitIsPVPFreeForAll(unit);
             local flaggedPVP = UnitIsPVP(unit);
+            local englishFaction = UnitFactionGroup(unit);
 
             if isFreeForAll then
                 unitFrame.pvp_flag:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\ffa");
-                unitFrame.pvp_flag:Show();
-            elseif flaggedPVP then
-                local faction = UnitFactionGroup(unit);
+            elseif flaggedPVP and englishFaction then
+                unitFrame.pvp_flag:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\" .. englishFaction);
+            end
 
-                if faction then
-                    unitFrame.pvp_flag:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\" .. faction);
-                    unitFrame.pvp_flag:Show();
-                else
-                    unitFrame.pvp_flag:Hide();
-                end
-            else
-                unitFrame.pvp_flag:Hide();
+            unitFrame.pvp_flag:ClearAllPoints();
+            unitFrame.pvp_flag:SetPoint("left", unitFrame.name, "right", -1, englishFaction == "Horde" and -4 or (englishFaction == "Alliance" or isFreeForAll) and -3 or 0);
+            unitFrame.pvp_flag:SetShown(Config.ShowFaction and (isFreeForAll or flaggedPVP) and englishFaction);
+        end
+    end
+end
+
+----------------------------------------
+-- Unit is Friend
+----------------------------------------
+function func:isFriend(unit)
+    local GUID = UnitGUID(unit);
+
+    if GUID then
+        if C_FriendList.IsFriend(GUID) then
+            return true;
+        end
+    end
+end
+
+----------------------------------------
+-- Fellowship Badge
+----------------------------------------
+function func:Update_FellowshipBadge(unit)
+    local function work(nameplate)
+        local unitFrame = nameplate.unitFrame;
+        local unit = unitFrame.unit;
+        local toggle = false;
+        local icon_r, icon_g, icon_b = 1, 0.9, 0.8;
+        local badge_r, badge_g, badge_b = 1, 0.9, 0.8;
+        local icon = "Interface\\addons\\ClassicPlatesPlus\\media\\icons\\member";
+
+        if unit then
+            -- Icon
+            if func:isFriend(unit) then
+                icon = "Interface\\addons\\ClassicPlatesPlus\\media\\icons\\friend";
+            elseif IsGuildMember(unit) then
+                icon = "Interface\\addons\\ClassicPlatesPlus\\media\\icons\\guild";
+            end
+
+            -- Badge
+            if UnitIsGroupLeader(unit) then
+                toggle = true;
+                badge_r, badge_g, badge_b = data.colors.red.r, data.colors.red.g, data.colors.red.b;
+            elseif func:UnitInYourParty(unit) then
+                toggle = true;
+                badge_r, badge_g, badge_b = data.colors.blue.r, data.colors.blue.g, data.colors.blue.b;
+            elseif UnitPlayerOrPetInRaid(unit) then
+                toggle = true;
+                badge_r, badge_g, badge_b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b
+            elseif IsGuildMember(unit) then
+                toggle = true;
+                badge_r, badge_g, badge_b = data.colors.green.r, data.colors.green.g, data.colors.green.b;
+            elseif C_FriendList.IsFriend(UnitGUID(unit)) then
+                toggle = true;
+                badge_r, badge_g, badge_b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
+            end
+        end
+
+        if UnitIsGroupLeader(unit) then
+            icon = "Interface\\addons\\ClassicPlatesPlus\\media\\icons\\leader";
+        end
+
+        unitFrame.fellowshipBadge.icon:SetTexture(icon);
+        unitFrame.fellowshipBadge.icon:SetVertexColor(icon_r, icon_g, icon_b);
+        unitFrame.fellowshipBadge.badge:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\badge");
+        unitFrame.fellowshipBadge.badge:SetVertexColor(badge_r, badge_g, badge_b);
+
+        unitFrame.fellowshipBadge:SetShown(Config.FellowshipBadge and toggle);
+    end
+
+    if unit then
+        local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+
+        if nameplate then
+            work(nameplate);
+        end
+    else
+        for _, nameplate in pairs(C_NamePlate.GetNamePlates()) do
+            if nameplate then
+                work(nameplate);
             end
         end
     end
@@ -1313,153 +1424,6 @@ function func:Update_Roster()
 end
 
 ----------------------------------------
--- Castbar start
-----------------------------------------
-function func:Castbar_Start(event, unit)
-    if unit then
-        local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
-
-        if nameplate then
-            local castbar = nameplate.unitFrame.castbar;
-            local name, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible, minValue, maxValue, reverser;
-
-            if event then
-                if event == "UNIT_SPELLCAST_START" then
-                    name, text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = UnitCastingInfo(unit);
-                    minValue = -(endTimeMS - startTimeMS) / 1000;
-                    maxValue = 0;
-                    reverser = -1;
-                    castbar.statusbar:SetStatusBarColor(data.colors.orange.r, data.colors.orange.g, data.colors.orange.b);
-                elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
-                    name, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = UnitChannelInfo(unit);
-                    minValue = 0;
-                    maxValue = (endTimeMS - startTimeMS) / 1000;
-                    reverser = 1;
-                    castbar.statusbar:SetStatusBarColor(data.colors.purple.r, data.colors.purple.g, data.colors.purple.b);
-                end
-            else
-                local name1, text1, icon1, startTimeMS1, endTimeMS1, isTradeSkill1, _, notInterruptible1 = UnitCastingInfo(unit);
-                local name2, text2, icon2, startTimeMS2, endTimeMS2, isTradeSkill2, notInterruptible2 = UnitChannelInfo(unit);
-
-                if name1 then
-                    name, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = name1, text1, icon1, startTimeMS1, endTimeMS1, isTradeSkill1, notInterruptible1;
-                    minValue = -(endTimeMS - startTimeMS) / 1000;
-                    maxValue = 0;
-                    reverser = -1;
-                    castbar.statusbar:SetStatusBarColor(data.colors.orange.r, data.colors.orange.g, data.colors.orange.b);
-                elseif name2 then
-                    name, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = name2, text2, icon2, startTimeMS2, endTimeMS2, isTradeSkill2, notInterruptible2;
-                    minValue = 0;
-                    maxValue = (endTimeMS - startTimeMS) / 1000;
-                    reverser = 1;
-                    castbar.statusbar:SetStatusBarColor(data.colors.purple.r, data.colors.purple.g, data.colors.purple.b);
-                end
-            end
-
-            if text then
-                if isTradeSkill then
-                    castbar.border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbar");
-                elseif notInterruptible then
-                    castbar.border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbarUI2");
-                else
-                    castbar.border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbar");
-                end
-
-                castbar.name:SetText(text);
-
-                local maxNameWidth = 100
-                if castbar.name:GetStringWidth() > maxNameWidth then
-                    local spellName = castbar.name:GetText()
-
-                    if castbar.name:GetStringWidth(spellName) > maxNameWidth then
-                        local spellNameLength = strlenutf8(spellName)
-                        local trimmedLength = math.floor(maxNameWidth / castbar.name:GetStringWidth(spellName) * spellNameLength)
-
-                        spellName = func:utf8sub(spellName, 1, trimmedLength)
-                        castbar.name:SetText(spellName .. "...");
-                    end
-                end
-
-                castbar.countdown:Show();
-                castbar.name:SetTextColor(1,1,1);
-                castbar.icon:SetTexture(icon);
-                castbar.border:SetVertexColor(0.75, 0.75, 0.75);
-                castbar.statusbar:SetMinMaxValues(minValue, maxValue);
-
-                local timeElapsed = 0;
-                castbar:SetScript("OnUpdate", function(self, elapsed)
-                    timeElapsed = timeElapsed + elapsed;
-                    if not castbar.animation:IsPlaying() then
-                        castbar.statusbar:SetValue(reverser * ((endTimeMS / 1000) - GetTime()));
-                    end
-
-                    if timeElapsed > 0.1 then
-                        local value = (endTimeMS / 1000) - GetTime();
-                        timeElapsed = 0;
-                        castbar.countdown:SetText(func:formatTime(value));
-                    end
-                end);
-
-                if castbar.animation:IsPlaying() then
-                    castbar.animation:Stop();
-                end
-
-                castbar:Show();
-            end
-        end
-    end
-end
-
-----------------------------------------
--- Castbar end
-----------------------------------------
-function func:Castbar_End(event, unit)
-    if unit then
-        local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
-
-        if nameplate then
-            local castbar = nameplate.unitFrame.castbar;
-            local channelName = UnitChannelInfo(unit);
-
-            if event == "UNIT_SPELLCAST_FAILED"
-            or event == "UNIT_SPELLCAST_FAILED_QUIET"
-            or event == "UNIT_SPELLCAST_INTERRUPTED" then
-                castbar.statusbar:SetStatusBarColor(data.colors.red.r, data.colors.red.g, data.colors.red.b);
-                castbar.border:SetVertexColor(data.colors.red.r, data.colors.red.g, data.colors.red.b);
-                castbar.name:SetTextColor(data.colors.orange.r, data.colors.orange.g, data.colors.orange.b);
-                castbar.statusbar:SetValue(0);
-            end
-
-            if event == "UNIT_SPELLCAST_SUCCEEDED" and not channelName then
-                castbar.statusbar:SetStatusBarColor(data.colors.green.r, data.colors.green.g, data.colors.green.b);
-                castbar.border:SetVertexColor(data.colors.green.r, data.colors.green.g, data.colors.green.b);
-                castbar.name:SetTextColor(data.colors.yellow.r, data.colors.yellow.g, data.colors.yellow.b);
-                castbar.statusbar:SetValue(0);
-            end
-
-            if event == "UNIT_SPELLCAST_STOP"
-            or event == "UNIT_SPELLCAST_CHANNEL_STOP" then
-                if castbar.animation:IsPlaying() then
-                    castbar.animation:Restart();
-                else
-                    castbar.animation:Play();
-                end
-                castbar.countdown:Hide();
-            end
-        end
-
-        if UnitIsUnit(unit, "player") then
-            local name = UnitCastingInfo("player");
-
-            if not name then
-                data.nameplate.powerbarCost:Hide();
-                data.nameplate.powerbarCostSpark:Hide();
-            end
-        end
-    end
-end
-
-----------------------------------------
 -- Raid target index
 ----------------------------------------
 function func:RaidTargetIndex()
@@ -1477,7 +1441,7 @@ function func:RaidTargetIndex()
                     if mark then
                         local texture;
 
-                        if mark == 1 then texture = "UI-RaidTargetingIcon_1";
+                            if mark == 1 then texture = "UI-RaidTargetingIcon_1";
                         elseif mark == 2 then texture = "UI-RaidTargetingIcon_2";
                         elseif mark == 3 then texture = "UI-RAIDTARGETINGICON_3";
                         elseif mark == 4 then texture = "UI-RaidTargetingIcon_4";

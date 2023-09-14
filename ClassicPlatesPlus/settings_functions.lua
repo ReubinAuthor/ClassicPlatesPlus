@@ -23,6 +23,23 @@ local function updateEverything()
     func:ResizeNameplates();
 end
 
+local function updateCVar()
+    if not InCombatLockdown() then
+        func:CVars("VARIABLES_LOADED");
+    else
+        if not data.tickers.CVar then
+            data.tickers.CVar = C_Timer.NewTicker(1, function()
+                if not InCombatLockdown() then
+                    func:CVars("VARIABLES_LOADED");
+
+                    data.tickers.CVar:Cancel();
+                    data.tickers.CVar = nil;
+                end
+            end)
+        end
+    end
+end
+
 -- Update Nameplate Visuals
 local function updateNameplateVisuals()
     local nameplates = C_NamePlate.GetNamePlates();
@@ -63,7 +80,7 @@ local function updateAurasVisuals()
         if scale <= 0 then scale = 0.1 end
 
         for i = 1, 40 do
-            if unitFrame[auraType]["auras"][i] then
+            if unitFrame[auraType]["auras"] and unitFrame[auraType]["auras"][i] then
                 unitFrame[auraType]["auras"][i]:SetScale(scale);
                 unitFrame[auraType]["auras"][i].cooldown:SetReverse(Config.AurasReverseAnimation);
                 unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
@@ -267,6 +284,19 @@ local functionsTable = {
         updateNameplateScale();
         func:ResizeNameplates();
     end,
+    NamesOnly = function() updateNameplateVisuals(); end,
+    NamesOnlyExcludeNPC = function() updateNameplateVisuals(); end,
+    NamesOnlyExcludeFriends = function() updateNameplateVisuals(); end,
+    NamesOnlyExcludeGuild = function() updateNameplateVisuals(); end,
+    NamesOnlyExcludeParty = function() updateNameplateVisuals(); end,
+    NamesOnlyExcludeRaid = function() updateNameplateVisuals(); end,
+    EnlargeSelected = function() updateCVar() end;
+    ScaleWithDistance = function() updateCVar() end;
+    FellowshipBadge = function() updateNameplateVisuals(); end,
+    FriendlyClassColorNamesAndGuild = function() updateNameplateVisuals(); end,
+    EnemyClassColorNamesAndGuild = function() updateNameplateVisuals(); end,
+    ShowFaction = function() updateNameplateVisuals(); end,
+    QuestMark = function() updateNameplateVisuals(); end,
 }
 
 -- Execute function by passed config name

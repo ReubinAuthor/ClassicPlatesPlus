@@ -9,6 +9,10 @@ local data = core.data;
 local yellow = "|cff" .. "ffd100";
 local white  = "|cff" .. "ffffff";
 local green  = "|cff" .. "7CFC00";
+local orange = "|cff" .. "FF5600";
+local blue   = "|cff" .. "0072CA";
+local purple = "|cff" .. "FF00FF";
+
 
 -- Panels table
 data.settings = {
@@ -50,9 +54,20 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Portrait";
+            local name = "Scale Nameplates With Distance";
+            local tooltip = "Scale nameplates down the further away they are";
+            local cfg = "ScaleWithDistance";
+            local default = true;
+            local flair = { classicEra = false, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Enlarge Selected Nameplates";
             local tooltip = "";
-            local cfg = "Portrait";
+            local cfg = "EnlargeSelected";
             local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
@@ -61,20 +76,35 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Friendly Players Class Icons";
+            local name = "Fade Unselected Targets";
             local tooltip = "";
-            local cfg = "ClassIconsFriendly";
-            local default = false;
+            local cfg = "FadeUnselected";
+            local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
+        -- Slider
+        do
+            local name = "Fade Intensity";
+            local tooltip = "";
+            local cfg = "FadeIntensity";
+            local default = 0.5;
+            local step = 0.01;
+            local minValue = 0.0;
+            local maxValue = 1.0;
+            local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
         -- CheckButton
         do
-            local name = "Enemy Players Class Icons";
+            local name = "Portrait";
             local tooltip = "";
-            local cfg = "ClassIconsEnemy";
+            local cfg = "Portrait";
             local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
@@ -108,7 +138,7 @@ function func:Load_Settings()
             local name = "Name & Guild Outline";
             local tooltip = "";
             local cfg = "NameAndGuildOutline";
-            local default = false;
+            local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
@@ -119,7 +149,7 @@ function func:Load_Settings()
             local name = "Large Name";
             local tooltip = "";
             local cfg = "LargeName";
-            local default = false;
+            local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
@@ -149,28 +179,35 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Fade Unselected Targets";
+            local name = "Quest Mark";
+            local tooltip = "Creature class: " .. white .. "Elite, Rare, Rare Elite, World Boss";
+            local cfg = "QuestMark";
+            local default = true;
+            local flair = { classicEra = false, wrath = false, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Faction Badge";
             local tooltip = "";
-            local cfg = "FadeUnselected";
+            local cfg = "ShowFaction";
             local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
-        -- Slider
+        -- CheckButton
         do
-            local name = "Fade Intensity";
-            local tooltip = "";
-            local cfg = "FadeIntensity";
-            local default = 0.5;
-            local step = 0.01;
-            local minValue = 0.0;
-            local maxValue = 1.0;
-            local decimals = 2;
+            local name = "Fellowship Badge";
+            local tooltip = "Badge colors: " .. purple .. "Friend, " .. green .. "Guildmate, " .. blue .. "Party member, " .. orange .. "Raid member";
+            local cfg = "FellowshipBadge";
+            local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Slider
@@ -238,27 +275,12 @@ function func:Load_Settings()
             local name = "Castbar Position";
             local tooltip = "";
             local cfg = "CastbarPositionY";
-            local default = 0;
+            local default = 2;
             local step = 1;
             local minValue = 0;
             local maxValue = 50;
             local decimals = 0;
             local flair = { classicEra = false, wrath = true, retail = true };
-
-            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
-        end
-
-        -- Slider
-        do
-            local name = "Class Power Scale";
-            local tooltip = "Class power: " .. white .. "Combo Points, Runes, Totems";
-            local cfg = "ClassPowerScale";
-            local default = 1;
-            local step = 0.01;
-            local minValue = 0.50;
-            local maxValue = 1.50;
-            local decimals = 2;
-            local flair = { classicEra = true, wrath = true, retail = false };
 
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
@@ -271,28 +293,6 @@ function func:Load_Settings()
             local name = "Power Bar";
             local tooltip = "";
             local cfg = "Powerbar";
-            local default = true;
-            local flair = { classicEra = true, wrath = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Frienly Healthbar Class Colors";
-            local tooltip = "";
-            local cfg = "HealthBarClassColorsFriendly";
-            local default = true;
-            local flair = { classicEra = true, wrath = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Enemy Healthbar Class Colors";
-            local tooltip = "";
-            local cfg = "HealthBarClassColorsEnemy";
             local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
@@ -374,6 +374,165 @@ function func:Load_Settings()
             local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Slider
+        do
+            local name = "Class Power Scale";
+            local tooltip = "Class power: " .. white .. "Combo Points" --Runes, Totems";
+            local cfg = "ClassPowerScale";
+            local default = 1;
+            local step = 0.01;
+            local minValue = 0.50;
+            local maxValue = 1.50;
+            local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = false };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Class Related");
+
+        -- CheckButton
+        do
+            local name = "Friendly Players Class Icon";
+            local tooltip = "";
+            local cfg = "ClassIconsFriendly";
+            local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Enemy Players Class Icon";
+            local tooltip = "";
+            local cfg = "ClassIconsEnemy";
+            local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Frienly Healthbar Class Color";
+            local tooltip = "";
+            local cfg = "HealthBarClassColorsFriendly";
+            local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Enemy Healthbar Class Color";
+            local tooltip = "";
+            local cfg = "HealthBarClassColorsEnemy";
+            local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Friendly Name & Guild Class Color";
+            local tooltip = "";
+            local cfg = "FriendlyClassColorNamesAndGuild";
+            local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Enemy Name & Guild Class Color";
+            local tooltip = "";
+            local cfg = "EnemyClassColorNamesAndGuild";
+            local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Names only");
+
+        -- DropDownMenu
+        do
+            local name = "Names Only";
+            local tooltip = "";
+            local cfg = "NamesOnly";
+            local default = 1;
+            local options = {
+                [1] = "None",
+                [2] = "Friendlies",
+                [3] = "Enemies",
+                [4] = "All"
+            }
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- CheckButton
+        do
+            local name = "Exclude NPC";
+            local tooltip = "";
+            local cfg = "NamesOnlyExcludeNPC";
+            local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Exclude Friends";
+            local tooltip = "";
+            local cfg = "NamesOnlyExcludeFriends";
+            local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Exclude Guild Members";
+            local tooltip = "";
+            local cfg = "NamesOnlyExcludeGuild";
+            local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Exclude Party Members";
+            local tooltip = "";
+            local cfg = "NamesOnlyExcludeParty";
+            local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Exclude Raid Members";
+            local tooltip = "";
+            local cfg = "NamesOnlyExcludeRaid";
+            local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- Sub-Category

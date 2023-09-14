@@ -18,12 +18,6 @@ function func:Nameplate_Created(nameplate)
         unitFrame:SetFrameStrata("low");
 
         --------------------------------
-        -- Highlights strata
-        --------------------------------
-        unitFrame.highlightsStrata = CreateFrame("frame", nil, unitFrame);
-        unitFrame.highlightsStrata:SetFrameStrata("background");
-
-        --------------------------------
         -- Name & Guild
         --------------------------------
         unitFrame.name = unitFrame:CreateFontString(nil, nil, "GameFontNormalOutline");
@@ -36,24 +30,35 @@ function func:Nameplate_Created(nameplate)
         unitFrame.guild:SetJustifyH("center");
 
         --------------------------------
+        -- Parent rest
+        --------------------------------
+        unitFrame.parent = CreateFrame("frame", nil, unitFrame);
+
+        --------------------------------
+        -- Highlights strata
+        --------------------------------
+        unitFrame.highlightsStrata = CreateFrame("frame", nil, unitFrame.parent);
+        unitFrame.highlightsStrata:SetFrameStrata("background");
+
+        --------------------------------
         -- Healthbar
         --------------------------------
 
         -- Statusbar
-        unitFrame.healthbar = CreateFrame("StatusBar", nil, unitFrame);
+        unitFrame.healthbar = CreateFrame("StatusBar", nil, unitFrame.parent);
         unitFrame.healthbar:SetSize(112, 10);
         unitFrame.healthbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar");
         unitFrame.healthbar:SetFrameLevel(1);
 
         -- Border
-        unitFrame.healthbar.border = unitFrame:CreateTexture();
+        unitFrame.healthbar.border = unitFrame.parent:CreateTexture();
         unitFrame.healthbar.border:SetPoint("center", unitFrame.healthbar, "center");
         unitFrame.healthbar.border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\borders\\healthbar");
         unitFrame.healthbar.border:SetSize(128, 16);
         unitFrame.healthbar.border:SetDrawLayer("border", 1);
 
         -- Heal prediction
-        unitFrame.healthbar.healPrediction = unitFrame:CreateTexture(nil, "background");
+        unitFrame.healthbar.healPrediction = unitFrame.parent:CreateTexture(nil, "background");
         unitFrame.healthbar.healPrediction:SetPoint("left", unitFrame.healthbar:GetStatusBarTexture(), "right");
         unitFrame.healthbar.healPrediction:SetHeight(unitFrame.healthbar:GetHeight());
         unitFrame.healthbar.healPrediction:SetTexture("Interface\\TARGETINGFRAME\\UI-StatusBar");
@@ -62,7 +67,7 @@ function func:Nameplate_Created(nameplate)
         unitFrame.healthbar.healPrediction:Hide();
 
         -- Heal prediction spark
-        unitFrame.healthbar.healPredictionSpark = unitFrame:CreateTexture(nil, "background");
+        unitFrame.healthbar.healPredictionSpark = unitFrame.parent:CreateTexture(nil, "background");
         unitFrame.healthbar.healPredictionSpark:SetPoint("center", unitFrame.healthbar.healPrediction, "right");
         unitFrame.healthbar.healPredictionSpark:SetSize(6, 12);
         unitFrame.healthbar.healPredictionSpark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
@@ -77,7 +82,7 @@ function func:Nameplate_Created(nameplate)
         unitFrame.healthbar.background:SetDrawLayer("background");
 
         -- Spark
-        unitFrame.healthbar.spark = unitFrame:CreateTexture();
+        unitFrame.healthbar.spark = unitFrame.parent:CreateTexture();
         unitFrame.healthbar.spark:SetPoint("center", unitFrame.healthbar:GetStatusBarTexture(), "right");
         unitFrame.healthbar.spark:SetSize(6, 12);
         unitFrame.healthbar.spark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
@@ -96,11 +101,11 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
 
         -- Main
-        unitFrame.healthMain = unitFrame:CreateFontString(nil, "overlay");
+        unitFrame.healthMain = unitFrame.parent:CreateFontString(nil, "overlay");
         unitFrame.healthMain:SetJustifyH("center");
 
         -- Secondary
-        unitFrame.healthSecondary = unitFrame:CreateFontString(nil, "overlay", "GameFontNormalOutline");
+        unitFrame.healthSecondary = unitFrame.parent:CreateFontString(nil, "overlay", "GameFontNormalOutline");
         unitFrame.healthSecondary:SetScale(0.8);
 
         --------------------------------
@@ -108,7 +113,7 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
 
         -- Parent
-        unitFrame.powerbar = CreateFrame("Frame", nil, unitFrame);
+        unitFrame.powerbar = CreateFrame("Frame", nil, unitFrame.parent);
         unitFrame.powerbar:SetSize(100, 10);
         unitFrame.powerbar:SetFrameLevel(3);
 
@@ -151,7 +156,7 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
         -- Combo points
         --------------------------------
-        unitFrame.classPower = CreateFrame("frame", nil, unitFrame);
+        unitFrame.classPower = CreateFrame("frame", nil, unitFrame.parent);
         unitFrame.classPower:SetPoint("bottom", unitFrame.name, "top", 0, 2);
         unitFrame.classPower:SetSize(14, 14);
 
@@ -160,7 +165,7 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
 
         -- Parent
-        unitFrame.portrait = CreateFrame("Frame", nil, unitFrame);
+        unitFrame.portrait = CreateFrame("Frame", nil, unitFrame.parent);
 
         -- Portrait
         unitFrame.portrait.texture = unitFrame.portrait:CreateTexture();
@@ -198,7 +203,7 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
 
         -- Parent
-        unitFrame.level = CreateFrame("frame", nil, unitFrame);
+        unitFrame.level = CreateFrame("frame", nil, unitFrame.parent);
         unitFrame.level:SetSize(32, 32);
 
         -- Value
@@ -239,7 +244,7 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
         -- Quest
         --------------------------------
-        unitFrame.quest = unitFrame:CreateTexture();
+        unitFrame.quest = unitFrame.parent:CreateTexture();
         unitFrame.quest:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\quest");
         unitFrame.quest:SetVertexColor(1, 0.77, 0);
         unitFrame.quest:SetSize(32, 32);
@@ -250,9 +255,9 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
 
         -- Parent
-        unitFrame.threatPercentage = CreateFrame("Frame", nil, unitFrame);
+        unitFrame.threatPercentage = CreateFrame("Frame", nil, unitFrame.parent);
         unitFrame.threatPercentage:SetSize(64,16);
-        unitFrame.threatPercentage:SetFrameLevel(2);
+        unitFrame.threatPercentage:SetFrameLevel(3);
         unitFrame.threatPercentage:SetScript("OnShow", function()
             func:Update_NameAndGuildPositions(nameplate);
         end);
@@ -294,34 +299,48 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
         -- Classification
         --------------------------------
-        unitFrame.classification = unitFrame:CreateTexture();
+        unitFrame.classification = unitFrame.parent:CreateTexture();
         unitFrame.classification:SetDrawLayer("artwork", 1);
+
+        --------------------------------
+        -- PVP Flag
+        --------------------------------
+        unitFrame.pvp_flag = unitFrame:CreateTexture();
+        unitFrame.pvp_flag:SetSize(22, 22);
 
         --------------------------------
         -- Faction
         --------------------------------
-        unitFrame.pvp_flag = unitFrame:CreateTexture();
-        unitFrame.pvp_flag:SetIgnoreParentScale(not Config.Portrait);
-        unitFrame.pvp_flag:SetDrawLayer("artwork", 2);
+        unitFrame.fellowshipBadge = CreateFrame("frame", nil, unitFrame);
+        unitFrame.fellowshipBadge:SetSize(22,22);
+        unitFrame.fellowshipBadge:SetFrameLevel(4);
+
+        unitFrame.fellowshipBadge.icon = unitFrame.fellowshipBadge:CreateTexture();
+        unitFrame.fellowshipBadge.icon:SetAllPoints();
+        unitFrame.fellowshipBadge.icon:SetDrawLayer("artwork", 3);
+
+        unitFrame.fellowshipBadge.badge = unitFrame.fellowshipBadge:CreateTexture();
+        unitFrame.fellowshipBadge.badge:SetAllPoints();
+        unitFrame.fellowshipBadge.badge:SetDrawLayer("artwork", 2);
 
         --------------------------------
         -- Auras counter
         --------------------------------
-        unitFrame.buffsCounter = unitFrame:CreateFontString(nil, nil, "GameFontNormalOutline")
+        unitFrame.buffsCounter = unitFrame.parent:CreateFontString(nil, nil, "GameFontNormalOutline")
         unitFrame.buffsCounter:SetTextColor(0,1,0);
-        unitFrame.debuffsCounter = unitFrame:CreateFontString(nil, nil, "GameFontNormalOutline")
+        unitFrame.debuffsCounter = unitFrame.parent:CreateFontString(nil, nil, "GameFontNormalOutline")
         unitFrame.debuffsCounter:SetTextColor(1, 0.2, 0);
 
         --------------------------------
         -- Auras
         --------------------------------
-        unitFrame.buffs = CreateFrame("Frame", nil, unitFrame);
-        unitFrame.debuffs = CreateFrame("Frame", nil, unitFrame);
+        unitFrame.buffs = CreateFrame("Frame", nil, unitFrame.parent);
+        unitFrame.debuffs = CreateFrame("Frame", nil, unitFrame.parent);
 
         --------------------------------
         -- Class Bar Dummy
         --------------------------------
-        unitFrame.ClassBarDummy = CreateFrame("frame", nil, unitFrame);
+        unitFrame.ClassBarDummy = CreateFrame("frame", nil, unitFrame.parent);
         unitFrame.ClassBarDummy:SetPoint("bottom", unitFrame.name, "top", 0, 4);
         unitFrame.ClassBarDummy:SetWidth(10);
         unitFrame.ClassBarDummy:SetIgnoreParentScale(true);
@@ -368,7 +387,7 @@ function func:Nameplate_Created(nameplate)
         unitFrame.castbar.countdown = unitFrame.castbar:CreateFontString(nil, nil, "GameFontNormalSmall");
         unitFrame.castbar.countdown:SetPoint("right", unitFrame.castbar.statusbar, "right", -2, 0);
         unitFrame.castbar.countdown:SetTextColor(1,1,1);
-        unitFrame.castbar.countdown:SetJustifyH("right");
+        unitFrame.castbar.countdown:SetJustifyH("left");
         unitFrame.castbar.countdown:SetScale(0.8);
 
         -- Name

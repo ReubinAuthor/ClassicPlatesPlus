@@ -1,7 +1,7 @@
 ----------------------------------------
 -- Core
 ----------------------------------------
-local _, core = ...;
+local myAddon, core = ...;
 local func = core.func;
 local data = core.data;
 
@@ -13,6 +13,9 @@ function func:Nameplate_Added(unit, visuals)
         local nameplate = C_NamePlate.GetNamePlateForUnit(unit, false);
 
         if nameplate then
+            nameplate.UnitFrame:Hide();
+            nameplate.UnitFrame:UnregisterAllEvents();
+
             if UnitIsUnit(unit, "target") then
                 func:PositionAuras(nameplate.unitFrame);
             end
@@ -36,8 +39,6 @@ function func:Nameplate_Added(unit, visuals)
                 unitFrame.name:SetScale(Config.LargeName and 0.95 or 0.75);
                 unitFrame.guild:SetScale(Config.LargeGuildName and 0.95 or 0.75);
 
-                --print(unitFrame.name:GetHeight() * unitFrame.name:GetEffectiveScale());
-
                 -- Threat percentage
                 unitFrame.threatPercentage:ClearAllPoints();
 
@@ -45,7 +46,7 @@ function func:Nameplate_Added(unit, visuals)
                 unitFrame.classification:ClearAllPoints();
 
                 -- Faction
-                unitFrame.pvp_flag:ClearAllPoints();
+                unitFrame.fellowshipBadge:ClearAllPoints();
 
                 -- Health values: Main
                 unitFrame.healthMain:SetTextColor(
@@ -98,9 +99,7 @@ function func:Nameplate_Added(unit, visuals)
                 unitFrame.ClassBarDummy:SetHeight(data.classBarHeight);
 
                 -- Class power
-                --if not data.isRetail then
-                    unitFrame.classPower:SetScale(Config.ClassPowerScale);
-                --end
+                unitFrame.classPower:SetScale(Config.ClassPowerScale);
 
                 -- Health Value Secondary
                 unitFrame.healthSecondary:SetJustifyH("left");
@@ -112,15 +111,9 @@ function func:Nameplate_Added(unit, visuals)
                 if Config.Portrait then
                     unitFrame.classification:SetParent(unitFrame.portrait);
                     unitFrame.classification:SetSize(48,48);
-                    unitFrame.pvp_flag:SetSize(27,27);
-                    unitFrame.pvp_flag:SetParent(unitFrame.portrait);
-                    unitFrame.pvp_flag:SetPoint("center", unitFrame.portrait.texture, "center", -7, -1.4);
-                    unitFrame.pvp_flag:SetScale(1);
-                    unitFrame.raidTarget.icon:SetPoint("right", unitFrame.portrait.texture, "left", -6, 0);
 
                     if Config.ShowLevel then
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 0, -1.5);
-                        unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or -3) - Config.CastbarPositionY);
                         unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 0, -1);
                         unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center");
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
@@ -128,34 +121,26 @@ function func:Nameplate_Added(unit, visuals)
                         unitFrame.quest:SetPoint("left", unitFrame.level, "right", -14, 1);
                     else
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", -9, -1.5);
-                        unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and -2 or -9, (powerbarToggle and 4 or -3) - Config.CastbarPositionY);
-                        unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", -6.33, -1); --<
-                        unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", -9, 0); --<
+                        unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", -6.33, -1);
+                        unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", -9, 0);
                         unitFrame.healthSecondary:SetPoint("right", unitFrame.healthbar, "right", -4, 0);
                         unitFrame.healthSecondary:SetJustifyH("right");
                         unitFrame.classification:SetPoint("center", unitFrame.portrait.texture, "center", -5, -2);
                         unitFrame.quest:SetPoint("left", unitFrame.healthbar, "right", -6, 1);
                     end
                 else
-                    unitFrame.classification:SetParent(unitFrame);
+                    unitFrame.classification:SetParent(unitFrame.parent);
                     unitFrame.classification:SetSize(32,32);
-                    unitFrame.pvp_flag:SetSize(30,30);
-                    unitFrame.pvp_flag:SetParent(unitFrame);
-                    unitFrame.pvp_flag:SetPoint("right", unitFrame.name, "left", 10, -5);
-                    unitFrame.pvp_flag:SetScale(0.7);
-                    unitFrame.raidTarget.icon:SetPoint("right", unitFrame.healthbar, "left", -6, 0);
 
                     if Config.ShowLevel then
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 9, -1.5);
-                        unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and 2.67 or 9, (powerbarToggle and 4 or 0) - Config.CastbarPositionY);
-                        unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 6.33, -1); --<
-                        unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", 9, 0); --<
+                        unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 6.33, -1);
+                        unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", 9, 0);
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
                         unitFrame.classification:SetPoint("center", unitFrame.level.border, "center", 7, 0);
                         unitFrame.quest:SetPoint("left", unitFrame.level, "right", -14, 1);
                     else
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 0, -1.5);
-                        unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or 0) - Config.CastbarPositionY);
                         unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 0, -1);
                         unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", 0, 0);
                         unitFrame.healthSecondary:SetPoint("left", unitFrame.healthbar, "left", 4, 0);
@@ -165,7 +150,7 @@ function func:Nameplate_Added(unit, visuals)
                     end
                 end
 
-                local toggle = true;
+                local widgetToggle = true;
                 if data.isRetail then
                     local widgetOnly = UnitNameplateShowsWidgetsOnly(unit);
                     local widget = nameplate.UnitFrame.WidgetContainer;
@@ -175,7 +160,7 @@ function func:Nameplate_Added(unit, visuals)
                             widget:SetParent(nameplate);
                             widget:ClearAllPoints();
                             widget:SetPoint("center");
-                            toggle = UnitExists("target")
+                            widgetToggle = UnitExists("target")
                         else
                             widget:SetParent(unitFrame);
                             widget:ClearAllPoints();
@@ -213,6 +198,7 @@ function func:Nameplate_Added(unit, visuals)
                 func:Update_Guild(unit);
                 func:Update_Classification(unit);
                 func:Update_Portrait(unit);
+                func:Update_FellowshipBadge(unit);
                 func:Update_PVP_Flag(unit);
                 func:Update_Level(unit);
                 func:Update_Health(unit);
@@ -229,25 +215,91 @@ function func:Nameplate_Added(unit, visuals)
                 func:Castbar_Start(nil, unit);
                 func:RaidTargetIndex();
                 func:PredictHeal(unit);
-                if data.isRetail then
-                    func:Update_quests(unit);
+                func:Update_quests(unit);
+
+                if not nameplate.UnitFrame.name[myAddon .. "_anchored"] then
+                    local isAnchoringName = false;
+
+                    hooksecurefunc(nameplate.UnitFrame.name,"SetPoint", function(self)
+                        self[myAddon .. "_anchored"] = true;
+
+                        if isAnchoringName then
+                            return;
+                        end
+
+                        isAnchoringName = true;
+                        if self:GetParent() then
+                            local nameplate = self:GetParent():GetParent();
+
+                            if nameplate then
+                                func:Update_NameAndGuildPositions(nameplate, true);
+                            end
+                        end
+                        isAnchoringName = false;
+                    end);
+                end
+
+                -- Names Only
+                local canAttack = UnitCanAttack("player", unit);
+                local isTarget = UnitIsUnit("target", unit);
+
+                local showParent = isTarget
+                    or Config.NamesOnly == 1
+                    or Config.NamesOnly == 2 and canAttack
+                    or Config.NamesOnly == 3 and not canAttack
+                    or Config.NamesOnly == 4 and false
+
+                local exclude = Config.NamesOnlyExcludeNPC and not (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit))
+                    or Config.NamesOnlyExcludeFriends and func:isFriend(unit)
+                    or Config.NamesOnlyExcludeGuild and IsGuildMember(unit)
+                    or Config.NamesOnlyExcludeParty and func:UnitInYourParty(unit)
+                    or Config.NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
+
+                if not showParent and not exclude then
+                    unitFrame.raidTarget.icon:SetPoint("right", unitFrame.name, "left", unitFrame.fellowshipBadge:IsShown() and -20 or -6, 0);
+                    unitFrame.raidTarget.icon:SetScale(0.7);
+                    unitFrame.castbar:SetPoint("top", unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name, "bottom", 0, -2 - Config.CastbarPositionY);
+                else
+                    unitFrame.raidTarget.icon:SetScale(1);
+
+                    if Config.Portrait then
+                        unitFrame.raidTarget.icon:SetPoint("right", unitFrame.portrait.texture, "left", -6, 0);
+
+                        if Config.ShowLevel then
+                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or -3) - Config.CastbarPositionY);
+                        else
+                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and -2 or -9, (powerbarToggle and 4 or -3) - Config.CastbarPositionY);
+                        end
+                    else
+                        unitFrame.raidTarget.icon:SetPoint("right", unitFrame.healthbar, "left", -6, 0);
+
+                        if Config.ShowLevel then
+                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and 2.67 or 9, (powerbarToggle and 4 or 0) - Config.CastbarPositionY);
+                        else
+                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or 0) - Config.CastbarPositionY);
+                        end
+                    end
+                end
+
+                -- Felloship Badge
+                if not showParent and not exclude or not Config.Portrait then
+                    unitFrame.fellowshipBadge:SetPoint("right", unitFrame.name, "left", 1, 1);
+                    unitFrame.fellowshipBadge:SetScale(0.75);
+                    unitFrame.fellowshipBadge:SetIgnoreParentScale(true);
+                else
+                    unitFrame.fellowshipBadge:SetPoint("center", unitFrame.portrait.texture, "center", -12, 4);
+                    unitFrame.fellowshipBadge:SetScale(1);
+                    unitFrame.fellowshipBadge:SetIgnoreParentScale(false);
                 end
 
                 -- Interact Icon
                 func:InteractIcon(nameplate);
 
-                -- Scripts
-                --[[local timeElapsed = 0;
-                unitFrame:SetScript("OnUpdate", function(self, elapsed)
-                    timeElapsed = timeElapsed + elapsed;
-                    if timeElapsed > 0.1 then
-                        timeElapsed = 0;
-                        func:Update_Threat(unit); -- Updating threat
-                    end
-                end);]]
+                -- Toggling Parent
+                unitFrame.parent:SetShown(showParent or exclude);
 
-                -- Showing nameplate
-                unitFrame:SetShown(toggle and not UnitIsGameObject(unit) and (data.isRetail and not UnitNameplateShowsWidgetsOnly(unit) or not data.isRetail));
+                -- Toggling nameplate
+                unitFrame:SetShown(widgetToggle and not UnitIsGameObject(unit) and (data.isRetail and not UnitNameplateShowsWidgetsOnly(unit) or not data.isRetail));
             end
 
             -- Hiding default nameplates

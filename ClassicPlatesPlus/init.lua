@@ -68,6 +68,7 @@ function core:init(event, ...)
     if event == "PLAYER_GUILD_UPDATE" then
         if arg and string.match(arg, "nameplate") then
             func:Update_Guild(arg);
+            func:Update_FellowshipBadge(arg);
         end
     end
 
@@ -168,9 +169,10 @@ function core:init(event, ...)
     if event == "UNIT_FACTION" then
         func:Update_healthbar(arg);
         func:Update_Portrait(arg);
-        func:Update_PVP_Flag(arg);
         func:Update_Name(arg);
         func:Update_Colors(arg);
+        func:Nameplate_Added(arg);
+        func:Update_PVP_Flag(arg);
     end
 
     if event == "UNIT_PORTRAIT_UPDATE" then
@@ -213,6 +215,7 @@ function core:init(event, ...)
 
     if event == "GROUP_ROSTER_UPDATE" then
         func:Update_Roster();
+        func:Update_FellowshipBadge();
     end
 
     if event == "RAID_TARGET_UPDATE" then
@@ -220,9 +223,11 @@ function core:init(event, ...)
     end
 
     if event == "QUEST_LOG_UPDATE" then
-        if data.isRetail then
-            func:Update_quests();
-        end
+        func:Update_quests();
+    end
+
+    if event == "FRIENDLIST_UPDATE" then
+        func:Update_FellowshipBadge();
     end
 end
 
@@ -290,6 +295,7 @@ events:RegisterEvent("GROUP_ROSTER_UPDATE");
 events:RegisterEvent("RAID_TARGET_UPDATE");
 events:RegisterEvent("MODIFIER_STATE_CHANGED");
 events:RegisterEvent("CVAR_UPDATE");
+events:RegisterEvent("FRIENDLIST_UPDATE");
 
 -- Scripts
 events:SetScript("OnEvent", core.init);
