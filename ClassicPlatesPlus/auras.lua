@@ -77,10 +77,12 @@ function func:Update_Auras(unit)
                             local hidePassiveCheck = data.isClassic and true or not (hidePassiveAuras and duration == 0);
                             local show = unit ~= "player" and ((AurasShow == 1 and (source == "player" or source == "vehicle")) or AurasShow == 2);
 
-                            local toggle = (
+                            -- The "Important Aura" list gives the user the impression of a Brute Force Whitelist, 
+                            -- where auras added to the list are always shown, regardless of other conditions.
+                            -- The following change to the toggle variable fixes that behavior.
+                            local toggle = data.settings.AurasImportantList[name] or (
                                 hidePassiveCheck and (
                                     show
-                                    or data.settings.AurasImportantList[name]
                                     or unit == "player" and (auraType == "debuffs" or auraType == "buffs" and (Config.AurasSourcePersonal == 1 and source == "player" or Config.AurasSourcePersonal == 2))
                                 )
                             ) and not data.settings.AurasBlacklist[name];
