@@ -31,12 +31,13 @@ function func:Update_Auras(unit)
         if nameplate then
             local unitFrame = unit == "player" and nameplate or nameplate.unitFrame;
             local canAssist = UnitCanAssist("player", unit);
-            local hidePassiveAuras = Config.HidePassiveAuras;
+            local AurasHidePassive = Config.AurasHidePassive;
             local AurasShow = Config.AurasShow;
             local buffOnFriendly = Config.BuffsFriendly and canAssist;
             local debuffOnFriendly = Config.DebuffsFriendly and canAssist;
             local buffOnEnemy = Config.BuffsEnemy and not canAssist;
             local debuffOnEnemy = Config.DebuffsEnemy and not canAssist;
+            local UnitIsPlayer = unit == "player" or source == "vehicle";
 
             unitFrame.toSort = {
                 important_buffs = {},
@@ -63,27 +64,32 @@ function func:Update_Auras(unit)
                         -- Test Auras
                         local test = false;
                         if test then
-                            if i < 17 then --and auraType == "debuffs" then
-                                name = "Test Aura 1"
-                                icon = 136243
-                                stacks = i
-                                duration = 1
-                                expirationTime = duration + GetTime()
-                                source = "player"
+                            if i <= 3 then --and auraType == "debuffs" then
+                                name = "Test Aura " .. i;
+                                icon = 1120721;
+                                stacks = i;
+                                duration = 0;
+                                expirationTime = duration + GetTime();
+                                source = "target";
+                            end
+                            if i > 3 and i < 7 then
+                                name = "Test Aura " .. i;
+                                icon = 136243;
+                                stacks = i;
+                                duration = 0;
+                                expirationTime = duration + GetTime();
+                                source = "player";
                             end
                         end
 
-                        if name then
-                            local hidePassiveCheck = data.isClassic and true or not (hidePassiveAuras and duration == 0);
-                            local show = unit ~= "player" and ((AurasShow == 1 and (source == "player" or source == "vehicle")) or AurasShow == 2);
+                        local SourceIsPlayer = source == "player" or source == "vehicle";
 
-                            local toggle = (
-                                hidePassiveCheck and (
-                                    show
-                                    or data.settings.AurasImportantList[name]
-                                    or unit == "player" and (auraType == "debuffs" or auraType == "buffs" and (Config.AurasSourcePersonal == 1 and source == "player" or Config.AurasSourcePersonal == 2))
-                                )
-                            ) and not data.settings.AurasBlacklist[name];
+                        if name then
+
+                            local hidePassiveCheck = data.isClassic and true or not ( ( duration == 0 and (AurasHidePassive == 2 or ( AurasHidePassive == 3 and not SourceIsPlayer ) ) ) );
+                            local show = not UnitIsPlayer and ( ( AurasShow == 1 and SourceIsPlayer ) or AurasShow == 2);
+                            local isPlayersAura = UnitIsPlayer and (auraType == "debuffs" or auraType == "buffs" and ( Config.AurasSourcePersonal == 1 and SourceIsPlayer or Config.AurasSourcePersonal == 2 ) );
+                            local toggle = data.settings and ( ( data.settings.AurasImportantList[name] or ( hidePassiveCheck and ( show or isPlayersAura ) ) and not data.settings.AurasBlacklist[name] ) );
 
                             if toggle then
                                 if not unitFrame[auraType]["auras"][i] then
@@ -202,6 +208,59 @@ function func:Update_Auras(unit)
                                     -- Stacks
                                     unitFrame[auraType]["auras"][i].stacks:SetText("x" .. stacks);
                                     unitFrame[auraType]["auras"][i].stacks:SetShown(stacks > 0);
+                                end
+
+                                -- Tooltip
+                                if Config.AurasTooltip then
+                                    local frame = unitFrame[auraType]["auras"][i];
+                                    local hover;
+
+                                    local function keyCheck()
+                                        if Config.AurasTooltip == 1 and IsShiftKeyDown()
+                                        or Config.AurasTooltip == 2 and IsControlKeyDown()
+                                        or Config.AurasTooltip == 3 and IsAltKeyDown()
+                                        then
+                                            return true;
+                                        end
+                                    end
+
+                                    local function work(frame)
+                                        if hover and keyCheck() then
+                                            GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMLEFT", 0, -2);
+                                            GameTooltip:SetUnitAura(unit, i, filter);
+                                            GameTooltip:Show();
+                                        end
+                                    end
+
+                                    frame:SetScript("OnEnter", function(self)
+                                        self:EnableMouse(keyCheck());
+                                        hover = true;
+                                        work(self);
+                                    end);
+
+                                    frame:SetScript("OnLeave", function(self)
+                                        self:EnableMouse(keyCheck());
+                                        hover = false;
+                                        local owner = GameTooltip:GetOwner();
+
+                                        if owner == self or not owner then
+                                            GameTooltip:Hide();
+                                        end
+                                    end);
+
+                                    frame:RegisterEvent("MODIFIER_STATE_CHANGED");
+                                    frame:SetScript("OnEvent", function(self)
+                                        local owner = GameTooltip:GetOwner();
+
+                                        self:EnableMouse(keyCheck());
+                                        work(self);
+
+                                        if not keyCheck() and owner == self or not owner then
+                                            GameTooltip:Hide();
+                                        end
+                                    end);
+
+                                    frame:EnableMouse(keyCheck());
                                 end
 
                                 -- Flags

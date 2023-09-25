@@ -23,6 +23,7 @@ local function updateEverything()
     func:ResizeNameplates();
 end
 
+-- Update CVars
 local function updateCVar()
     if not InCombatLockdown() then
         func:CVars("VARIABLES_LOADED");
@@ -31,6 +32,30 @@ local function updateCVar()
             data.tickers.CVar = C_Timer.NewTicker(1, function()
                 if not InCombatLockdown() then
                     func:CVars("VARIABLES_LOADED");
+
+                    data.tickers.CVar:Cancel();
+                    data.tickers.CVar = nil;
+                end
+            end)
+        end
+    end
+end
+
+-- Aplly CVar
+local function applyCVar(cvar, config)
+    if config then
+        config = 1;
+    else
+        config = 0;
+    end
+
+    if not InCombatLockdown() then
+        SetCVar(cvar, config);
+    else
+        if not data.tickers.CVar then
+            data.tickers.CVar = C_Timer.NewTicker(1, function()
+                if not InCombatLockdown() then
+                    SetCVar(cvar, config);
 
                     data.tickers.CVar:Cancel();
                     data.tickers.CVar = nil;
@@ -232,7 +257,7 @@ local functionsTable = {
 
     -- Auras
     AurasShow = function() updateAuras(); end,
-    HidePassiveAuras = function() updateAuras(); end,
+    AurasHidePassive = function() updateAuras(); end,
     AurasCountdown = function() updateAurasVisuals(); end,
     AurasReverseAnimation = function() updateAurasVisuals(); end,
     BuffsFriendly = function() updateAuras(); end,
@@ -285,7 +310,7 @@ local functionsTable = {
         func:ResizeNameplates();
     end,
     NamesOnly = function() updateNameplateVisuals(); end,
-    NamesOnlyExcludeNPC = function() updateNameplateVisuals(); end,
+    NamesOnlyExcludeNPCs = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeFriends = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeGuild = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeParty = function() updateNameplateVisuals(); end,
@@ -297,6 +322,10 @@ local functionsTable = {
     EnemyClassColorNamesAndGuild = function() updateNameplateVisuals(); end,
     ShowFaction = function() updateNameplateVisuals(); end,
     QuestMark = function() updateNameplateVisuals(); end,
+    PersonalNameplateAlwaysShow = function()
+        applyCVar("NameplatePersonalShowAlways", Config.PersonalNameplateAlwaysShow);
+        func:PersonalNameplateAdd();
+    end,
 }
 
 -- Execute function by passed config name
@@ -533,7 +562,7 @@ end
 ----------------------------------------
 -- Create CheckButton
 ----------------------------------------
-function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default)
+function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default, cvar)
     local frameName = myAddon .. "_" .. panel.name .. "_CheckButton_" .. name;
 
     -- Adding Config
@@ -557,6 +586,10 @@ function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default)
     frame_title:SetJustifyH("left");
     frame_title:SetText(name);
     TrimName(frame_title);
+
+    if cvar then
+        Config[cfg] = tostring(GetCVar(cvar)) == "1";
+    end
 
     local frame_button = CreateFrame("CheckButton", frameName, parent, "InterfaceOptionsCheckButtonTemplate");
     frame_button:SetPoint("left", parent, "left", 194, 0);

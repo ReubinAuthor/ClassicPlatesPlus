@@ -456,63 +456,75 @@ end
 ----------------------------------------
 function func:ToggleNameplatePersonal(event)
     local nameplate = data.nameplate;
-
-    func:Update_Auras("player");
+    local toggle = false;
 
     if data.isRetail then
         local myNameplate = C_NamePlate.GetNamePlateForUnit("player");
-        nameplate:SetShown(data.cvars.nameplateHideHealthAndPower == "0" and data.cvars.nameplateShowSelf == "1" and myNameplate and myNameplate:IsVisible());
+
+        toggle = data.cvars.nameplateHideHealthAndPower == "0"
+             and data.cvars.nameplateShowSelf == "1"
+             and myNameplate
+             and myNameplate:IsVisible()
+
     elseif Config.PersonalNameplate then
-        local _, _, classID = UnitClass("player");
-        local powerType = UnitPowerType("player");
-
-        if InCombatLockdown() or event == "PLAYER_REGEN_DISABLED" then
-            nameplate:SetAlpha(1);
-            nameplate:Show();
-        else
-            local fullHealth = UnitHealth("player") == UnitHealthMax("player");
-
-            nameplate:SetAlpha(0.5);
-
-            if UnitIsDeadOrGhost("player") then
-                nameplate.animationHide:Play();
-            elseif classID == 11 then -- if player is a druid
-                local noRage = UnitPower("player", 1) <= 0;
-                local fullEnergy = UnitPower("player", 3) == UnitPowerMax("player", 3);
-                local fullMana = UnitPower("player", 0) == UnitPowerMax("player", 0);
-
-                if fullHealth and (powerType == 1 and noRage or powerType == 3 and fullEnergy or powerType == 0 and fullMana) then
-                    nameplate.animationHide:Play();
-                else
-                    nameplate:Show();
-                end
-            elseif classID == 1 then -- if player is a warrior
-                local noRage = UnitPower("player", 1) <= 0;
-
-                if fullHealth and (powerType == 1 and noRage) then
-                    nameplate.animationHide:Play();
-                else
-                    nameplate:Show();
-                end
-            elseif classID == 6 then -- if player is a death knight
-                local noRunicPower = UnitPower("player", 6) <= 0;
-
-                if fullHealth and noRunicPower then
-                    nameplate.animationHide:Play();
-                else
-                    nameplate:Show();
-                end
+        if not UnitIsDeadOrGhost("player") then
+            if InCombatLockdown() or event == "PLAYER_REGEN_DISABLED" then
+                nameplate:SetAlpha(1);
+                toggle = true;
             else
-                if UnitPower("player") == UnitPowerMax("player")
-                and UnitHealth("player") == UnitHealthMax("player")
-                then
-                    nameplate.animationHide:Play();
-                else
-                    nameplate:Show();
+                local fullHealth = UnitHealth("player") >= UnitHealthMax("player");
+
+                nameplate:SetAlpha(0.5);
+
+                if Config.PersonalNameplateAlwaysShow then
+                    toggle = true;
+                elseif not fullHealth then
+                    toggle = true;
                 end
             end
         end
+
+        ------
+        if not UnitIsDeadOrGhost("player") then
+            local classID = select(3, UnitClass("player"));
+            local powerType = UnitPowerType("player");
+
+            if InCombatLockdown() or event == "PLAYER_REGEN_DISABLED" then
+                nameplate:SetAlpha(1);
+                toggle = true;
+            else
+                local fullHealth = UnitHealth("player") >= UnitHealthMax("player");
+
+                nameplate:SetAlpha(0.5);
+
+                if Config.PersonalNameplateAlwaysShow then
+                    toggle = true;
+                elseif classID == 11 then -- If player is a druid
+                    local noRage = UnitPower("player", 1) <= 0;
+                    local fullEnergy = UnitPower("player", 3) == UnitPowerMax("player", 3);
+                    local fullMana = UnitPower("player", 0) == UnitPowerMax("player", 0);
+
+                    toggle = not (fullHealth and (powerType == 1 and noRage or powerType == 3 and fullEnergy or powerType == 0 and fullMana))
+                elseif classID == 1 then -- If player is a warrior
+                    local noRage = UnitPower("player", 1) <= 0;
+
+                    toggle = not (fullHealth and (powerType == 1 and noRage));
+                elseif classID == 6 then -- If player is a death knight
+                    local noRunicPower = UnitPower("player", 6) <= 0;
+
+                    toggle = not (fullHealth and noRunicPower);
+                else
+                    toggle = not (UnitPower("player") == UnitPowerMax("player") and fullHealth);
+                end
+            end
+        end
+    end
+
+    if toggle then
+        func:Update_Auras("player");
+        nameplate.animationHide:Stop();
+        nameplate:Show();
     else
-        nameplate:Hide();
+        nameplate.animationHide:Play();
     end
 end

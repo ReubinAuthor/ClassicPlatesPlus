@@ -34,8 +34,29 @@ local data = core.data;
 -- CVars
 ----------------------------------------
 function func:CVars(event)
-    if event == "VARIABLES_LOADED" then
+    if event == "PLAYER_LOGOUT" then
+        -- Distance
+        SetCVar("nameplateMinScale", 1.0);
+        SetCVar("nameplateMaxScale", 1.0);
+        SetCVar("nameplateMinScaleDistance", 10);
+        SetCVar("nameplateMaxScaleDistance", 10);
+        SetCVar("nameplateMinAlpha", 0.6);
 
+        -- Selected
+        SetCVar("nameplateNotSelectedAlpha", 0.5);
+        SetCVar("nameplateSelectedAlpha", 1.0);
+        SetCVar("nameplateSelectedScale", 1.0);
+
+        -- Inset
+        SetCVar("nameplateOtherTopInset", .08);
+
+        -- Nameplates size
+        SetCVar("nameplateGlobalScale", 1.0);
+
+        -- Rest
+        SetCVar("nameplateTargetRadialPosition", 0);
+        SetCVar("clampTargetNameplateToScreen", 0);
+    else
         -- Storing settings we are going to use frequently
         data.cvars.nameplateHideHealthAndPower = tostring(GetCVar("nameplateHideHealthAndPower"));
         data.cvars.nameplateShowFriendlyBuffs = tostring(GetCVar("nameplateShowFriendlyBuffs"));
@@ -65,30 +86,6 @@ function func:CVars(event)
         -- Rest
         SetCVar("nameplateTargetRadialPosition", 2);
         SetCVar("clampTargetNameplateToScreen", 1);
-
-    elseif event == "PLAYER_LOGOUT" then
-
-        -- Distance
-        SetCVar("nameplateMinScale", 1.0);
-        SetCVar("nameplateMaxScale", 1.0);
-        SetCVar("nameplateMinScaleDistance", 10);
-        SetCVar("nameplateMaxScaleDistance", 10);
-        SetCVar("nameplateMinAlpha", 0.6);
-
-        -- Selected
-        SetCVar("nameplateNotSelectedAlpha", 0.5);
-        SetCVar("nameplateSelectedAlpha", 1.0);
-        SetCVar("nameplateSelectedScale", 1.0);
-
-        -- Inset
-        SetCVar("nameplateOtherTopInset", .08);
-
-        -- Nameplates size
-        SetCVar("nameplateGlobalScale", 1.0);
-
-        -- Rest
-        SetCVar("nameplateTargetRadialPosition", 0);
-        SetCVar("clampTargetNameplateToScreen", 0);
     end
 end
 
@@ -896,6 +893,10 @@ function func:Update_Power(unit)
                     -- Toggling spark
                     func:ToggleSpark(mana, manaMax, nameplate.extraBar.spark);
                 end
+
+                if not data.isRetail then
+                    func:ToggleNameplatePersonal();
+                end
             end
         else
             local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
@@ -927,10 +928,6 @@ function func:Update_Power(unit)
                 func:ToggleSpark(power, powerMax, unitFrame.powerbar.spark);
             end
         end
-    end
-
-    if not data.isRetail then
-        func:ToggleNameplatePersonal();
     end
 end
 
@@ -987,7 +984,7 @@ function func:Update_ClassPower(unit)
         local unitFrame = nameplate.unitFrame;
 
         if nameplate.unitFrame.unit then
-            local comboPoints = GetComboPoints(player, nameplate.unitFrame.unit);
+            local comboPoints = GetComboPoints(player, unitFrame.unit);
 
             if comboPoints > 0 then
                 for i = 1, comboPoints do
@@ -1212,11 +1209,14 @@ function func:Update_NameAndGuildPositions(nameplate, hook)
                 or Config.NamesOnly == 4 and false
 
             if not showParent then
-                local exclude = Config.NamesOnlyExcludeNPC and not (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit))
-                             or Config.NamesOnlyExcludeFriends and func:isFriend(unit)
-                             or Config.NamesOnlyExcludeGuild   and IsGuildMember(unit)
-                             or Config.NamesOnlyExcludeParty   and func:UnitInYourParty(unit)
-                             or Config.NamesOnlyExcludeRaid    and UnitPlayerOrPetInRaid(unit)
+                local UnitIsPlayerOrPlayersPet = UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit);
+                local exclude =
+                       Config.NamesOnlyExcludeNPCs == 2 and not UnitIsPlayerOrPlayersPet
+                    or Config.NamesOnlyExcludeNPCs == 3 and canAttack and not UnitIsPlayerOrPlayersPet
+                    or Config.NamesOnlyExcludeFriends and func:isFriend(unit)
+                    or Config.NamesOnlyExcludeGuild and IsGuildMember(unit)
+                    or Config.NamesOnlyExcludeParty and func:UnitInYourParty(unit)
+                    or Config.NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
 
                 if not exclude then
                     nameplate.UnitFrame.name:ClearAllPoints();
@@ -1347,6 +1347,8 @@ function func:Update_FellowshipBadge(unit)
             end
 
             -- Badge
+            local guid = UnitGUID(unit);
+
             if UnitIsGroupLeader(unit) then
                 toggle = true;
                 badge_r, badge_g, badge_b = data.colors.red.r, data.colors.red.g, data.colors.red.b;
@@ -1359,14 +1361,14 @@ function func:Update_FellowshipBadge(unit)
             elseif IsGuildMember(unit) then
                 toggle = true;
                 badge_r, badge_g, badge_b = data.colors.green.r, data.colors.green.g, data.colors.green.b;
-            elseif C_FriendList.IsFriend(UnitGUID(unit)) then
+            elseif guid and C_FriendList.IsFriend(guid) then
                 toggle = true;
                 badge_r, badge_g, badge_b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
             end
-        end
 
-        if UnitIsGroupLeader(unit) then
-            icon = "Interface\\addons\\ClassicPlatesPlus\\media\\icons\\leader";
+            if UnitIsGroupLeader(unit) then
+                icon = "Interface\\addons\\ClassicPlatesPlus\\media\\icons\\leader";
+            end
         end
 
         unitFrame.fellowshipBadge.icon:SetTexture(icon);

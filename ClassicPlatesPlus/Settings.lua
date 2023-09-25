@@ -54,6 +54,18 @@ function func:Load_Settings()
 
         -- CheckButton
         do
+            local name = "Always Show Personal Nameplate";
+            local tooltip = "";
+            local cfg = "PersonalNameplateAlwaysShow";
+            local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
+            local cvar = "NameplatePersonalShowAlways";
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default, cvar);
+        end
+
+        -- CheckButton
+        do
             local name = "Scale Nameplates With Distance";
             local tooltip = "Scale nameplates down the further away they are";
             local cfg = "ScaleWithDistance";
@@ -480,15 +492,20 @@ function func:Load_Settings()
             func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
-        -- CheckButton
+        -- DropDownMenu
         do
             local name = "Exclude NPC";
             local tooltip = "";
-            local cfg = "NamesOnlyExcludeNPC";
-            local default = true;
+            local cfg = "NamesOnlyExcludeNPCs";
+            local default = 3;
+            local options = {
+                [1] = "None",
+                [2] = "All",
+                [3] = "Attackable"
+            }
             local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
         -- CheckButton
@@ -638,20 +655,42 @@ function func:Load_Settings()
             func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
-        -- CheckButton
+        -- DropDownMenu
         do
             local name = "Hide Passive Auras";
             local tooltip = "Hide auras without expiration time";
-            local cfg = "HidePassiveAuras";
-            local default = true;
+            local cfg = "AurasHidePassive";
+            local default = 1;
+            local options = {
+                [1] = "None",
+                [2] = "All",
+                [3] = "All except your own"
+            }
             local flair = { classicEra = true, wrath = true, retail = true };
 
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Tooltip";
+            local tooltip = "";
+            local cfg = "AurasTooltip";
+            local default = 1;
+            local options = {
+                [1] = "Hold SHIFT",
+                [2] = "Hold CTRL",
+                [3] = "Hold ALT",
+                [4] = "Disabled"
+            }
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
         -- CheckButton
         do
-            local name = "Show Countdown";
+            local name = "Countdown";
             local tooltip = "";
             local cfg = "AurasCountdown";
             local default = true;

@@ -221,21 +221,25 @@ function func:Nameplate_Added(unit, visuals)
                     local isAnchoringName = false;
 
                     hooksecurefunc(nameplate.UnitFrame.name,"SetPoint", function(self)
-                        self[myAddon .. "_anchored"] = true;
+                        if not self:IsProtected() then
+                            self[myAddon .. "_anchored"] = true;
 
-                        if isAnchoringName then
-                            return;
-                        end
-
-                        isAnchoringName = true;
-                        if self:GetParent() then
-                            local nameplate = self:GetParent():GetParent();
-
-                            if nameplate then
-                                func:Update_NameAndGuildPositions(nameplate, true);
+                            if isAnchoringName then
+                                return;
                             end
+
+                            isAnchoringName = true;
+
+                            if self:GetParent() then
+                                local nameplate = self:GetParent():GetParent();
+
+                                if nameplate then
+                                    func:Update_NameAndGuildPositions(nameplate, true);
+                                end
+                            end
+
+                            isAnchoringName = false;
                         end
-                        isAnchoringName = false;
                     end);
                 end
 
@@ -243,13 +247,17 @@ function func:Nameplate_Added(unit, visuals)
                 local canAttack = UnitCanAttack("player", unit);
                 local isTarget = UnitIsUnit("target", unit);
 
-                local showParent = isTarget
+                local showParent =
+                       isTarget
                     or Config.NamesOnly == 1
                     or Config.NamesOnly == 2 and canAttack
                     or Config.NamesOnly == 3 and not canAttack
                     or Config.NamesOnly == 4 and false
 
-                local exclude = Config.NamesOnlyExcludeNPC and not (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit))
+                local UnitIsPlayerOrPlayersPet = UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit);
+                local exclude =
+                       Config.NamesOnlyExcludeNPCs == 2 and not UnitIsPlayerOrPlayersPet
+                    or Config.NamesOnlyExcludeNPCs == 3 and canAttack and not UnitIsPlayerOrPlayersPet
                     or Config.NamesOnlyExcludeFriends and func:isFriend(unit)
                     or Config.NamesOnlyExcludeGuild and IsGuildMember(unit)
                     or Config.NamesOnlyExcludeParty and func:UnitInYourParty(unit)
