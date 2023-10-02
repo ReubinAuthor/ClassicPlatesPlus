@@ -230,19 +230,21 @@ end
 -- Class Bar Height
 ----------------------------------------
 function func:ClassBarHeight()
-    local classID = select(3, UnitClass("player"));
+    local classFile = select(2, UnitClass("player"));
 
-    if classID == 2 then -- Paladin
+    if classFile == "PALADIN" then
         data.classBarHeight = 30;
-    elseif classID == 4 then -- Rogue
+    elseif classFile == "SHAMAN" then
+        data.classBarHeight = 28;
+    elseif classFile == "ROGUE" then
         data.classBarHeight = 14;
-    elseif classID == 6 then -- Death Knight
+    elseif classFile == "DEATHKNIGHT" then
         data.classBarHeight = 15.6;
-    elseif classID == 9 then -- Warlock
+    elseif classFile == "WARLOCK" then
         data.classBarHeight = 21;
-    elseif classID == 11 then -- Druid
+    elseif classFile == "DRUID" then
         data.classBarHeight = 14;
-    elseif classID == 13 then -- Evoker
+    elseif classFile == "EVOKER" then
         data.classBarHeight = 18;
     end
 end
@@ -432,7 +434,6 @@ end
 ----------------------------------------
 function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
     local canAttackUnit = UnitCanAttack("player", unit);
-    local iAmTarget = UnitIsUnit(unit .. "target", "player");
     local isPlayer = UnitIsPlayer(unit);
     local isPet = UnitIsOtherPlayersPet(unit);
     local isTapped = UnitIsTapDenied(unit);
@@ -513,16 +514,21 @@ function func:Update_Colors(unit)
         local Rs,Gs,Bs = UnitSelectionColor(unit, true);
         local _, englishClass = UnitClass(unit);
         local classColor = RAID_CLASS_COLORS[englishClass];
-        local target = UnitIsUnit(unit, "target");
+        local target = UnitIsUnit("target", unit);
+        local canAttack = UnitCanAttack("player", unit);
+        local isPlayer = UnitIsPlayer(unit);
+        local isPVP = UnitIsPVP(unit);
+        local isFFA = UnitIsPVPFreeForAll(unit);
+        local UnitIsOtherPlayersPet = UnitIsOtherPlayersPet(unit);
 
-        if UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
-            if UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit) then
+        if canAttack and (isPlayer or UnitIsOtherPlayersPet) then
+            if isPVP or isFFA then
                 r,g,b = Rs, Gs, Bs;
             else
                 r,g,b = color.r, color.g, color.b;
             end
-        elseif UnitIsFriend(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) then
-            if UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit) then
+        elseif not canAttack and (isPlayer or UnitIsOtherPlayersPet) then
+            if isPVP or isFFA then
                 r,g,b = Rs, Gs, Bs;
             else
                 r,g,b = color.r, color.g, color.b;
@@ -532,14 +538,14 @@ function func:Update_Colors(unit)
         end
 
         -- Coloring name and guild
-        if UnitIsEnemy(unit, "player") and UnitIsTapDenied(unit) then
+        if canAttack and UnitIsTapDenied(unit) then
             unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
             unitFrame.guild:SetTextColor(0.5, 0.5, 0.5);
         else
-            if Config.FriendlyClassColorNamesAndGuild and UnitIsFriend(unit, "player") and UnitIsPlayer(unit) then
+            if Config.FriendlyClassColorNamesAndGuild and not canAttack and isPlayer then
                 unitFrame.name:SetTextColor(classColor.r, classColor.g, classColor.b);
                 unitFrame.guild:SetTextColor(classColor.r, classColor.g, classColor.b);
-            elseif Config.EnemyClassColorNamesAndGuild and UnitIsEnemy(unit, "player") and UnitIsPlayer(unit) then
+            elseif Config.EnemyClassColorNamesAndGuild and canAttack and isPlayer then
                 unitFrame.name:SetTextColor(classColor.r, classColor.g, classColor.b);
                 unitFrame.guild:SetTextColor(classColor.r, classColor.g, classColor.b);
             else
@@ -549,7 +555,7 @@ function func:Update_Colors(unit)
         end
 
         -- Coloring borders
-        if UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) and (UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit)) then
+        if canAttack and (isPlayer or UnitIsOtherPlayersPet) and (isPVP or isFFA) then
             unitFrame.portrait.border:SetVertexColor(Rs, Gs, Bs);
             unitFrame.healthbar.border:SetVertexColor(Rs, Gs, Bs);
             unitFrame.level.border:SetVertexColor(Rs, Gs, Bs);
@@ -977,9 +983,147 @@ end
 ----------------------------------------
 -- Updating Class Power
 ----------------------------------------
-function func:Update_ClassPower(unit)
+function func:Update_ClassPower(unit, var1)
     local player = UnitInVehicle("player") and "vehicle" or "player";
+    local classFile = select(2, UnitClass("player"));
 
+    if classFile == "SHAMAN" then
+        data.nameplate.classPower.totems = {};
+
+        local totems = data.nameplate.classPower.totems;
+        local classPower = data.nameplate.classPower;
+
+        for i = 1, 4 do
+            local haveTotem, _, startTime, duration, icon = GetTotemInfo(i);
+            local toggle = haveTotem and duration > 0;
+
+            if toggle then
+                if not classPower[i] then
+                    classPower[i] = CreateFrame("frame", nil, classPower);
+                    classPower[i]:SetSize(44, 44);
+
+                    classPower[i].border = classPower[i]:CreateTexture();
+                    classPower[i].border:SetAllPoints();
+                    classPower[i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\totemBorder");
+                    classPower[i].border:SetVertexColor(data.colors.border.r, data.colors.border.g, data.colors.border.b);
+
+                    classPower[i].mask = classPower[i]:CreateMaskTexture();
+                    classPower[i].mask:SetAllPoints();
+                    classPower[i].mask:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\totemMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
+
+                    classPower[i].center = classPower[i]:CreateTexture();
+                    classPower[i].center:SetAllPoints();
+                    classPower[i].center:AddMaskTexture(classPower[i].mask);
+                    classPower[i].center:SetDrawLayer("background", 1);
+
+                    classPower[i].countdown = classPower[i]:CreateFontString(nil, nil, "GameFontNormalOutline");
+                    classPower[i].countdown:SetPoint("center");
+                    classPower[i].countdown:SetJustifyH("left");
+                    classPower[i].countdown:SetScale(1.3);
+                end
+
+                classPower[i].center:SetTexture(icon);
+                classPower[i].countdown:SetText(func:formatTime(startTime + duration - GetTime()));
+
+                -- Tooltip
+                if Config.Tooltip then
+                    local hover;
+
+                    local function keyCheck()
+                        if Config.Tooltip == 1 and IsShiftKeyDown()
+                        or Config.Tooltip == 2 and IsControlKeyDown()
+                        or Config.Tooltip == 3 and IsAltKeyDown()
+                        then
+                            return true;
+                        end
+                    end
+
+                    local function work(frame)
+                        if hover and keyCheck() then
+                            GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMLEFT", 0, -2);
+                            GameTooltip:SetTotem(i)
+                            GameTooltip:Show();
+                        end
+                    end
+
+                    classPower[i]:SetScript("OnEnter", function(self)
+                        self:EnableMouse(keyCheck());
+                        hover = true;
+                        work(self);
+                    end);
+
+                    classPower[i]:SetScript("OnLeave", function(self)
+                        self:EnableMouse(keyCheck());
+                        hover = false;
+                        local owner = GameTooltip:GetOwner();
+
+                        if owner == self or not owner then
+                            GameTooltip:Hide();
+                        end
+                    end);
+
+                    classPower[i]:RegisterEvent("MODIFIER_STATE_CHANGED");
+                    classPower[i]:SetScript("OnEvent", function(self)
+                        local owner = GameTooltip:GetOwner();
+
+                        self:EnableMouse(keyCheck());
+                        work(self);
+
+                        if not keyCheck() and owner == self or not owner then
+                            GameTooltip:Hide();
+                        end
+                    end);
+
+                    classPower[i]:EnableMouse(keyCheck());
+                end
+
+                -- Countdown
+                local timeElapsed = 0;
+                classPower[i]:SetScript("OnUpdate", function(self, elapsed)
+                    timeElapsed = timeElapsed + elapsed;
+
+                    if timeElapsed > 0.1 then
+                        local countdown = startTime + duration - GetTime();
+
+                        timeElapsed = 0;
+                        if countdown < 10 then
+                            self.countdown:SetVertexColor(1, 0.5, 0);
+                        else
+                            self.countdown:SetVertexColor(1, 0.82, 0);
+                        end
+
+                        self.countdown:SetText(func:formatTime(countdown));
+                    end
+                end);
+
+                table.insert(totems, classPower[i]);
+                classPower[i]:Show();
+            elseif classPower[i] then
+                classPower[i]:Hide();
+            end
+        end
+
+        local totalTotems = #totems;
+
+        for i in ipairs(totems) do
+            totems[i]:ClearAllPoints();
+
+            if i == 1 then
+                totems[i]:SetPoint("top", data.nameplate.ClassBarDummy, "top", -(totalTotems -1) * 22, -6);
+            else
+                totems[i]:SetPoint("left", data.nameplate.classPower[i - 1], "right");
+            end
+        end
+
+        if totalTotems > 0 then
+            data.nameplate.ClassBarDummy:SetHeight(28);
+        end
+
+        classPower:SetShown(totalTotems > 0);
+        func:PositionAuras(data.nameplate, "player");
+    end
+
+    -- Combo Points
     for _, nameplate in ipairs(C_NamePlate.GetNamePlates(false)) do
         local unitFrame = nameplate.unitFrame;
 

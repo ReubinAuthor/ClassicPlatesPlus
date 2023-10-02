@@ -93,6 +93,10 @@ function core:init(event, ...)
         end
     end
 
+    if event == "PLAYER_TOTEM_UPDATE" then
+        func:Update_ClassPower();
+    end
+
     if event == "UPDATE_SHAPESHIFT_FORM" then
         func:ClassBarHeight();
         func:PersonalNameplateAdd();
@@ -256,6 +260,7 @@ if data.isRetail then
     events:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED");
 end
 events:RegisterEvent("QUEST_LOG_UPDATE");
+events:RegisterEvent("PLAYER_TOTEM_UPDATE");
 
 -- Unit
 events:RegisterEvent("UNIT_NAME_UPDATE");

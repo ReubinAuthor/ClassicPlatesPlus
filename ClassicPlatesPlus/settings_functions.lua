@@ -42,25 +42,19 @@ local function updateCVar()
 end
 
 -- Aplly CVar
-local function applyCVar(cvar, config)
-    if config then
-        config = 1;
-    else
-        config = 0;
-    end
-
+local function applyCVar(cvar, var)
     if not InCombatLockdown() then
-        SetCVar(cvar, config);
+        SetCVar(cvar, var);
     else
         if not data.tickers.CVar then
             data.tickers.CVar = C_Timer.NewTicker(1, function()
                 if not InCombatLockdown() then
-                    SetCVar(cvar, config);
+                    SetCVar(cvar, var);
 
                     data.tickers.CVar:Cancel();
                     data.tickers.CVar = nil;
                 end
-            end)
+            end);
         end
     end
 end
@@ -323,7 +317,11 @@ local functionsTable = {
     ShowFaction = function() updateNameplateVisuals(); end,
     QuestMark = function() updateNameplateVisuals(); end,
     PersonalNameplateAlwaysShow = function()
-        applyCVar("NameplatePersonalShowAlways", Config.PersonalNameplateAlwaysShow);
+        if Config.PersonalNameplateAlwaysShow then
+            applyCVar("NameplatePersonalShowAlways", 1);
+        else
+            applyCVar("NameplatePersonalShowAlways", 0);
+        end
         func:PersonalNameplateAdd();
     end,
 }
@@ -562,7 +560,7 @@ end
 ----------------------------------------
 -- Create CheckButton
 ----------------------------------------
-function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default, cvar)
+function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default)
     local frameName = myAddon .. "_" .. panel.name .. "_CheckButton_" .. name;
 
     -- Adding Config
@@ -586,10 +584,6 @@ function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default, cvar
     frame_title:SetJustifyH("left");
     frame_title:SetText(name);
     TrimName(frame_title);
-
-    if cvar then
-        Config[cfg] = tostring(GetCVar(cvar)) == "1";
-    end
 
     local frame_button = CreateFrame("CheckButton", frameName, parent, "InterfaceOptionsCheckButtonTemplate");
     frame_button:SetPoint("left", parent, "left", 194, 0);

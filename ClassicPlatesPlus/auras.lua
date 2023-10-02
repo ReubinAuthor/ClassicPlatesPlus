@@ -211,14 +211,14 @@ function func:Update_Auras(unit)
                                 end
 
                                 -- Tooltip
-                                if Config.AurasTooltip then
+                                if Config.Tooltip then
                                     local frame = unitFrame[auraType]["auras"][i];
                                     local hover;
 
                                     local function keyCheck()
-                                        if Config.AurasTooltip == 1 and IsShiftKeyDown()
-                                        or Config.AurasTooltip == 2 and IsControlKeyDown()
-                                        or Config.AurasTooltip == 3 and IsAltKeyDown()
+                                        if Config.Tooltip == 1 and IsShiftKeyDown()
+                                        or Config.Tooltip == 2 and IsControlKeyDown()
+                                        or Config.Tooltip == 3 and IsAltKeyDown()
                                         then
                                             return true;
                                         end
@@ -226,8 +226,14 @@ function func:Update_Auras(unit)
 
                                     local function work(frame)
                                         if hover and keyCheck() then
+                                            GameTooltip:Hide();
                                             GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMLEFT", 0, -2);
                                             GameTooltip:SetUnitAura(unit, i, filter);
+
+                                            if spellId then
+                                                GameTooltip:AddDoubleLine("Spell ID", spellId, nil, nil, nil, 1, 1, 1);
+                                            end
+
                                             GameTooltip:Show();
                                         end
                                     end
@@ -432,21 +438,30 @@ end
 function func:PositionAuras(unitFrame, unit)
     if unitFrame then
         local resourceOnTarget = data.cvars.nameplateResourceOnTarget;
-        local classID = select(3, UnitClass("player"));
+        local classFile = select(2, UnitClass("player"));
         local powerType = UnitPowerType("player");
-        local class = (classID == 11 and powerType == 3) or classID == 2 or classID == 4 or classID == 6 or classID == 9 or classID == 13;
+
+        local class =
+                classFile == "PALADIN"
+            or  classFile == "ROGUE"
+            or  classFile == "DEATHKNIGHT"
+            or  classFile == "WARLOCK"
+            or (classFile == "DRUID" and powerType == 3)
+            or  classFile == "EVOKER";
+
         local auraWidth = 28;
         local bigGap = 12;
         local gap = 6;
         local calc = 0;
         local anchor, y, pos1, pos2, totalAuras, totalGaps;
 
+        unit = unit or unitFrame.unit;
+
         -- Get Anchor
-        if unitFrame.unit and (UnitIsUnit(unitFrame.unit, "target") and class and resourceOnTarget == "1" or not data.isRetail and unitFrame.classPower and unitFrame.classPower:IsShown()) then
-            anchor = data.isRetail and unitFrame.ClassBarDummy or unitFrame.classPower;
-        else
-            anchor = unitFrame.name;
-        end
+        anchor =
+                data.isRetail and resourceOnTarget == "1" and unit and UnitIsUnit(unit, "target") and class and unitFrame.ClassBarDummy
+            or unitFrame.classPower:IsShown() and unitFrame.classPower
+            or unitFrame.name;
 
         -- Position auras
         if unitFrame.sorted then
@@ -485,6 +500,8 @@ function func:PositionAuras(unitFrame, unit)
             end
 
             -- Debuffs
+            local totalBuffs = #unitFrame.sorted.buffs;
+
             for k,v in ipairs(unitFrame.sorted.debuffs) do
                 if k == 1 then
                     totalAuras = #unitFrame.sorted.debuffs;
@@ -494,23 +511,27 @@ function func:PositionAuras(unitFrame, unit)
                     if unit == "player" then
                         pos1, pos2 = "top", "bottom";
 
-                        if resourceOnTarget == "0" then
+                        if resourceOnTarget == "0" and class then
                             anchor = unitFrame.ClassBarDummy;
                             y = -8;
                         else
-                            if unitFrame.extraBar:IsShown() then
+                            if unitFrame.classPower:IsShown() then
+                                anchor = unitFrame.classPower;
+                            elseif unitFrame.extraBar:IsShown() then
                                 anchor = unitFrame.extraBar;
                             else
                                 anchor = unitFrame.powerbar;
                             end
                             y = -10;
                         end
-                    elseif #unitFrame.sorted.buffs > 0 then
-                        anchor = unitFrame.sorted.buffs[#unitFrame.sorted.buffs];
-                        pos1, pos2, y = "left", "right", 0;
-                        calc = bigGap;
                     else
-                        pos1, pos2, y = "bottom", "top", 6;
+                        if totalBuffs > 0 then
+                            anchor = unitFrame.sorted.buffs[totalBuffs];
+                            pos1, pos2, y = "left", "right", 0;
+                            calc = bigGap;
+                        else
+                            pos1, pos2, y = "bottom", "top", 6;
+                        end
                     end
                 elseif #unitFrame.sorted.debuffs > 0 then
                     anchor = unitFrame.sorted.debuffs[k - 1];

@@ -154,7 +154,7 @@ function func:Nameplate_Created(nameplate)
         unitFrame.powerbar.highlight:SetDrawLayer("background", -8);
 
         --------------------------------
-        -- Combo points
+        -- Class Power
         --------------------------------
         unitFrame.classPower = CreateFrame("frame", nil, unitFrame.parent);
         unitFrame.classPower:SetPoint("bottom", unitFrame.name, "top", 0, 2);

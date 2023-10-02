@@ -43,29 +43,6 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Personal Nameplate";
-            local tooltip = not data.isRetail and "To move the personal nameplate, hold " .. green .. "CTRL" .. yellow .. " and drag it with " .. green .. "Left Mouse Button" or "";
-            local cfg = "PersonalNameplate";
-            local default = true;
-            local flair = { classicEra = true, wrath = true, retail = false };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Always Show Personal Nameplate";
-            local tooltip = "";
-            local cfg = "PersonalNameplateAlwaysShow";
-            local default = false;
-            local flair = { classicEra = true, wrath = true, retail = true };
-            local cvar = "NameplatePersonalShowAlways";
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default, cvar);
-        end
-
-        -- CheckButton
-        do
             local name = "Scale Nameplates With Distance";
             local tooltip = "Scale nameplates down the further away they are";
             local cfg = "ScaleWithDistance";
@@ -110,6 +87,23 @@ function func:Load_Settings()
             local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Tooltip";
+            local tooltip = "";
+            local cfg = "Tooltip";
+            local default = 1;
+            local options = {
+                [1] = "Hold SHIFT",
+                [2] = "Hold CTRL",
+                [3] = "Hold ALT",
+                [4] = "Disabled"
+            }
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
         -- CheckButton
@@ -239,21 +233,6 @@ function func:Load_Settings()
 
         -- Slider
         do
-            local name = "Personal Nameplates Scale";
-            local tooltip = "";
-            local cfg = "PersonalNameplatesScale";
-            local default = 1.00;
-            local step = 0.01;
-            local minValue = 0.75;
-            local maxValue = 1.25;
-            local decimals = 2;
-            local flair = { classicEra = true, wrath = true, retail = true };
-
-            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
-        end
-
-        -- Slider
-        do
             local name = "Max Nameplate Distance";
             local tooltip = "Must be out of combat for the effect to take place";
             local cfg = "MaxNameplateDistance";
@@ -293,6 +272,47 @@ function func:Load_Settings()
             local maxValue = 50;
             local decimals = 0;
             local flair = { classicEra = false, wrath = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Personal Nameplate");
+
+        -- CheckButton
+        do
+            local name = "Personal Nameplate";
+            local tooltip = not data.isRetail and "To move the personal nameplate, hold " .. green .. "CTRL" .. yellow .. " and drag it with " .. green .. "Left Mouse Button" or "";
+            local cfg = "PersonalNameplate";
+            local default = true;
+            local flair = { classicEra = true, wrath = true, retail = false };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Always Show Personal Nameplate";
+            local tooltip = "";
+            local cfg = "PersonalNameplateAlwaysShow";
+            local default = false;
+            local flair = { classicEra = true, wrath = true, retail = true };
+            local cvar = "NameplatePersonalShowAlways";
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default, cvar);
+        end
+
+        -- Slider
+        do
+            local name = "Personal Nameplates Scale";
+            local tooltip = "";
+            local cfg = "PersonalNameplatesScale";
+            local default = 1.00;
+            local step = 0.01;
+            local minValue = 0.75;
+            local maxValue = 1.25;
+            local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
@@ -665,23 +685,6 @@ function func:Load_Settings()
                 [1] = "None",
                 [2] = "All",
                 [3] = "All except your own"
-            }
-            local flair = { classicEra = true, wrath = true, retail = true };
-
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-        end
-
-        -- DropDownMenu
-        do
-            local name = "Tooltip";
-            local tooltip = "";
-            local cfg = "AurasTooltip";
-            local default = 1;
-            local options = {
-                [1] = "Hold SHIFT",
-                [2] = "Hold CTRL",
-                [3] = "Hold ALT",
-                [4] = "Disabled"
             }
             local flair = { classicEra = true, wrath = true, retail = true };
 

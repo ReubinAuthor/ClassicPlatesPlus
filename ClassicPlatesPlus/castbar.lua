@@ -16,8 +16,9 @@ function func:Castbar_Start(event, unit)
             local castbar = nameplate.unitFrame.castbar;
             local text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible, minValue, maxValue, progressReverser;
             local r,g,b;
-
             local test = false;
+
+            castbar.animation:Stop();
 
             if test then
                 text = "This is a test castbar with a very long name";
@@ -32,21 +33,22 @@ function func:Castbar_Start(event, unit)
                 r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
             elseif event then
                 if event == "UNIT_SPELLCAST_START" then
-                    _, text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = UnitCastingInfo(unit);
+                    text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = select(2, UnitCastingInfo(unit));
 
                     minValue = -(endTimeMS - startTimeMS) / 1000;
                     maxValue = 0;
                     progressReverser = -1;
                     r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
                 elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
-                    _, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = UnitChannelInfo(unit);
+                    text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = select(2, UnitChannelInfo(unit));
+
                     minValue = 0;
                     maxValue = (endTimeMS - startTimeMS) / 1000;
                     progressReverser = 1;
                     r,g,b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
                 end
             else
-                _, text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = UnitCastingInfo(unit);
+                text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = select(2, UnitCastingInfo(unit));
 
                 if text then
                     minValue = -(endTimeMS - startTimeMS) / 1000;
@@ -54,7 +56,7 @@ function func:Castbar_Start(event, unit)
                     r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
                     progressReverser = -1;
                 else
-                    _, text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = UnitChannelInfo(unit);
+                    text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = select(2, UnitChannelInfo(unit));
 
                     if text then
                         minValue = 0;
@@ -105,10 +107,6 @@ function func:Castbar_Start(event, unit)
                     end
                 end);
 
-                if castbar.animation:IsPlaying() then
-                    castbar.animation:Stop();
-                end
-
                 castbar.countdown:Show();
                 castbar:SetShown(not isTradeSkill);
             end
@@ -133,32 +131,25 @@ function func:Castbar_End(event, unit)
                 castbar.statusbar:SetStatusBarColor(data.colors.red.r, data.colors.red.g, data.colors.red.b);
                 castbar.border:SetVertexColor(data.colors.red.r, data.colors.red.g, data.colors.red.b);
                 castbar.name:SetTextColor(data.colors.orange.r, data.colors.orange.g, data.colors.orange.b);
-                castbar.statusbar:SetValue(0);
             end
 
             if event == "UNIT_SPELLCAST_SUCCEEDED" and not channelName then
                 castbar.statusbar:SetStatusBarColor(data.colors.green.r, data.colors.green.g, data.colors.green.b);
                 castbar.border:SetVertexColor(data.colors.green.r, data.colors.green.g, data.colors.green.b);
                 castbar.name:SetTextColor(data.colors.yellow.r, data.colors.yellow.g, data.colors.yellow.b);
-                castbar.statusbar:SetValue(0);
             end
 
             if event == "UNIT_SPELLCAST_STOP"
             or event == "UNIT_SPELLCAST_CHANNEL_STOP" then
-                if castbar.animation:IsPlaying() then
-                    castbar.animation:Restart();
-                else
-                    castbar.animation:Play();
-                end
-
-                castbar.border:SetVertexColor(0.75, 0.75, 0.75);
-                castbar.name:SetTextColor(1,1,1);
-                castbar.statusbar:SetValue(0);
-
+                castbar.animation:Stop();
+                castbar.animation:Play();
                 castbar.countdown:Hide();
             end
+
+            castbar.statusbar:SetValue(0);
         end
 
+        -- Spell Cost
         if UnitIsUnit(unit, "player") then
             local name = UnitCastingInfo("player");
 

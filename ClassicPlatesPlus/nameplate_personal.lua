@@ -14,6 +14,7 @@ function func:PersonalNameplateCreate()
     if not data.nameplate then
         -- Anchor
         data.nameplate = CreateFrame("frame", myAddon .. "nameplateSelf", UIParent);
+
         local nameplate = data.nameplate;
 
         nameplate:SetSize(256,64);
@@ -288,12 +289,22 @@ function func:PersonalNameplateCreate()
         nameplate.ClassBarDummy:SetWidth(10);
         nameplate.ClassBarDummy:SetIgnoreParentScale(true);
 
+        --------------------------------
+        -- Class Power
+        --------------------------------
+        nameplate.classPower = CreateFrame("frame", nil, nameplate.main);
+        nameplate.classPower:SetPoint("bottom", nameplate.ClassBarDummy, "bottom", 0, 2);
+        nameplate.classPower:SetSize(20, 20);
+        nameplate.classPower:SetIgnoreParentScale(true);
+        nameplate.classPower:SetScale(0.6);
+        nameplate.classPower:Hide();
+
         -- Animation
         local function combatCheck()
             if InCombatLockdown() then
                 return 1;
             else
-                return 0.4;
+                return 0.5;
             end
         end
 
@@ -336,14 +347,16 @@ function func:PersonalNameplateAdd()
     if nameplate then
         local dummyAnchor = NamePlateDriverFrame.classNamePlateAlternatePowerBar or NamePlateDriverFrame.classNamePlatePowerBar or nameplate.powerbar;
 
+        nameplate:ClearAllPoints();
+
         if data.isRetail then
             local myNameplate = C_NamePlate.GetNamePlateForUnit("player");
 
             nameplate:SetScale(0.7);
-            nameplate:ClearAllPoints();
 
             if myNameplate then
                 nameplate:SetParent(myNameplate);
+                nameplate.main:SetPoint("center", nameplate, "center", 0, 0);
             end
         else
             nameplate:SetPoint("top", UIParent, "bottom", 0, Config.PersonalNameplatePointY);
@@ -363,7 +376,7 @@ function func:PersonalNameplateAdd()
         nameplate.buffsCounter:SetScale(Config.PersonalNameplatesScale + 0.5);
         nameplate.debuffsCounter:SetScale(Config.PersonalNameplatesScale + 0.5);
 
-        nameplate.ClassBarDummy:SetPoint("top", dummyAnchor, "bottom", 0, -4);
+        nameplate.ClassBarDummy:SetPoint("top", dummyAnchor, "bottom", 0, 0);
         nameplate.ClassBarDummy:SetHeight(data.classBarHeight);
 
         nameplate.healthSecondary:SetTextColor(
@@ -410,6 +423,7 @@ function func:PersonalNameplateAdd()
 
         func:Toggle_ExtraBar();
         func:ToggleNameplatePersonal();
+        func:Update_ClassPower();
     end
 end
 
@@ -467,24 +481,6 @@ function func:ToggleNameplatePersonal(event)
              and myNameplate:IsVisible()
 
     elseif Config.PersonalNameplate then
-        if not UnitIsDeadOrGhost("player") then
-            if InCombatLockdown() or event == "PLAYER_REGEN_DISABLED" then
-                nameplate:SetAlpha(1);
-                toggle = true;
-            else
-                local fullHealth = UnitHealth("player") >= UnitHealthMax("player");
-
-                nameplate:SetAlpha(0.5);
-
-                if Config.PersonalNameplateAlwaysShow then
-                    toggle = true;
-                elseif not fullHealth then
-                    toggle = true;
-                end
-            end
-        end
-
-        ------
         if not UnitIsDeadOrGhost("player") then
             local classID = select(3, UnitClass("player"));
             local powerType = UnitPowerType("player");
