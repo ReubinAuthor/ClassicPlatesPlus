@@ -145,10 +145,7 @@ function core:init(event, ...)
 
     if event == "UNIT_POWER_FREQUENT" then
         func:Update_Power(arg);
-
-        if not data.isRetail then
-            func:Update_ClassPower(arg);
-        end
+        func:Update_ClassPower(arg);
     end
 
     if event == "UNIT_MAXPOWER" then

@@ -1124,51 +1124,53 @@ function func:Update_ClassPower(unit, var1)
     end
 
     -- Combo Points
-    for _, nameplate in ipairs(C_NamePlate.GetNamePlates(false)) do
-        local unitFrame = nameplate.unitFrame;
+    if not data.isRetail then
+        for _, nameplate in ipairs(C_NamePlate.GetNamePlates(false)) do
+            local unitFrame = nameplate.unitFrame;
 
-        if nameplate.unitFrame.unit then
-            local comboPoints = GetComboPoints(player, unitFrame.unit);
+            if nameplate.unitFrame.unit then
+                local comboPoints = GetComboPoints(player, unitFrame.unit);
 
-            if comboPoints > 0 then
-                for i = 1, comboPoints do
-                    if not unitFrame.classPower[i] then
-                        unitFrame.classPower[i] = CreateFrame("frame", nil, unitFrame.classPower);
-                        unitFrame.classPower[i]:SetSize(14, 14);
+                if comboPoints > 0 then
+                    for i = 1, comboPoints do
+                        if not unitFrame.classPower[i] then
+                            unitFrame.classPower[i] = CreateFrame("frame", nil, unitFrame.classPower);
+                            unitFrame.classPower[i]:SetSize(14, 14);
 
-                        unitFrame.classPower[i].center = unitFrame.classPower[i]:CreateTexture();
-                        unitFrame.classPower[i].center:SetPoint("center");
-                        unitFrame.classPower[i].center:SetSize(18, 18);
-                        unitFrame.classPower[i].center:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\comboPoints");
+                            unitFrame.classPower[i].center = unitFrame.classPower[i]:CreateTexture();
+                            unitFrame.classPower[i].center:SetPoint("center");
+                            unitFrame.classPower[i].center:SetSize(18, 18);
+                            unitFrame.classPower[i].center:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\comboPoints");
 
-                        unitFrame.classPower[i].border = unitFrame.classPower[i]:CreateTexture();
-                        unitFrame.classPower[i].border:SetPoint("center");
-                        unitFrame.classPower[i].border:SetSize(18, 18);
-                        unitFrame.classPower[i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\comboPointsBorder");
-                        unitFrame.classPower[i].border:SetVertexColor(data.colors.border.r, data.colors.border.g, data.colors.border.b);
+                            unitFrame.classPower[i].border = unitFrame.classPower[i]:CreateTexture();
+                            unitFrame.classPower[i].border:SetPoint("center");
+                            unitFrame.classPower[i].border:SetSize(18, 18);
+                            unitFrame.classPower[i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\powers\\comboPointsBorder");
+                            unitFrame.classPower[i].border:SetVertexColor(data.colors.border.r, data.colors.border.g, data.colors.border.b);
+                        end
+                    end
+
+                    for i in ipairs(unitFrame.classPower) do
+                        if i == 1 then
+                            unitFrame.classPower[i]:SetPoint("center", unitFrame.classPower, "center", -(comboPoints -1) * 7, 0);
+                        elseif i > 1 then
+                            unitFrame.classPower[i]:SetPoint("left", unitFrame.classPower[i - 1], "right");
+                        end
+
+                        unitFrame.classPower[i]:SetShown(i <= comboPoints);
                     end
                 end
 
-                for i in ipairs(unitFrame.classPower) do
-                    if i == 1 then
-                        unitFrame.classPower[i]:SetPoint("center", unitFrame.classPower, "center", -(comboPoints -1) * 7, 0);
-                    elseif i > 1 then
-                        unitFrame.classPower[i]:SetPoint("left", unitFrame.classPower[i - 1], "right");
-                    end
+                unitFrame.classPower:SetScript("OnShow", function()
+                    func:PositionAuras(unitFrame);
+                end);
+                unitFrame.classPower:SetScript("OnHide", function()
+                    func:PositionAuras(unitFrame);
+                end);
 
-                    unitFrame.classPower[i]:SetShown(i <= comboPoints);
-                end
+                unitFrame.classPower:SetWidth(18 * comboPoints);
+                unitFrame.classPower:SetShown(comboPoints > 0);
             end
-
-            unitFrame.classPower:SetScript("OnShow", function()
-                func:PositionAuras(unitFrame);
-            end);
-            unitFrame.classPower:SetScript("OnHide", function()
-                func:PositionAuras(unitFrame);
-            end);
-
-            unitFrame.classPower:SetWidth(18 * comboPoints);
-            unitFrame.classPower:SetShown(comboPoints > 0);
         end
     end
 end
