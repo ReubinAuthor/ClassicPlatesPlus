@@ -318,7 +318,6 @@ function func:Update_Auras(unit)
                                     if timeElapsed > 0.1 then
                                         local countdown = expirationTime - GetTime();
 
-                                        timeElapsed = 0;
                                         if countdown < 10 then
                                             self.countdown:SetVertexColor(1, 0.5, 0);
                                         else
@@ -459,8 +458,8 @@ function func:PositionAuras(unitFrame, unit)
 
         -- Get Anchor
         anchor =
-                data.isRetail and resourceOnTarget == "1" and unit and UnitIsUnit(unit, "target") and class and unitFrame.ClassBarDummy
-            or unitFrame.classPower:IsShown() and unitFrame.classPower
+               data.isRetail and resourceOnTarget == "1" and unit and UnitIsUnit(unit, "target") and class and unitFrame.classPower
+            or unitFrame.classPower:IsVisible() and unitFrame.classPower
             or unitFrame.name;
 
         -- Position auras
@@ -512,16 +511,22 @@ function func:PositionAuras(unitFrame, unit)
                         pos1, pos2 = "top", "bottom";
 
                         if resourceOnTarget == "0" and class then
-                            anchor = unitFrame.ClassBarDummy;
-                            y = -8;
+                            anchor = unitFrame.classPower;
+
+                            if classFile == "PALADIN" then
+                                y = 0;
+                            else
+                                y = -8;
+                            end
                         else
-                            if unitFrame.classPower:IsShown() then
+                            if unitFrame.classPower:IsVisible() then
                                 anchor = unitFrame.classPower;
                             elseif unitFrame.extraBar:IsShown() then
                                 anchor = unitFrame.extraBar;
                             else
                                 anchor = unitFrame.powerbar;
                             end
+
                             y = -10;
                         end
                     else

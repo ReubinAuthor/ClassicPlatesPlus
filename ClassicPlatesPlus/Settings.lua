@@ -302,6 +302,32 @@ function func:Load_Settings()
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default, cvar);
         end
 
+        -- CheckButton
+        do
+            local name = "Special Power";
+            local tooltip = "Custom made special power bar: " .. white .. "Totems" .. yellow .. "\nMore will be added later";
+            local cfg = "SpecialPower";
+            local default = true;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Slider
+        do
+            local name = "Special Power Scale";
+            local tooltip = "";
+            local cfg = "SpecialPowerScale";
+            local default = 1.00;
+            local step = 0.01;
+            local minValue = 0.75;
+            local maxValue = 1.25;
+            local decimals = 2;
+            local flair = { classicEra = true, wrath = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
         -- Slider
         do
             local name = "Personal Nameplates Scale";
@@ -410,9 +436,9 @@ function func:Load_Settings()
 
         -- Slider
         do
-            local name = "Class Power Scale";
-            local tooltip = "Class power: " .. white .. "Combo Points" --Runes, Totems";
-            local cfg = "ClassPowerScale";
+            local name = "Combo Points Scale";
+            local tooltip = "";
+            local cfg = "ComboPointsScaleClassless" --"ClassPowerScale";
             local default = 1;
             local step = 0.01;
             local minValue = 0.50;
@@ -686,7 +712,7 @@ function func:Load_Settings()
                 [2] = "All",
                 [3] = "All except your own"
             }
-            local flair = { classicEra = true, wrath = true, retail = true };
+            local flair = { classicEra = false, wrath = true, retail = true };
 
             func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end

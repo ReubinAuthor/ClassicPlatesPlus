@@ -77,8 +77,8 @@ function func:CVars(event)
         SetCVar("nameplateSelectedScale", Config.EnlargeSelected and 1.2 or not Config.EnlargeSelected and 1);
 
         -- Inset
-        local classPowerScale = data.isRetail and 0 or Config.ClassPowerScale;
-        SetCVar("nameplateOtherTopInset", .08 * Config.NameplatesScale + (.024 * Config.AurasScale) + (0.018 * classPowerScale));
+        local ComboPointsScaleClassless = data.isRetail and 0 or Config.ComboPointsScaleClassless;
+        SetCVar("nameplateOtherTopInset", .08 * Config.NameplatesScale + (.024 * Config.AurasScale) + (0.018 * ComboPointsScaleClassless));
 
         -- Nameplates size
         SetCVar("nameplateGlobalScale", Config.NameplatesScale);
@@ -235,7 +235,7 @@ function func:ClassBarHeight()
     if classFile == "PALADIN" then
         data.classBarHeight = 30;
     elseif classFile == "SHAMAN" then
-        data.classBarHeight = 28;
+        data.classBarHeight = 24;
     elseif classFile == "ROGUE" then
         data.classBarHeight = 14;
     elseif classFile == "DEATHKNIGHT" then
@@ -420,8 +420,8 @@ function func:InteractIcon(nameplate)
             if auras and auras:IsShown() then
                 interactIcon:SetPoint("bottom", auras, "top", 0, 8);
                 interactIcon:SetPoint("center", unitFrame.name, "center");
-            elseif resourceOnTarget == "1" and unitFrame.ClassBarDummy then
-                interactIcon:SetPoint("bottom", unitFrame.ClassBarDummy, "top", 0, 4);
+            elseif resourceOnTarget == "1" and unitFrame.ClassPower then
+                interactIcon:SetPoint("bottom", unitFrame.ClassPower, "top", 0, 4);
             else
                 interactIcon:SetPoint("bottom", unitFrame.name, "top", 0, 4);
             end
@@ -698,6 +698,7 @@ function func:Update_Health(unit)
                     or Config.Percentage and healthPercent
                     or ""
                 );
+
                 nameplate.healthSecondary:SetText(percentageAsMainValue and hp or healthPercent);
 
                 nameplate.healthMain:SetShown(Config.NumericValue or Config.Percentage);
@@ -963,6 +964,7 @@ function func:Update_ExtraBar()
         nameplate.extraBar:SetValue(value);
         nameplate.extraBar.value:SetText(formatValue(value));
 
+        -- WHY ADD ON-UPDATE HERE???
         local timeElapsed = 0;
         nameplate.extraBar:SetScript("OnUpdate", function(self, elapsed)
             timeElapsed = timeElapsed + elapsed;
@@ -970,7 +972,6 @@ function func:Update_ExtraBar()
             if timeElapsed > 0.1 then
                 local value = formatValue(AlternatePowerBar:GetValue());
 
-                timeElapsed = 0;
                 self:SetValue(value);
                 self.value:SetText(value);
             end
@@ -995,12 +996,12 @@ function func:Update_ClassPower(unit, var1)
 
         for i = 1, 4 do
             local haveTotem, _, startTime, duration, icon = GetTotemInfo(i);
-            local toggle = haveTotem and duration > 0;
+            local toggle = Config.SpecialPower and haveTotem and duration > 0;
 
             if toggle then
                 if not classPower[i] then
                     classPower[i] = CreateFrame("frame", nil, classPower);
-                    classPower[i]:SetSize(44, 44);
+                    classPower[i]:SetSize(data.classBarHeight, data.classBarHeight);
 
                     classPower[i].border = classPower[i]:CreateTexture();
                     classPower[i].border:SetAllPoints();
@@ -1019,85 +1020,86 @@ function func:Update_ClassPower(unit, var1)
                     classPower[i].countdown = classPower[i]:CreateFontString(nil, nil, "GameFontNormalOutline");
                     classPower[i].countdown:SetPoint("center");
                     classPower[i].countdown:SetJustifyH("left");
-                    classPower[i].countdown:SetScale(1.3);
+                    classPower[i].countdown:SetScale(0.75);
                 end
 
-                classPower[i].center:SetTexture(icon);
-                classPower[i].countdown:SetText(func:formatTime(startTime + duration - GetTime()));
+                if classPower[i] then
+                    classPower[i].center:SetTexture(icon);
+                    classPower[i].countdown:SetText(func:formatTime(startTime + duration - GetTime()));
 
-                -- Tooltip
-                if Config.Tooltip then
-                    local hover;
+                    -- Tooltip
+                    if Config.Tooltip then
+                        local hover;
 
-                    local function keyCheck()
-                        if Config.Tooltip == 1 and IsShiftKeyDown()
-                        or Config.Tooltip == 2 and IsControlKeyDown()
-                        or Config.Tooltip == 3 and IsAltKeyDown()
-                        then
-                            return true;
+                        local function keyCheck()
+                            if Config.Tooltip == 1 and IsShiftKeyDown()
+                            or Config.Tooltip == 2 and IsControlKeyDown()
+                            or Config.Tooltip == 3 and IsAltKeyDown()
+                            then
+                                return true;
+                            end
                         end
+
+                        local function work(frame)
+                            if hover and keyCheck() then
+                                GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMLEFT", 0, -2);
+                                GameTooltip:SetTotem(i)
+                                GameTooltip:Show();
+                            end
+                        end
+
+                        classPower[i]:SetScript("OnEnter", function(self)
+                            self:EnableMouse(keyCheck());
+                            hover = true;
+                            work(self);
+                        end);
+
+                        classPower[i]:SetScript("OnLeave", function(self)
+                            self:EnableMouse(keyCheck());
+                            hover = false;
+                            local owner = GameTooltip:GetOwner();
+
+                            if owner == self or not owner then
+                                GameTooltip:Hide();
+                            end
+                        end);
+
+                        classPower[i]:RegisterEvent("MODIFIER_STATE_CHANGED");
+                        classPower[i]:SetScript("OnEvent", function(self)
+                            local owner = GameTooltip:GetOwner();
+
+                            self:EnableMouse(keyCheck());
+                            work(self);
+
+                            if not keyCheck() and owner == self or not owner then
+                                GameTooltip:Hide();
+                            end
+                        end);
+
+                        classPower[i]:EnableMouse(keyCheck());
                     end
 
-                    local function work(frame)
-                        if hover and keyCheck() then
-                            GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMLEFT", 0, -2);
-                            GameTooltip:SetTotem(i)
-                            GameTooltip:Show();
-                        end
-                    end
+                    -- Countdown
+                    local timeElapsed = 0;
+                    classPower[i]:SetScript("OnUpdate", function(self, elapsed)
+                        timeElapsed = timeElapsed + elapsed;
 
-                    classPower[i]:SetScript("OnEnter", function(self)
-                        self:EnableMouse(keyCheck());
-                        hover = true;
-                        work(self);
-                    end);
+                        if timeElapsed > 0.1 then
+                            local countdown = startTime + duration - GetTime();
 
-                    classPower[i]:SetScript("OnLeave", function(self)
-                        self:EnableMouse(keyCheck());
-                        hover = false;
-                        local owner = GameTooltip:GetOwner();
+                            if countdown < 10 then
+                                self.countdown:SetVertexColor(1, 0.5, 0);
+                            else
+                                self.countdown:SetVertexColor(1, 0.82, 0);
+                            end
 
-                        if owner == self or not owner then
-                            GameTooltip:Hide();
+                            self.countdown:SetText(func:formatTime(countdown));
                         end
                     end);
 
-                    classPower[i]:RegisterEvent("MODIFIER_STATE_CHANGED");
-                    classPower[i]:SetScript("OnEvent", function(self)
-                        local owner = GameTooltip:GetOwner();
-
-                        self:EnableMouse(keyCheck());
-                        work(self);
-
-                        if not keyCheck() and owner == self or not owner then
-                            GameTooltip:Hide();
-                        end
-                    end);
-
-                    classPower[i]:EnableMouse(keyCheck());
+                    table.insert(totems, classPower[i]);
+                    classPower[i]:Show();
                 end
-
-                -- Countdown
-                local timeElapsed = 0;
-                classPower[i]:SetScript("OnUpdate", function(self, elapsed)
-                    timeElapsed = timeElapsed + elapsed;
-
-                    if timeElapsed > 0.1 then
-                        local countdown = startTime + duration - GetTime();
-
-                        timeElapsed = 0;
-                        if countdown < 10 then
-                            self.countdown:SetVertexColor(1, 0.5, 0);
-                        else
-                            self.countdown:SetVertexColor(1, 0.82, 0);
-                        end
-
-                        self.countdown:SetText(func:formatTime(countdown));
-                    end
-                end);
-
-                table.insert(totems, classPower[i]);
-                classPower[i]:Show();
             elseif classPower[i] then
                 classPower[i]:Hide();
             end
@@ -1109,19 +1111,20 @@ function func:Update_ClassPower(unit, var1)
             totems[i]:ClearAllPoints();
 
             if i == 1 then
-                totems[i]:SetPoint("top", data.nameplate.ClassBarDummy, "top", -(totalTotems -1) * 22, -6);
+                totems[i]:SetPoint("top", data.nameplate.classPower, "top", -(totalTotems -1) * (data.classBarHeight / 2), 0);
             else
                 totems[i]:SetPoint("left", data.nameplate.classPower[i - 1], "right");
             end
         end
 
-        if totalTotems > 0 then
-            data.nameplate.ClassBarDummy:SetHeight(28);
-        end
-
+        classPower:SetScale(Config.SpecialPowerScale);
         classPower:SetShown(totalTotems > 0);
         func:PositionAuras(data.nameplate, "player");
     end
+
+    --[[if classFile == "DEATHKNIGHT" then
+
+    end]]
 
     -- Combo Points
     if not data.isRetail then
@@ -1168,6 +1171,7 @@ function func:Update_ClassPower(unit, var1)
                     func:PositionAuras(unitFrame);
                 end);
 
+                unitFrame.classPower:SetScale(Config.ComboPointsScaleClassless);
                 unitFrame.classPower:SetWidth(18 * comboPoints);
                 unitFrame.classPower:SetShown(comboPoints > 0);
             end

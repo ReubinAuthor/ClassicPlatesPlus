@@ -290,7 +290,7 @@ local functionsTable = {
     MaxNameplateDistance = function() updateNameplateDistance(); end,
     CastbarScale = function() updateNameplateVisuals(); end,
     CastbarPositionY = function() updateNameplateVisuals(); end,
-    ClassPowerScale = function() updateNameplateVisuals(); end,
+    ComboPointsScaleClassless = function() func:Update_ClassPower(); end,
     AurasCountdownPosition = function() updateAurasVisuals(); end,
     NameAndGuildOutline = function()
         updateNameplateVisuals();
@@ -324,6 +324,8 @@ local functionsTable = {
         end
         func:PersonalNameplateAdd();
     end,
+    SpecialPower = function() func:Update_ClassPower(); end,
+    SpecialPowerScale = function() func:Update_ClassPower(); end,
 }
 
 -- Execute function by passed config name

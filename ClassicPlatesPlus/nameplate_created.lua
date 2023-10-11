@@ -340,10 +340,10 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
         -- Class Bar Dummy
         --------------------------------
-        unitFrame.ClassBarDummy = CreateFrame("frame", nil, unitFrame.parent);
-        unitFrame.ClassBarDummy:SetPoint("bottom", unitFrame.name, "top", 0, 4);
-        unitFrame.ClassBarDummy:SetWidth(10);
-        unitFrame.ClassBarDummy:SetIgnoreParentScale(true);
+        unitFrame.classPower = CreateFrame("frame", nil, unitFrame.parent);
+        unitFrame.classPower:SetPoint("bottom", unitFrame.name, "top", 0, 4);
+        unitFrame.classPower:SetWidth(10);
+        unitFrame.classPower:SetIgnoreParentScale(true);
 
         --------------------------------
         -- Castbar

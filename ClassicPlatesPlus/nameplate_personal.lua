@@ -88,15 +88,14 @@ function func:PersonalNameplateCreate()
         nameplate.healthbar:SetPoint("top", nameplate.border, "center", 0, 36);
         nameplate.healthbar:SetSize(222, 28);
         nameplate.healthbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar");
-        nameplate.healthbar:SetFrameLevel(1);
         nameplate.healthbar:SetStatusBarColor(0,1,0);
+        nameplate.healthbar:SetFrameLevel(1);
 
         nameplate.healthbarSpark = nameplate.main:CreateTexture();
-        nameplate.healthbarSpark:SetParent(nameplate.main);
         nameplate.healthbarSpark:SetPoint("center", nameplate.healthbar:GetStatusBarTexture(), "right");
-        nameplate.healthbarSpark:SetSize(16, 32);
+        nameplate.healthbarSpark:SetSize(10, 32);
         nameplate.healthbarSpark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
-        nameplate.healthbarSpark:SetVertexColor(1, 0.82, 0, 0.7);
+        nameplate.healthbarSpark:SetVertexColor(1, 0.82, 0);
         nameplate.healthbarSpark:SetBlendMode("ADD");
         nameplate.healthbarSpark:SetDrawLayer("artwork");
         nameplate.healthbarSpark:Hide();
@@ -118,7 +117,7 @@ function func:PersonalNameplateCreate()
         nameplate.healPredictionSpark = nameplate.main:CreateTexture();
         nameplate.healPredictionSpark:SetParent(nameplate.main);
         nameplate.healPredictionSpark:SetPoint("center", nameplate.healPrediction, "right");
-        nameplate.healPredictionSpark:SetSize(16, 32);
+        nameplate.healPredictionSpark:SetSize(10, 32);
         nameplate.healPredictionSpark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
         nameplate.healPredictionSpark:SetVertexColor(0, 1, 0, 0.33);
         nameplate.healPredictionSpark:SetBlendMode("add");
@@ -178,9 +177,8 @@ function func:PersonalNameplateCreate()
         nameplate.powerbar:SetFrameLevel(1);
 
         nameplate.powerbarSpark = nameplate.main:CreateTexture();
-        nameplate.powerbarSpark:SetParent(nameplate.main);
         nameplate.powerbarSpark:SetPoint("center", nameplate.powerbar:GetStatusBarTexture(), "right");
-        nameplate.powerbarSpark:SetSize(12, 22);
+        nameplate.powerbarSpark:SetSize(10, 22);
         nameplate.powerbarSpark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
         nameplate.powerbarSpark:SetVertexColor(1, 0.82, 0, 0.7);
         nameplate.powerbarSpark:SetBlendMode("add");
@@ -239,7 +237,7 @@ function func:PersonalNameplateCreate()
 
         nameplate.powerbarCostSpark = nameplate.main:CreateTexture();
         nameplate.powerbarCostSpark:SetPoint("center", nameplate.powerbarCost, "left");
-        nameplate.powerbarCostSpark:SetSize(12, 22);
+        nameplate.powerbarCostSpark:SetSize(10, 22);
         nameplate.powerbarCostSpark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
         nameplate.powerbarCostSpark:SetVertexColor(0.5, 0.5, 1, 1);
         nameplate.powerbarCostSpark:SetBlendMode("add");
@@ -257,7 +255,7 @@ function func:PersonalNameplateCreate()
         nameplate.extraBar.spark = nameplate.main:CreateTexture();
         nameplate.extraBar.spark:SetParent(nameplate.extraBar);
         nameplate.extraBar.spark:SetPoint("center", nameplate.extraBar:GetStatusBarTexture(), "right");
-        nameplate.extraBar.spark:SetSize(12, 22);
+        nameplate.extraBar.spark:SetSize(10, 22);
         nameplate.extraBar.spark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
         nameplate.extraBar.spark:SetVertexColor(1, 0.82, 0, 0.7);
         nameplate.extraBar.spark:SetBlendMode("add");
@@ -283,20 +281,11 @@ function func:PersonalNameplateCreate()
         nameplate.extraBar.value:SetScale(0.9 + scaleOffset);
 
         --------------------------------
-        -- Class Bar Dummy
-        --------------------------------
-        nameplate.ClassBarDummy = CreateFrame("frame", nil, nameplate.main);
-        nameplate.ClassBarDummy:SetWidth(10);
-        nameplate.ClassBarDummy:SetIgnoreParentScale(true);
-
-        --------------------------------
         -- Class Power
         --------------------------------
         nameplate.classPower = CreateFrame("frame", nil, nameplate.main);
-        nameplate.classPower:SetPoint("bottom", nameplate.ClassBarDummy, "bottom", 0, 2);
-        nameplate.classPower:SetSize(20, 20);
+        nameplate.classPower:SetSize(data.classBarHeight, data.classBarHeight);
         nameplate.classPower:SetIgnoreParentScale(true);
-        nameplate.classPower:SetScale(0.6);
         nameplate.classPower:Hide();
 
         -- Animation
@@ -376,8 +365,8 @@ function func:PersonalNameplateAdd()
         nameplate.buffsCounter:SetScale(Config.PersonalNameplatesScale + 0.5);
         nameplate.debuffsCounter:SetScale(Config.PersonalNameplatesScale + 0.5);
 
-        nameplate.ClassBarDummy:SetPoint("top", dummyAnchor, "bottom", 0, 0);
-        nameplate.ClassBarDummy:SetHeight(data.classBarHeight);
+        nameplate.classPower:SetPoint("top", dummyAnchor, "bottom", 0, -4);
+        nameplate.classPower:SetHeight(data.classBarHeight);
 
         nameplate.healthSecondary:SetTextColor(
             Config.HealthFontColor.r,

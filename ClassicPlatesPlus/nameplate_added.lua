@@ -95,11 +95,9 @@ function func:Nameplate_Added(unit, visuals)
                 -- Quest
                 unitFrame.quest:ClearAllPoints();
 
-                -- Class Bar
-                unitFrame.ClassBarDummy:SetHeight(data.classBarHeight);
-
                 -- Class power
-                unitFrame.classPower:SetScale(Config.ClassPowerScale);
+                unitFrame.classPower:SetHeight(data.classBarHeight);
+                unitFrame.classPower:SetScale(Config.SpecialPowerScale);
 
                 -- Health Value Secondary
                 unitFrame.healthSecondary:SetJustifyH("left");
