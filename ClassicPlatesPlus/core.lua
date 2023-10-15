@@ -490,10 +490,10 @@ function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
                 else
                     return getLighterColor(ThreatPercentageOfLead, Config.ThreatAggroColor.r, Config.ThreatAggroColor.g, Config.ThreatAggroColor.b);
                 end
-            elseif status == 1 or (ThreatPercentageOfLead and ThreatPercentageOfLead > Config.ThreatWarningThreshold) then
-                return Config.ThreatWarningColor.r, Config.ThreatWarningColor.g, Config.ThreatWarningColor.b;
             elseif GetPartyAssignment("MainTank", "player", true) and func:OtherTank(unit) then
                 return Config.ThreatOtherTankColor.r, Config.ThreatOtherTankColor.g, Config.ThreatOtherTankColor.b;
+            elseif status == 1 or (ThreatPercentageOfLead and ThreatPercentageOfLead > Config.ThreatWarningThreshold) then
+                return Config.ThreatWarningColor.r, Config.ThreatWarningColor.g, Config.ThreatWarningColor.b;
             else
                 return getDefault();
             end
