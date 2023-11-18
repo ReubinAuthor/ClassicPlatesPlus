@@ -254,10 +254,13 @@ local functionsTable = {
     AurasHidePassive = function() updateAuras(); end,
     AurasCountdown = function() updateAurasVisuals(); end,
     AurasReverseAnimation = function() updateAurasVisuals(); end,
+
     BuffsFriendly = function() updateAuras(); end,
+    DebuffsFriendly = function() updateAuras(); end,
+
     BuffsEnemy = function() updateAuras(); end,
     DebuffsEnemy = function() updateAuras(); end,
-    DebuffsFriendly = function() updateAuras(); end,
+
     AurasMaxBuffsFriendly = function() updateAuras(); end,
     AurasMaxDebuffsFriendly = function() updateAuras(); end,
     AurasMaxBuffsEnemy = function() updateAuras(); end,

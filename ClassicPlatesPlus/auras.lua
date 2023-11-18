@@ -30,14 +30,9 @@ function func:Update_Auras(unit)
 
         if nameplate then
             local unitFrame = unit == "player" and nameplate or nameplate.unitFrame;
-            local canAssist = UnitCanAssist("player", unit);
+            local canAttack = UnitCanAttack("player", unit);
             local AurasHidePassive = Config.AurasHidePassive;
             local AurasShow = Config.AurasShow;
-            local buffOnFriendly = Config.BuffsFriendly and canAssist;
-            local debuffOnFriendly = Config.DebuffsFriendly and canAssist;
-            local buffOnEnemy = Config.BuffsEnemy and not canAssist;
-            local debuffOnEnemy = Config.DebuffsEnemy and not canAssist;
-            local UnitIsPlayer = unit == "player" or source == "vehicle";
 
             unitFrame.toSort = {
                 important_buffs = {},
@@ -56,303 +51,319 @@ function func:Update_Auras(unit)
             if not unitFrame.buffs.auras then unitFrame.buffs.auras = {} end
             if not unitFrame.debuffs.auras then unitFrame.debuffs.auras = {} end
 
-            local function createFrames(filter, auraType, showType, r,g,b)
-                if showType then
-                    for i = 1, 40 do
-                        local name, icon, stacks, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod = UnitAura(unit, i, filter);
+            local function createFrames(filter, auraType, r,g,b)
+                for i = 1, 40 do
+                    local name, icon, stacks, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod = UnitAura(unit, i, filter);
+                    local UnitIsPlayer = unit == "player" or source == "vehicle";
 
-                        -- Test Auras
-                        local test = false;
-                        if test then
-                            if i <= 3 then --and auraType == "debuffs" then
-                                name = "Test Aura " .. i;
-                                icon = 1120721;
-                                stacks = i;
-                                duration = 0;
-                                expirationTime = duration + GetTime();
-                                source = "target";
+                    local function showType()
+                        if canAttack then
+                            if Config.BuffsEnemy and auraType == "buffs" then
+                                return true;
                             end
-                            if i > 3 and i < 7 then
-                                name = "Test Aura " .. i;
-                                icon = 136243;
-                                stacks = i;
-                                duration = 0;
-                                expirationTime = duration + GetTime();
-                                source = "player";
+                            if Config.DebuffsEnemy and auraType == "debuffs" then
+                                return true;
+                            end
+                        else
+                            if Config.BuffsFriendly and auraType == "buffs" then
+                                return true;
+                            end
+                            if Config.DebuffsFriendly and auraType == "debuffs" then
+                                return true;
                             end
                         end
+                    end
 
-                        local SourceIsPlayer = source == "player" or source == "vehicle";
+                    -- Test Auras
+                    local test = false;
+                    if test then
+                        if i <= 3 then --and auraType == "debuffs" then
+                            name = "Test Aura " .. i;
+                            icon = 1120721;
+                            stacks = i;
+                            duration = 0;
+                            expirationTime = duration + GetTime();
+                            source = "target";
+                        end
+                        if i > 3 and i < 7 then
+                            name = "Test Aura " .. i;
+                            icon = 136243;
+                            stacks = i;
+                            duration = 0;
+                            expirationTime = duration + GetTime();
+                            source = "player";
+                        end
+                    end
 
-                        if name then
+                    local SourceIsPlayer = source == "player" or source == "vehicle";
 
-                            local hidePassiveCheck = data.isClassic and true or not ( ( duration == 0 and (AurasHidePassive == 2 or ( AurasHidePassive == 3 and not SourceIsPlayer ) ) ) );
-                            local show = not UnitIsPlayer and ( ( AurasShow == 1 and SourceIsPlayer ) or AurasShow == 2);
-                            local isPlayersAura = UnitIsPlayer and (auraType == "debuffs" or auraType == "buffs" and ( Config.AurasSourcePersonal == 1 and SourceIsPlayer or Config.AurasSourcePersonal == 2 ) );
-                            local toggle = data.settings and ( ( data.settings.AurasImportantList[name] or ( hidePassiveCheck and ( show or isPlayersAura ) ) and not data.settings.AurasBlacklist[name] ) );
+                    if name then
+                        local hidePassiveCheck = data.isClassic and true or not ( ( duration == 0 and (AurasHidePassive == 2 or ( AurasHidePassive == 3 and not SourceIsPlayer ) ) ) );
+                        local show = not UnitIsPlayer and ( ( AurasShow == 1 and SourceIsPlayer ) or AurasShow == 2);
+                        local isPlayersAura = UnitIsPlayer and (auraType == "debuffs" or auraType == "buffs" and ( Config.AurasSourcePersonal == 1 and SourceIsPlayer or Config.AurasSourcePersonal == 2 ) );
+                        local toggle = data.settings and (
+                                data.settings.AurasImportantList[name]
+                                or (
+                                    showType() and  hidePassiveCheck and ( show or isPlayersAura )
+                                   )
+                                    and not data.settings.AurasBlacklist[name]
+                            );
 
-                            if toggle then
-                                if not unitFrame[auraType]["auras"][i] then
-                                    ------------------------------------
-                                    -- Main
-                                    ------------------------------------
-                                    unitFrame[auraType]["auras"][i] = CreateFrame("frame", nil, unitFrame);
-                                    unitFrame[auraType]["auras"][i]:SetSize(28, 24);
-                                    unitFrame[auraType]["auras"][i]:SetFrameLevel(1);
-                                    unitFrame[auraType]["auras"][i]:SetIgnoreParentScale(true);
-                                    unitFrame[auraType]["auras"][i]:SetScale(scale);
+                        if toggle then
+                            if not unitFrame[auraType]["auras"][i] then
+                                ------------------------------------
+                                -- Main
+                                ------------------------------------
+                                unitFrame[auraType]["auras"][i] = CreateFrame("frame", nil, unitFrame);
+                                unitFrame[auraType]["auras"][i]:SetSize(28, 24);
+                                unitFrame[auraType]["auras"][i]:SetFrameLevel(1);
+                                unitFrame[auraType]["auras"][i]:SetIgnoreParentScale(true);
+                                unitFrame[auraType]["auras"][i]:SetScale(scale);
 
-                                    ------------------------------------
-                                    -- Firse level
-                                    ------------------------------------
-                                    unitFrame[auraType]["auras"][i].first = CreateFrame("frame", nil, unitFrame[auraType]["auras"][i]);
-                                    unitFrame[auraType]["auras"][i].first:SetPoint("center", unitFrame[auraType]["auras"][i], "center");
-                                    unitFrame[auraType]["auras"][i].first:SetAllPoints();
-                                    unitFrame[auraType]["auras"][i].first:SetFrameLevel(1);
+                                ------------------------------------
+                                -- Firse level
+                                ------------------------------------
+                                unitFrame[auraType]["auras"][i].first = CreateFrame("frame", nil, unitFrame[auraType]["auras"][i]);
+                                unitFrame[auraType]["auras"][i].first:SetPoint("center", unitFrame[auraType]["auras"][i], "center");
+                                unitFrame[auraType]["auras"][i].first:SetAllPoints();
+                                unitFrame[auraType]["auras"][i].first:SetFrameLevel(1);
 
-                                    -- Highlight
-                                    unitFrame[auraType]["auras"][i].highlight = unitFrame[auraType]["auras"][i].first:CreateTexture();
-                                    unitFrame[auraType]["auras"][i].highlight:SetPoint("Center", unitFrame[auraType]["auras"][i].first);
-                                    unitFrame[auraType]["auras"][i].highlight:SetSize(64,64);
-                                    unitFrame[auraType]["auras"][i].highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantHighlight");
-                                    unitFrame[auraType]["auras"][i].highlight:SetVertexColor(1,0,0,1);
+                                -- Highlight
+                                unitFrame[auraType]["auras"][i].highlight = unitFrame[auraType]["auras"][i].first:CreateTexture();
+                                unitFrame[auraType]["auras"][i].highlight:SetPoint("Center", unitFrame[auraType]["auras"][i].first);
+                                unitFrame[auraType]["auras"][i].highlight:SetSize(64,64);
+                                unitFrame[auraType]["auras"][i].highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantHighlight");
+                                unitFrame[auraType]["auras"][i].highlight:SetVertexColor(1,0,0,1);
 
-                                    -- Highlight animation group
-                                    unitFrame[auraType]["auras"][i].highlight.animationGrp = unitFrame[auraType]["auras"][i].highlight:CreateAnimationGroup();
-                                    unitFrame[auraType]["auras"][i].highlight.animationGrp:SetLooping("repeat");
+                                -- Highlight animation group
+                                unitFrame[auraType]["auras"][i].highlight.animationGrp = unitFrame[auraType]["auras"][i].highlight:CreateAnimationGroup();
+                                unitFrame[auraType]["auras"][i].highlight.animationGrp:SetLooping("repeat");
 
-                                    -- Highlight animation alpha
-                                    local animation_alphaFrom = unitFrame[auraType]["auras"][i].highlight.animationGrp:CreateAnimation("Alpha");
-                                    animation_alphaFrom:SetDuration(0.33);
-                                    animation_alphaFrom:SetFromAlpha(0);
-                                    animation_alphaFrom:SetToAlpha(1);
-                                    animation_alphaFrom:SetOrder(1);
-                                    local animation_alphaTo = unitFrame[auraType]["auras"][i].highlight.animationGrp:CreateAnimation("Alpha");
-                                    animation_alphaTo:SetDuration(0.33);
-                                    animation_alphaTo:SetFromAlpha(1);
-                                    animation_alphaTo:SetToAlpha(0);
-                                    animation_alphaTo:SetOrder(2);
+                                -- Highlight animation alpha
+                                local animation_alphaFrom = unitFrame[auraType]["auras"][i].highlight.animationGrp:CreateAnimation("Alpha");
+                                animation_alphaFrom:SetDuration(0.33);
+                                animation_alphaFrom:SetFromAlpha(0);
+                                animation_alphaFrom:SetToAlpha(1);
+                                animation_alphaFrom:SetOrder(1);
+                                local animation_alphaTo = unitFrame[auraType]["auras"][i].highlight.animationGrp:CreateAnimation("Alpha");
+                                animation_alphaTo:SetDuration(0.33);
+                                animation_alphaTo:SetFromAlpha(1);
+                                animation_alphaTo:SetToAlpha(0);
+                                animation_alphaTo:SetOrder(2);
 
-                                    -- Mask
-                                    unitFrame[auraType]["auras"][i].mask = unitFrame[auraType]["auras"][i].first:CreateMaskTexture();
-                                    unitFrame[auraType]["auras"][i].mask:SetPoint("center", unitFrame[auraType]["auras"][i].first, "center");
-                                    unitFrame[auraType]["auras"][i].mask:SetSize(64, 32);
-                                    unitFrame[auraType]["auras"][i].mask:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\mask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
+                                -- Mask
+                                unitFrame[auraType]["auras"][i].mask = unitFrame[auraType]["auras"][i].first:CreateMaskTexture();
+                                unitFrame[auraType]["auras"][i].mask:SetPoint("center", unitFrame[auraType]["auras"][i].first, "center");
+                                unitFrame[auraType]["auras"][i].mask:SetSize(64, 32);
+                                unitFrame[auraType]["auras"][i].mask:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\mask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE");
 
-                                    -- Icon
-                                    unitFrame[auraType]["auras"][i].icon = unitFrame[auraType]["auras"][i].first:CreateTexture();
-                                    unitFrame[auraType]["auras"][i].icon:SetPoint("center", unitFrame[auraType]["auras"][i].first, "center");
-                                    unitFrame[auraType]["auras"][i].icon:SetSize(28, 28);
-                                    unitFrame[auraType]["auras"][i].icon:SetTexture(icon);
-                                    unitFrame[auraType]["auras"][i].icon:AddMaskTexture(unitFrame[auraType]["auras"][i].mask);
-                                    unitFrame[auraType]["auras"][i].icon:SetDrawLayer("background", 1);
+                                -- Icon
+                                unitFrame[auraType]["auras"][i].icon = unitFrame[auraType]["auras"][i].first:CreateTexture();
+                                unitFrame[auraType]["auras"][i].icon:SetPoint("center", unitFrame[auraType]["auras"][i].first, "center");
+                                unitFrame[auraType]["auras"][i].icon:SetSize(28, 28);
+                                unitFrame[auraType]["auras"][i].icon:SetTexture(icon);
+                                unitFrame[auraType]["auras"][i].icon:AddMaskTexture(unitFrame[auraType]["auras"][i].mask);
+                                unitFrame[auraType]["auras"][i].icon:SetDrawLayer("background", 1);
 
-                                    -- Cooldown
-                                    unitFrame[auraType]["auras"][i].cooldown = CreateFrame("Cooldown", nil, unitFrame[auraType]["auras"][i].first, "CooldownFrameTemplate");
-                                    unitFrame[auraType]["auras"][i].cooldown:SetAllPoints();
-                                    unitFrame[auraType]["auras"][i].cooldown:SetCooldown(GetTime() - (duration - (expirationTime - GetTime())), duration, timeMod);
-                                    unitFrame[auraType]["auras"][i].cooldown:SetDrawEdge(true);
-                                    unitFrame[auraType]["auras"][i].cooldown:SetDrawBling(false);
-                                    unitFrame[auraType]["auras"][i].cooldown:SetSwipeColor(0, 0, 0, 0.6);
-                                    unitFrame[auraType]["auras"][i].cooldown:SetHideCountdownNumbers(true);
-                                    unitFrame[auraType]["auras"][i].cooldown:SetReverse(Config.AurasReverseAnimation);
-                                    unitFrame[auraType]["auras"][i].cooldown:SetFrameLevel(1);
+                                -- Cooldown
+                                unitFrame[auraType]["auras"][i].cooldown = CreateFrame("Cooldown", nil, unitFrame[auraType]["auras"][i].first, "CooldownFrameTemplate");
+                                unitFrame[auraType]["auras"][i].cooldown:SetAllPoints();
+                                unitFrame[auraType]["auras"][i].cooldown:SetCooldown(GetTime() - (duration - (expirationTime - GetTime())), duration, timeMod);
+                                unitFrame[auraType]["auras"][i].cooldown:SetDrawEdge(true);
+                                unitFrame[auraType]["auras"][i].cooldown:SetDrawBling(false);
+                                unitFrame[auraType]["auras"][i].cooldown:SetSwipeColor(0, 0, 0, 0.6);
+                                unitFrame[auraType]["auras"][i].cooldown:SetHideCountdownNumbers(true);
+                                unitFrame[auraType]["auras"][i].cooldown:SetReverse(Config.AurasReverseAnimation);
+                                unitFrame[auraType]["auras"][i].cooldown:SetFrameLevel(1);
 
-                                    ------------------------------------
-                                    -- Second level
-                                    ------------------------------------
-                                    unitFrame[auraType]["auras"][i].second = CreateFrame("frame", nil, unitFrame[auraType]["auras"][i]);
-                                    unitFrame[auraType]["auras"][i].second:SetAllPoints();
-                                    unitFrame[auraType]["auras"][i].second:SetFrameLevel(2);
+                                ------------------------------------
+                                -- Second level
+                                ------------------------------------
+                                unitFrame[auraType]["auras"][i].second = CreateFrame("frame", nil, unitFrame[auraType]["auras"][i]);
+                                unitFrame[auraType]["auras"][i].second:SetAllPoints();
+                                unitFrame[auraType]["auras"][i].second:SetFrameLevel(2);
 
-                                    -- Border
-                                    unitFrame[auraType]["auras"][i].border = unitFrame[auraType]["auras"][i].second:CreateTexture();
-                                    unitFrame[auraType]["auras"][i].border:SetPoint("center", unitFrame[auraType]["auras"][i].second, "center");
-                                    unitFrame[auraType]["auras"][i].border:SetDrawLayer("border", 1);
+                                -- Border
+                                unitFrame[auraType]["auras"][i].border = unitFrame[auraType]["auras"][i].second:CreateTexture();
+                                unitFrame[auraType]["auras"][i].border:SetPoint("center", unitFrame[auraType]["auras"][i].second, "center");
+                                unitFrame[auraType]["auras"][i].border:SetDrawLayer("border", 1);
 
-                                    -- Countdown
-                                    unitFrame[auraType]["auras"][i].countdown = unitFrame[auraType]["auras"][i].second:CreateFontString(nil, nil, "GameFontNormalOutline");
-                                    if Config.AurasCountdownPosition == 1 then
-                                        unitFrame[auraType]["auras"][i].countdown:SetPoint("right", unitFrame[auraType]["auras"][i].second, "topRight", 5, -2.5);
-                                        unitFrame[auraType]["auras"][i].countdown:SetJustifyH("right");
-                                    elseif Config.AurasCountdownPosition == 2 then
-                                        unitFrame[auraType]["auras"][i].countdown:SetPoint("center", unitFrame[auraType]["auras"][i].second, "center");
-                                        unitFrame[auraType]["auras"][i].countdown:SetJustifyH("center");
-                                    end
-                                    unitFrame[auraType]["auras"][i].countdown:SetScale(0.9);
-                                    unitFrame[auraType]["auras"][i].countdown:SetText(func:formatTime(expirationTime - GetTime()));
-                                    unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
-
-                                    -- Stacks
-                                    unitFrame[auraType]["auras"][i].stacks = unitFrame[auraType]["auras"][i].second:CreateFontString(nil, nil, "GameFontNormalOutline");
-                                    unitFrame[auraType]["auras"][i].stacks:SetPoint("right", unitFrame[auraType]["auras"][i].second, "bottomRight", 5, 2.5);
-                                    unitFrame[auraType]["auras"][i].stacks:SetScale(0.9);
-                                    unitFrame[auraType]["auras"][i].stacks:SetText("x" .. stacks);
-                                    unitFrame[auraType]["auras"][i].stacks:SetJustifyH("right");
-                                    unitFrame[auraType]["auras"][i].stacks:SetShown(stacks > 0);
-                                else
-                                    -- Main
-                                    unitFrame[auraType]["auras"][i]:SetScale(scale);
-
-                                    -- Icon
-                                    unitFrame[auraType]["auras"][i].icon:SetTexture(icon);
-
-                                    -- Cooldown
-                                    unitFrame[auraType]["auras"][i].cooldown:SetCooldown(GetTime() - (duration - (expirationTime - GetTime())), duration, timeMod);
-                                    unitFrame[auraType]["auras"][i].cooldown:SetReverse(Config.AurasReverseAnimation);
-
-                                    -- Countdown
-                                    unitFrame[auraType]["auras"][i].countdown:SetText(func:formatTime(expirationTime - GetTime()));
-                                    unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
-
-                                    -- Stacks
-                                    unitFrame[auraType]["auras"][i].stacks:SetText("x" .. stacks);
-                                    unitFrame[auraType]["auras"][i].stacks:SetShown(stacks > 0);
+                                -- Countdown
+                                unitFrame[auraType]["auras"][i].countdown = unitFrame[auraType]["auras"][i].second:CreateFontString(nil, nil, "GameFontNormalOutline");
+                                if Config.AurasCountdownPosition == 1 then
+                                    unitFrame[auraType]["auras"][i].countdown:SetPoint("right", unitFrame[auraType]["auras"][i].second, "topRight", 5, -2.5);
+                                    unitFrame[auraType]["auras"][i].countdown:SetJustifyH("right");
+                                elseif Config.AurasCountdownPosition == 2 then
+                                    unitFrame[auraType]["auras"][i].countdown:SetPoint("center", unitFrame[auraType]["auras"][i].second, "center");
+                                    unitFrame[auraType]["auras"][i].countdown:SetJustifyH("center");
                                 end
+                                unitFrame[auraType]["auras"][i].countdown:SetScale(0.9);
+                                unitFrame[auraType]["auras"][i].countdown:SetText(func:formatTime(expirationTime - GetTime()));
+                                unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
 
-                                -- Tooltip
-                                if Config.Tooltip then
-                                    local frame = unitFrame[auraType]["auras"][i];
-                                    local hover;
+                                -- Stacks
+                                unitFrame[auraType]["auras"][i].stacks = unitFrame[auraType]["auras"][i].second:CreateFontString(nil, nil, "GameFontNormalOutline");
+                                unitFrame[auraType]["auras"][i].stacks:SetPoint("right", unitFrame[auraType]["auras"][i].second, "bottomRight", 5, 2.5);
+                                unitFrame[auraType]["auras"][i].stacks:SetScale(0.9);
+                                unitFrame[auraType]["auras"][i].stacks:SetText("x" .. stacks);
+                                unitFrame[auraType]["auras"][i].stacks:SetJustifyH("right");
+                                unitFrame[auraType]["auras"][i].stacks:SetShown(stacks > 0);
+                            else
+                                -- Main
+                                unitFrame[auraType]["auras"][i]:SetScale(scale);
 
-                                    local function keyCheck()
-                                        if Config.Tooltip == 1 and IsShiftKeyDown()
-                                        or Config.Tooltip == 2 and IsControlKeyDown()
-                                        or Config.Tooltip == 3 and IsAltKeyDown()
-                                        then
-                                            return true;
-                                        end
-                                    end
+                                -- Icon
+                                unitFrame[auraType]["auras"][i].icon:SetTexture(icon);
 
-                                    local function work(frame)
-                                        if hover and keyCheck() then
-                                            GameTooltip:Hide();
-                                            GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMLEFT", 0, -2);
-                                            GameTooltip:SetUnitAura(unit, i, filter);
+                                -- Cooldown
+                                unitFrame[auraType]["auras"][i].cooldown:SetCooldown(GetTime() - (duration - (expirationTime - GetTime())), duration, timeMod);
+                                unitFrame[auraType]["auras"][i].cooldown:SetReverse(Config.AurasReverseAnimation);
 
-                                            if spellId then
-                                                GameTooltip:AddDoubleLine("Spell ID", spellId, nil, nil, nil, 1, 1, 1);
-                                            end
+                                -- Countdown
+                                unitFrame[auraType]["auras"][i].countdown:SetText(func:formatTime(expirationTime - GetTime()));
+                                unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
 
-                                            GameTooltip:Show();
-                                        end
-                                    end
+                                -- Stacks
+                                unitFrame[auraType]["auras"][i].stacks:SetText("x" .. stacks);
+                                unitFrame[auraType]["auras"][i].stacks:SetShown(stacks > 0);
+                            end
 
-                                    frame:SetScript("OnEnter", function(self)
-                                        self:EnableMouse(keyCheck());
-                                        hover = true;
-                                        work(self);
-                                    end);
+                            -- Tooltip
+                            if Config.Tooltip then
+                                local frame = unitFrame[auraType]["auras"][i];
+                                local hover;
 
-                                    frame:SetScript("OnLeave", function(self)
-                                        self:EnableMouse(keyCheck());
-                                        hover = false;
-                                        local owner = GameTooltip:GetOwner();
-
-                                        if owner == self or not owner then
-                                            GameTooltip:Hide();
-                                        end
-                                    end);
-
-                                    frame:RegisterEvent("MODIFIER_STATE_CHANGED");
-                                    frame:SetScript("OnEvent", function(self)
-                                        local owner = GameTooltip:GetOwner();
-
-                                        self:EnableMouse(keyCheck());
-                                        work(self);
-
-                                        if not keyCheck() and owner == self or not owner then
-                                            GameTooltip:Hide();
-                                        end
-                                    end);
-
-                                    frame:EnableMouse(keyCheck());
-                                end
-
-                                -- Flags
-                                unitFrame[auraType]["auras"][i].name = name;
-                                unitFrame[auraType]["auras"][i].type = auraType;
-
-                                -- Sorting important and normal aurs
-                                if data.settings.AurasImportantList[name] then
-                                    table.insert(unitFrame.toSort["important_" .. auraType], unitFrame[auraType]["auras"][i]);
-                                else
-                                    table.insert(unitFrame.toSort[auraType], unitFrame[auraType]["auras"][i]);
-                                end
-
-                                -- Adjusting border and highlight
-                                if data.settings.AurasImportantList[name] then
-                                    unitFrame[auraType]["auras"][i].border:SetSize(64,64);
-                                    if stacks > 0 then
-                                        unitFrame[auraType]["auras"][i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantBorderStacks");
-                                        unitFrame[auraType]["auras"][i].highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantHighlightStacks");
-                                    else
-                                        unitFrame[auraType]["auras"][i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantBorder");
-                                        unitFrame[auraType]["auras"][i].highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantHighlight");
-                                    end
-                                else
-                                    unitFrame[auraType]["auras"][i].border:SetSize(64,32);
-                                    if stacks > 0 then
-                                        unitFrame[auraType]["auras"][i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\borderStacks");
-                                    else
-                                        unitFrame[auraType]["auras"][i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\border");
+                                local function keyCheck()
+                                    if Config.Tooltip == 1 and IsShiftKeyDown()
+                                    or Config.Tooltip == 2 and IsControlKeyDown()
+                                    or Config.Tooltip == 3 and IsAltKeyDown()
+                                    then
+                                        return true;
                                     end
                                 end
 
-                                -- Toggling highlight
-                                unitFrame[auraType]["auras"][i].highlight:SetShown(data.settings.AurasImportantList[name]);
+                                local function work(frame)
+                                    if hover and keyCheck() then
+                                        GameTooltip:Hide();
+                                        GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMLEFT", 0, -2);
+                                        GameTooltip:SetUnitAura(unit, i, filter);
 
-                                if unitFrame.raid[name] and canAssist and auraType == "debuffs" then
-                                    unitFrame[auraType]["auras"][i].border:SetVertexColor(0.85, 0.43, 0.83);
-                                    unitFrame[auraType]["auras"][i].highlight:SetVertexColor(0.85, 0.43, 0.83);
-                                else
-                                    unitFrame[auraType]["auras"][i].border:SetVertexColor(r,g,b);
-                                    unitFrame[auraType]["auras"][i].highlight:SetVertexColor(r,g,b);
-                                end
-
-                                -- Scripts
-                                local timeElapsed = 0;
-                                unitFrame[auraType]["auras"][i]:SetScript("OnUpdate", function(self, elapsed)
-                                    timeElapsed = timeElapsed + elapsed;
-
-                                    if timeElapsed > 0.1 then
-                                        local countdown = expirationTime - GetTime();
-
-                                        if countdown < 10 then
-                                            self.countdown:SetVertexColor(1, 0.5, 0);
-                                        else
-                                            self.countdown:SetVertexColor(1, 0.82, 0);
+                                        if spellId then
+                                            GameTooltip:AddDoubleLine("Spell ID", spellId, nil, nil, nil, 1, 1, 1);
                                         end
 
-                                        self.countdown:SetText(func:formatTime(countdown));
+                                        GameTooltip:Show();
+                                    end
+                                end
+
+                                frame:SetScript("OnEnter", function(self)
+                                    self:EnableMouse(keyCheck());
+                                    hover = true;
+                                    work(self);
+                                end);
+
+                                frame:SetScript("OnLeave", function(self)
+                                    self:EnableMouse(keyCheck());
+                                    hover = false;
+                                    local owner = GameTooltip:GetOwner();
+
+                                    if owner == self or not owner then
+                                        GameTooltip:Hide();
                                     end
                                 end);
 
-                                -- Showing aura
-                                unitFrame[auraType]["auras"][i]:Show();
-                                unitFrame[auraType]["auras"][i].highlight.animationGrp:Play();
-                            elseif unitFrame[auraType]["auras"][i] then
-                                unitFrame[auraType]["auras"][i]:Hide();
-                                unitFrame[auraType]["auras"][i].highlight.animationGrp:Stop();
+                                frame:RegisterEvent("MODIFIER_STATE_CHANGED");
+                                frame:SetScript("OnEvent", function(self)
+                                    local owner = GameTooltip:GetOwner();
+
+                                    self:EnableMouse(keyCheck());
+                                    work(self);
+
+                                    if not keyCheck() and owner == self or not owner then
+                                        GameTooltip:Hide();
+                                    end
+                                end);
+
+                                frame:EnableMouse(keyCheck());
                             end
+
+                            -- Flags
+                            unitFrame[auraType]["auras"][i].name = name;
+                            unitFrame[auraType]["auras"][i].type = auraType;
+
+                            -- Sorting important and normal aurs
+                            if data.settings.AurasImportantList[name] then
+                                table.insert(unitFrame.toSort["important_" .. auraType], unitFrame[auraType]["auras"][i]);
+                            else
+                                table.insert(unitFrame.toSort[auraType], unitFrame[auraType]["auras"][i]);
+                            end
+
+                            -- Adjusting border and highlight
+                            if data.settings.AurasImportantList[name] then
+                                unitFrame[auraType]["auras"][i].border:SetSize(64,64);
+                                if stacks > 0 then
+                                    unitFrame[auraType]["auras"][i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantBorderStacks");
+                                    unitFrame[auraType]["auras"][i].highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantHighlightStacks");
+                                else
+                                    unitFrame[auraType]["auras"][i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantBorder");
+                                    unitFrame[auraType]["auras"][i].highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\importantHighlight");
+                                end
+                            else
+                                unitFrame[auraType]["auras"][i].border:SetSize(64,32);
+                                if stacks > 0 then
+                                    unitFrame[auraType]["auras"][i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\borderStacks");
+                                else
+                                    unitFrame[auraType]["auras"][i].border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\auras\\border");
+                                end
+                            end
+
+                            -- Toggling highlight
+                            unitFrame[auraType]["auras"][i].highlight:SetShown(data.settings.AurasImportantList[name]);
+
+                            if unitFrame.raid[name] and canAttack and auraType == "debuffs" then
+                                unitFrame[auraType]["auras"][i].border:SetVertexColor(0.85, 0.43, 0.83);
+                                unitFrame[auraType]["auras"][i].highlight:SetVertexColor(0.85, 0.43, 0.83);
+                            else
+                                unitFrame[auraType]["auras"][i].border:SetVertexColor(r,g,b);
+                                unitFrame[auraType]["auras"][i].highlight:SetVertexColor(r,g,b);
+                            end
+
+                            -- Scripts
+                            local timeElapsed = 0;
+                            unitFrame[auraType]["auras"][i]:SetScript("OnUpdate", function(self, elapsed)
+                                timeElapsed = timeElapsed + elapsed;
+
+                                if timeElapsed > 0.1 then
+                                    local countdown = expirationTime - GetTime();
+
+                                    if countdown < 10 then
+                                        self.countdown:SetVertexColor(1, 0.5, 0);
+                                    else
+                                        self.countdown:SetVertexColor(1, 0.82, 0);
+                                    end
+
+                                    self.countdown:SetText(func:formatTime(countdown));
+                                end
+                            end);
+
+                            -- Showing aura
+                            unitFrame[auraType]["auras"][i]:Show();
+                            unitFrame[auraType]["auras"][i].highlight.animationGrp:Play();
                         elseif unitFrame[auraType]["auras"][i] then
                             unitFrame[auraType]["auras"][i]:Hide();
                             unitFrame[auraType]["auras"][i].highlight.animationGrp:Stop();
-                        else
-                            break;
                         end
-                    end
-                else
-                    for k,v in pairs(unitFrame[auraType]["auras"]) do
-                        if k then
-                            v:Hide();
-                        end
+                    elseif unitFrame[auraType]["auras"][i] then
+                        unitFrame[auraType]["auras"][i]:Hide();
+                        unitFrame[auraType]["auras"][i].highlight.animationGrp:Stop();
+                    else
+                        break;
                     end
                 end
             end
 
-            createFrames("HELPFUL", "buffs", (buffOnFriendly or buffOnEnemy), 0,1,0);
-            createFrames("HARMFUL", "debuffs", (debuffOnFriendly or debuffOnEnemy), 1,0,0);
+            createFrames("HELPFUL", "buffs", 0,1,0);
+            createFrames("HARMFUL", "debuffs", 1,0,0);
 
             ----------------------------------------
             -- Sorting auras
@@ -375,7 +386,7 @@ function func:Update_Auras(unit)
                 sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   Config.AurasPersonalMaxBuffs);
                 sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasPersonalMaxDebuffs);
                 sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, Config.AurasPersonalMaxDebuffs);
-            elseif canAssist then
+            elseif canAttack then
                 sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   Config.AurasMaxBuffsFriendly);
                 sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   Config.AurasMaxBuffsFriendly);
                 sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasMaxDebuffsFriendly);
@@ -417,7 +428,7 @@ function func:Update_Auras(unit)
             if unit == "player" then
                 processAuras(unitFrame.buffsCounter, "buffs", Config.AurasPersonalMaxBuffs, "left", "right", 5);
                 processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasPersonalMaxDebuffs, "left", "right", 5);
-            elseif canAssist then
+            elseif canAttack then
                 processAuras(unitFrame.buffsCounter, "buffs", Config.AurasMaxBuffsFriendly, "right", "left", -5);
                 processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasMaxDebuffsFriendly, "left", "right", 5);
             else

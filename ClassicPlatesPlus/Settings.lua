@@ -256,7 +256,7 @@ function func:Load_Settings()
             local minValue = 0.75;
             local maxValue = 1.25;
             local decimals = 2;
-            local flair = { classicEra = false, wrath = true, retail = true };
+            local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
@@ -271,7 +271,7 @@ function func:Load_Settings()
             local minValue = 0;
             local maxValue = 50;
             local decimals = 0;
-            local flair = { classicEra = false, wrath = true, retail = true };
+            local flair = { classicEra = true, wrath = true, retail = true };
 
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
@@ -769,7 +769,7 @@ function func:Load_Settings()
         do
             local name = "Show Debuffs on Friendlies";
             local tooltip = "";
-            local cfg = "BuffsEnemy";
+            local cfg = "DebuffsFriendly";
             local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
@@ -780,7 +780,7 @@ function func:Load_Settings()
         do
             local name = "Show Buffs on Enemies";
             local tooltip = "";
-            local cfg = "DebuffsEnemy";
+            local cfg = "BuffsEnemy";
             local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
@@ -791,7 +791,7 @@ function func:Load_Settings()
         do
             local name = "Show Debuffs on Enemies";
             local tooltip = "";
-            local cfg = "DebuffsFriendly";
+            local cfg = "DebuffsEnemy";
             local default = true;
             local flair = { classicEra = true, wrath = true, retail = true };
 
