@@ -278,8 +278,10 @@ local functionsTable = {
         end
     end,
     AurasSourcePersonal = function() func:Update_Auras("player"); end,
+
     BuffsPersonal = function() func:Update_Auras("player"); end,
     DebuffsPersonal = function() func:Update_Auras("player"); end,
+
     AurasPersonalMaxBuffs = function() func:Update_Auras("player"); end,
     AurasPersonalMaxDebuffs = function() func:Update_Auras("player"); end,
     AurasImportantList = function() updateAuras(); end,
@@ -291,6 +293,7 @@ local functionsTable = {
     FadeUnselected = function() updateNameplateVisuals(); end,
     FadeIntensity = function() updateNameplateVisuals(); end,
     MaxNameplateDistance = function() updateNameplateDistance(); end,
+    CastbarShow = function() updateNameplateVisuals(); end;
     CastbarScale = function() updateNameplateVisuals(); end,
     CastbarPositionY = function() updateNameplateVisuals(); end,
     ComboPointsScaleClassless = function() func:Update_ClassPower(); end,

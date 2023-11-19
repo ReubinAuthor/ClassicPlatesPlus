@@ -246,6 +246,17 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
+        -- CheckButton
+        do
+            local name = "Show Castbar";
+            local tooltip = "";
+            local cfg = "CastbarShow";
+            local default = true;
+            local flair = { classicEra = true, wrath = false, retail = false };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
         -- Slider
         do
             local name = "Castbar Scale";

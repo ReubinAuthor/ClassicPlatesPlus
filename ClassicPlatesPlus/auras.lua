@@ -57,19 +57,28 @@ function func:Update_Auras(unit)
                     local UnitIsPlayer = unit == "player" or source == "vehicle";
 
                     local function showType()
-                        if canAttack then
-                            if Config.BuffsEnemy and auraType == "buffs" then
+                        if unit == "player" then
+                            if Config.BuffsPersonal and auraType == "buffs" then
                                 return true;
                             end
-                            if Config.DebuffsEnemy and auraType == "debuffs" then
+                            if Config.DebuffsPersonal and auraType == "debuffs" then
                                 return true;
                             end
                         else
-                            if Config.BuffsFriendly and auraType == "buffs" then
-                                return true;
-                            end
-                            if Config.DebuffsFriendly and auraType == "debuffs" then
-                                return true;
+                            if canAttack then
+                                if Config.BuffsEnemy and auraType == "buffs" then
+                                    return true;
+                                end
+                                if Config.DebuffsEnemy and auraType == "debuffs" then
+                                    return true;
+                                end
+                            else
+                                if Config.BuffsFriendly and auraType == "buffs" then
+                                    return true;
+                                end
+                                if Config.DebuffsFriendly and auraType == "debuffs" then
+                                    return true;
+                                end
                             end
                         end
                     end

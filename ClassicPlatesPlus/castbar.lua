@@ -108,7 +108,7 @@ function func:Castbar_Start(event, unit)
                 end);
 
                 castbar.countdown:Show();
-                castbar:SetShown(not isTradeSkill);
+                castbar:SetShown(Config.CastbarShow and not isTradeSkill);
             end
         end
     end
