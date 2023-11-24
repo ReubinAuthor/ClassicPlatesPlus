@@ -86,7 +86,7 @@ function func:Update_Auras(unit)
                     -- Test Auras
                     local test = false;
                     if test then
-                        if i <= 3 then --and auraType == "debuffs" then
+                        if i <= 8 then --and auraType == "debuffs" then
                             name = "Test Aura " .. i;
                             icon = 1120721;
                             stacks = i;
@@ -94,7 +94,7 @@ function func:Update_Auras(unit)
                             expirationTime = duration + GetTime();
                             source = "target";
                         end
-                        if i > 3 and i < 7 then
+                        if i > 8 and i < 17 then
                             name = "Test Aura " .. i;
                             icon = 136243;
                             stacks = i;
@@ -396,15 +396,15 @@ function func:Update_Auras(unit)
                 sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasPersonalMaxDebuffs);
                 sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, Config.AurasPersonalMaxDebuffs);
             elseif canAttack then
-                sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   Config.AurasMaxBuffsFriendly);
-                sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   Config.AurasMaxBuffsFriendly);
-                sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasMaxDebuffsFriendly);
-                sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, Config.AurasMaxDebuffsFriendly);
-            else
                 sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   Config.AurasMaxBuffsEnemy);
                 sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   Config.AurasMaxBuffsEnemy);
                 sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasMaxDebuffsEnemy);
                 sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, Config.AurasMaxDebuffsEnemy);
+            else
+                sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   Config.AurasMaxBuffsFriendly);
+                sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   Config.AurasMaxBuffsFriendly);
+                sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasMaxDebuffsFriendly);
+                sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, Config.AurasMaxDebuffsFriendly);
             end
 
             ----------------------------------------
@@ -438,11 +438,11 @@ function func:Update_Auras(unit)
                 processAuras(unitFrame.buffsCounter, "buffs", Config.AurasPersonalMaxBuffs, "left", "right", 5);
                 processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasPersonalMaxDebuffs, "left", "right", 5);
             elseif canAttack then
-                processAuras(unitFrame.buffsCounter, "buffs", Config.AurasMaxBuffsFriendly, "right", "left", -5);
-                processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasMaxDebuffsFriendly, "left", "right", 5);
-            else
                 processAuras(unitFrame.buffsCounter, "buffs", Config.AurasMaxBuffsEnemy, "right", "left", -5);
                 processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasMaxDebuffsEnemy, "left", "right", 5);
+            else
+                processAuras(unitFrame.buffsCounter, "buffs", Config.AurasMaxBuffsFriendly, "right", "left", -5);
+                processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasMaxDebuffsFriendly, "left", "right", 5);
             end
 
             -- Interact Icon

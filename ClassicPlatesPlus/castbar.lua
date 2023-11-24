@@ -35,17 +35,21 @@ function func:Castbar_Start(event, unit)
                 if event == "UNIT_SPELLCAST_START" then
                     text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = select(2, UnitCastingInfo(unit));
 
-                    minValue = -(endTimeMS - startTimeMS) / 1000;
-                    maxValue = 0;
-                    progressReverser = -1;
-                    r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
+                    if text then
+                        minValue = -(endTimeMS - startTimeMS) / 1000;
+                        maxValue = 0;
+                        progressReverser = -1;
+                        r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
+                    end
                 elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
                     text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = select(2, UnitChannelInfo(unit));
 
-                    minValue = 0;
-                    maxValue = (endTimeMS - startTimeMS) / 1000;
-                    progressReverser = 1;
-                    r,g,b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
+                    if text then
+                        minValue = 0;
+                        maxValue = (endTimeMS - startTimeMS) / 1000;
+                        progressReverser = 1;
+                        r,g,b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
+                    end
                 end
             else
                 text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = select(2, UnitCastingInfo(unit));
