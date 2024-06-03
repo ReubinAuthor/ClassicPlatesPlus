@@ -13,6 +13,7 @@ core.data = {
         orange = {r = 1,    g = 0.5,  b = 0},
         red    = {r = 1,    g = 0,    b = 0},
         purple = {r = 1,    g = 0.3,  b = 1},
+        gray   = {r = 0.65,  g = 0.65,  b = 0.65},
     },
     tanks = {},
     members = {},
@@ -21,7 +22,7 @@ core.data = {
     myTarget = {},
     isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC,
     isRetail  = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE,
-    isWrath   = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC,
+    isCata    = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC,
     cvars = {},
     classBarHeight = 0,
     hooks = {}

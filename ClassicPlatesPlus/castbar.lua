@@ -30,7 +30,11 @@ function func:Castbar_Start(event, unit)
                 progressReverser = -1;
                 minValue = -(endTimeMS - startTimeMS) / 1000;
                 maxValue = 0;
-                r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
+                if notInterruptible then
+                    r,g,b = data.colors.gray.r, data.colors.gray.g, data.colors.gray.b;
+                else
+                    r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
+                end
             elseif event then
                 if event == "UNIT_SPELLCAST_START" then
                     text, icon, startTimeMS, endTimeMS, isTradeSkill, _, notInterruptible = select(2, UnitCastingInfo(unit));
@@ -39,7 +43,11 @@ function func:Castbar_Start(event, unit)
                         minValue = -(endTimeMS - startTimeMS) / 1000;
                         maxValue = 0;
                         progressReverser = -1;
-                        r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
+                        if notInterruptible then
+                            r,g,b = data.colors.gray.r, data.colors.gray.g, data.colors.gray.b;
+                        else
+                            r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
+                        end
                     end
                 elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
                     text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = select(2, UnitChannelInfo(unit));
@@ -48,7 +56,11 @@ function func:Castbar_Start(event, unit)
                         minValue = 0;
                         maxValue = (endTimeMS - startTimeMS) / 1000;
                         progressReverser = 1;
-                        r,g,b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
+                        if notInterruptible then
+                            r,g,b = data.colors.gray.r, data.colors.gray.g, data.colors.gray.b;
+                        else
+                            r,g,b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
+                        end
                     end
                 end
             else
@@ -57,7 +69,11 @@ function func:Castbar_Start(event, unit)
                 if text then
                     minValue = -(endTimeMS - startTimeMS) / 1000;
                     maxValue = 0;
-                    r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
+                    if notInterruptible then
+                        r,g,b = data.colors.gray.r, data.colors.gray.g, data.colors.gray.b;
+                    else
+                        r,g,b = data.colors.orange.r, data.colors.orange.g, data.colors.orange.b;
+                    end
                     progressReverser = -1;
                 else
                     text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible = select(2, UnitChannelInfo(unit));
@@ -65,7 +81,11 @@ function func:Castbar_Start(event, unit)
                     if text then
                         minValue = 0;
                         maxValue = (endTimeMS - startTimeMS) / 1000;
-                        r,g,b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
+                        if notInterruptible then
+                            r,g,b = data.colors.gray.r, data.colors.gray.g, data.colors.gray.b;
+                        else
+                            r,g,b = data.colors.purple.r, data.colors.purple.g, data.colors.purple.b;
+                        end
                         progressReverser = 1;
                     end
                 end
