@@ -246,13 +246,27 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Cast bar");
+
         -- CheckButton
         do
-            local name = "Show Castbar";
+            local name = "Show Cast bar";
             local tooltip = "";
             local cfg = "CastbarShow";
             local default = true;
             local flair = { classicEra = true, cata = false, retail = false };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Cast Bar Icon";
+            local tooltip = "";
+            local cfg = "CastbarIconShow";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
@@ -274,7 +288,7 @@ function func:Load_Settings()
 
         -- Slider
         do
-            local name = "Castbar Position";
+            local name = "Castbar Position (vertical)";
             local tooltip = "";
             local cfg = "CastbarPositionY";
             local default = 2;

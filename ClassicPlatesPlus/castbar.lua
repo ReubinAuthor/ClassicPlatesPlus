@@ -17,8 +17,19 @@ function func:Castbar_Start(event, unit)
             local text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible, minValue, maxValue, progressReverser;
             local r,g,b;
             local test = false;
+            local showIcon = Config.CastbarIconShow;
 
             castbar.animation:Stop();
+
+            if not showIcon then
+                castbar.statusbar:SetPoint("center", castbar.border, "center", 0, 0);
+                castbar.border:SetSize(128, 16);
+                castbar.icon:Hide();
+            else
+                castbar.statusbar:SetPoint("center", castbar.border, "center", 9, 0);
+                castbar.border:SetSize(256, 64);
+                castbar.icon:Show();
+            end
 
             if test then
                 text = "This is a test castbar with a very long name";
@@ -113,9 +124,18 @@ function func:Castbar_Start(event, unit)
                 castbar.icon:SetTexture(icon);
                 castbar.statusbar:SetMinMaxValues(minValue, maxValue);
                 castbar.statusbar:SetStatusBarColor(r,g,b);
-                castbar.border:SetTexture(notInterruptible and "Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbarUI2" or "Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbar");
+                castbar.border:SetTexture(
+                    (not showIcon) and "Interface\\addons\\ClassicPlatesPlus\\media\\borders\\healthbar"
+                    or notInterruptible and "Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbarUI2"
+                    or "Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbar"
+                );
                 castbar.border:SetVertexColor(0.75, 0.75, 0.75);
-                castbar:SetSize(140, notInterruptible and 28 or 22);
+                if not showIcon then
+                    castbar:SetSize(128, 16);
+                else
+                    castbar:SetSize(140, notInterruptible and 28 or 22);
+                end
+                castbar:SetSize((not showIcon) and 128 or 140, (not showIcon) and 16 or notInterruptible and 28 or 22);
 
                 local timeElapsed = 0;
                 castbar:SetScript("OnUpdate", function(self, elapsed)

@@ -332,6 +332,7 @@ local functionsTable = {
     end,
     SpecialPower = function() func:Update_ClassPower(); end,
     SpecialPowerScale = function() func:Update_ClassPower(); end,
+    CastbarIconShow = function() updateNameplateVisuals(); end,
 }
 
 -- Execute function by passed config name

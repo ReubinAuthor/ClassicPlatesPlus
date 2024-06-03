@@ -351,14 +351,11 @@ function func:Nameplate_Created(nameplate)
 
         -- Parent
         unitFrame.castbar = CreateFrame("frame", nil, unitFrame);
-        unitFrame.castbar:SetSize(134, 18);
         unitFrame.castbar:SetIgnoreParentScale(true);
 
         -- Border
         unitFrame.castbar.border = unitFrame.castbar:CreateTexture();
         unitFrame.castbar.border:SetPoint("center");
-        unitFrame.castbar.border:SetSize(256, 64);
-        unitFrame.castbar.border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\castbar\\castbarUI");
         unitFrame.castbar.border:SetVertexColor(0.75, 0.75, 0.75);
         unitFrame.castbar.border:SetDrawLayer("artwork", 2);
 
@@ -377,7 +374,6 @@ function func:Nameplate_Created(nameplate)
 
         -- Status bar
         unitFrame.castbar.statusbar = CreateFrame("StatusBar", nil, unitFrame.castbar);
-        unitFrame.castbar.statusbar:SetPoint("center", unitFrame.castbar.border, "center", 9, 0);
         unitFrame.castbar.statusbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar");
         unitFrame.castbar.statusbar:SetSize(112, 10);
         unitFrame.castbar.statusbar:SetStatusBarColor(data.colors.orange.r, data.colors.orange.g, data.colors.orange.b);
