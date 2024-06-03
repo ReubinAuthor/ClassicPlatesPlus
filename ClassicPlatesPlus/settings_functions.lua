@@ -618,8 +618,9 @@ function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default)
 
     -- Adding frame to the settings list
     if data.isClassic and flair.classicEra
-    or data.isWrath   and flair.wrath
-    or data.isRetail  and flair.retail then
+    or data.isCata   and flair.cata
+    or data.isRetail  and flair.retail
+    then
         table.insert(panel.list, parent);
     end
 end
@@ -713,8 +714,9 @@ function func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, opt
 
     -- Adding frame to the settings list
     if data.isClassic and flair.classicEra
-    or data.isWrath   and flair.wrath
-    or data.isRetail  and flair.retail then
+    or data.isCata   and flair.cata
+    or data.isRetail  and flair.retail
+    then
         table.insert(panel.list, parent);
     end
 end
@@ -787,8 +789,9 @@ function func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, min
 
     -- Adding frame to the settings list
     if data.isClassic and flair.classicEra
-    or data.isWrath   and flair.wrath
-    or data.isRetail  and flair.retail then
+    or data.isCata   and flair.cata
+    or data.isRetail  and flair.retail
+    then
         table.insert(panel.list, parent);
     end
 end
@@ -851,43 +854,48 @@ function func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default)
     frame_border:SetVertexColor(0.55, 0.55, 0.55);
     frame_mask:SetAllPoints(frame_border);
 
-    -- Sasving new values
-    local function saveColors(r,g,b,a)
-        Config[cfg].r = r;
-        Config[cfg].g = g;
-        Config[cfg].b = b;
-        Config[cfg].a = a;
-    end
+    -- Refresh
+    local function refresh()
+        frame_texture:SetVertexColor(
+            Config[cfg].r,
+            Config[cfg].g,
+            Config[cfg].b,
+            Config[cfg].a
+        );
 
-    local function showColorPicker(r,g,b,a,callback)
-        ColorPickerFrame:Hide();
-        ColorPickerFrame.hasOpacity = false;
-        ColorPickerFrame.previousValues = {r,g,b,a};
-        ColorPickerFrame.func, ColorPickerFrame.cancelFunc = callback, callback;
-        ColorPickerFrame:SetColorRGB(r,g,b);
-        ColorPickerFrame:Show();
-    end
-
-    frame_button.recolorTexture = function(color)
-        local r,g,b,a;
-
-        if color then
-            r,g,b,a = color[1], color[2], color[3], color[4];
-        else
-            r,g,b = ColorPickerFrame:GetColorRGB();
-            a = OpacitySliderFrame:GetValue();
-        end
-
-        -- Update
-        frame_texture:SetVertexColor(r,g,b,a);
-        saveColors(r,g,b,a);
         updateSettings(cfg);
     end
 
+    -- Click
     frame_button:SetScript("OnClick", function(self)
+        -- Prepping color picker info
+        local info = {};
         local r,g,b,a = frame_texture:GetVertexColor();
+        local prevColors = { r = r, g = g, b = b, a = a };
 
-        showColorPicker(r,g,b,a, self.recolorTexture);
+        info.r       = r or Config[cfg].r;
+        info.g       = g or Config[cfg].g;
+        info.b       = b or Config[cfg].b;
+        info.opacity = a or Config[cfg].a;
+        info.hasOpacity = false;
+
+        info.swatchFunc = function()
+            Config[cfg].r, Config[cfg].g, Config[cfg].b = ColorPickerFrame:GetColorRGB();
+            Config[cfg].a = ColorPickerFrame:GetColorAlpha();
+
+            refresh();
+        end
+
+        info.cancelFunc = function()
+            Config[cfg].r = prevColors.r;
+            Config[cfg].g = prevColors.g;
+            Config[cfg].b = prevColors.b;
+            Config[cfg].a = prevColors.a;
+
+            refresh();
+        end
+
+        ColorPickerFrame:SetupColorPickerAndShow(info);
     end);
 
     -- Reset button
@@ -899,7 +907,11 @@ function func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default)
     frame_reset:SetHighlightFontObject("GameFontHighlight");
     frame_reset:SetScript("Onclick", function()
         -- Update
-        saveColors(default.r, default.g, default.b, default.a);
+        Config[cfg].r = default.r;
+        Config[cfg].g = default.g;
+        Config[cfg].b = default.b;
+        Config[cfg].a = default.a;
+
         frame_texture:SetVertexColor(
             Config[cfg].r,
             Config[cfg].g,
@@ -924,8 +936,9 @@ function func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default)
 
     -- Adding frame to the settings list
     if data.isClassic and flair.classicEra
-    or data.isWrath   and flair.wrath
-    or data.isRetail  and flair.retail then
+    or data.isCata   and flair.cata
+    or data.isRetail  and flair.retail
+    then
         table.insert(panel.list, parent);
     end
 end
