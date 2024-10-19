@@ -1027,9 +1027,13 @@ function func:Load_Settings()
     end
 
     -- Adding panels
-    for k,v in ipairs(data.settings.panels) do
-        if k then
-            InterfaceOptions_AddCategory(v);
+    local mainCategory = Settings.RegisterCanvasLayoutCategory(panelMain, panelMain.name)
+
+    for k, v in ipairs(data.settings.panels) do
+        if k and v.name ~= panelMain.name then
+            Settings.RegisterCanvasLayoutSubcategory(mainCategory, v, v.name)
         end
     end
+
+    Settings.RegisterAddOnCategory(mainCategory)
 end
