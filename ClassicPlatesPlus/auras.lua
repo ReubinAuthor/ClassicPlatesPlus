@@ -16,18 +16,6 @@ function func:Update_Auras(unit)
         local scale = Config.AurasScale - scaleOffset;
         if scale <= 0 then scale = 0.1 end
 
-        -- LibClassicDurations (for classic era client)
-        local UnitAura = _G.UnitAura;
-
-        if data.isClassic then
-            local LibClassicDurations = LibStub("LibClassicDurations", true)
-
-            if LibClassicDurations then
-                LibClassicDurations:Register(myAddon);
-                UnitAura = LibClassicDurations.UnitAuraWrapper;
-            end
-        end
-
         if nameplate then
             local unitFrame = unit == "player" and nameplate or nameplate.unitFrame;
             local canAttack = UnitCanAttack("player", unit);
@@ -53,60 +41,69 @@ function func:Update_Auras(unit)
 
             local function createFrames(filter, auraType, r,g,b)
                 for i = 1, 40 do
-                    local name, icon, stacks, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod = UnitAura(unit, i, filter);
-                    local UnitIsPlayer = unit == "player" or source == "vehicle";
+                    local aura = C_UnitAuras.GetAuraDataByIndex(unit, i, filter);
 
-                    local function showType()
-                        if unit == "player" then
-                            if Config.BuffsPersonal and auraType == "buffs" then
-                                return true;
-                            end
-                            if Config.DebuffsPersonal and auraType == "debuffs" then
-                                return true;
-                            end
-                        else
-                            if canAttack then
-                                if Config.BuffsEnemy and auraType == "buffs" then
+                    if aura then
+                        local name = aura.name;
+                        local icon = aura.icon;
+                        local stacks = aura.applications;
+                        local duration = aura.duration;
+                        local expirationTime = aura.expirationTime;
+                        local source = aura.sourceUnit;
+                        local spellId = aura.spellId;
+                        local timeMod = aura.timeMod;
+
+                        local UnitIsPlayer = unit == "player" or source == "vehicle";
+
+                        local function showType()
+                            if unit == "player" then
+                                if Config.BuffsPersonal and auraType == "buffs" then
                                     return true;
                                 end
-                                if Config.DebuffsEnemy and auraType == "debuffs" then
+                                if Config.DebuffsPersonal and auraType == "debuffs" then
                                     return true;
                                 end
                             else
-                                if Config.BuffsFriendly and auraType == "buffs" then
-                                    return true;
-                                end
-                                if Config.DebuffsFriendly and auraType == "debuffs" then
-                                    return true;
+                                if canAttack then
+                                    if Config.BuffsEnemy and auraType == "buffs" then
+                                        return true;
+                                    end
+                                    if Config.DebuffsEnemy and auraType == "debuffs" then
+                                        return true;
+                                    end
+                                else
+                                    if Config.BuffsFriendly and auraType == "buffs" then
+                                        return true;
+                                    end
+                                    if Config.DebuffsFriendly and auraType == "debuffs" then
+                                        return true;
+                                    end
                                 end
                             end
                         end
-                    end
 
-                    -- Test Auras
-                    local test = false;
-                    if test then
-                        if i <= 8 then --and auraType == "debuffs" then
-                            name = "Test Aura " .. i;
-                            icon = 1120721;
-                            stacks = i;
-                            duration = 0;
-                            expirationTime = duration + GetTime();
-                            source = "target";
+                        -- Test Auras
+                        local test = false;
+                        if test then
+                            if i <= 8 then --and auraType == "debuffs" then
+                                name = "Test Aura " .. i;
+                                icon = 1120721;
+                                stacks = i;
+                                duration = 0;
+                                expirationTime = duration + GetTime();
+                                source = "target";
+                            end
+                            if i > 8 and i < 17 then
+                                name = "Test Aura " .. i;
+                                icon = 136243;
+                                stacks = i;
+                                duration = 0;
+                                expirationTime = duration + GetTime();
+                                source = "player";
+                            end
                         end
-                        if i > 8 and i < 17 then
-                            name = "Test Aura " .. i;
-                            icon = 136243;
-                            stacks = i;
-                            duration = 0;
-                            expirationTime = duration + GetTime();
-                            source = "player";
-                        end
-                    end
 
-                    local SourceIsPlayer = source == "player" or source == "vehicle";
-
-                    if name then
+                        local SourceIsPlayer = source == "player" or source == "vehicle";
                         local hidePassiveCheck = data.isClassic and true or not ( ( duration == 0 and (AurasHidePassive == 2 or ( AurasHidePassive == 3 and not SourceIsPlayer ) ) ) );
                         local show = not UnitIsPlayer and ( ( AurasShow == 1 and SourceIsPlayer ) or AurasShow == 2);
                         local isPlayersAura = UnitIsPlayer and (auraType == "debuffs" or auraType == "buffs" and ( Config.AurasSourcePersonal == 1 and SourceIsPlayer or Config.AurasSourcePersonal == 2 ) );
@@ -114,7 +111,7 @@ function func:Update_Auras(unit)
                                 data.settings.AurasImportantList[name]
                                 or (
                                     showType() and  hidePassiveCheck and ( show or isPlayersAura )
-                                   )
+                                )
                                     and not data.settings.AurasBlacklist[name]
                             );
 
