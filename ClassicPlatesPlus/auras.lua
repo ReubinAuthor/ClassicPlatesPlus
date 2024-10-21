@@ -474,10 +474,13 @@ function func:PositionAuras(unitFrame, unit)
         unit = unit or unitFrame.unit;
 
         -- Get Anchor
-        anchor =
-               data.isRetail and resourceOnTarget == "1" and unit and UnitIsUnit(unit, "target") and class and unitFrame.classPower
-            or unitFrame.classPower:IsVisible() and unitFrame.classPower
-            or unitFrame.name;
+        if data.isRetail and resourceOnTarget == "1" and unit and UnitIsUnit(unit, "target") and class then
+            anchor = unitFrame.classPower;
+        elseif not data.isRetail and unitFrame.classPower:IsVisible() then
+            anchor = unitFrame.classPower;
+        else
+            anchor = unitFrame.name;
+        end
 
         -- Position auras
         if unitFrame.sorted then
