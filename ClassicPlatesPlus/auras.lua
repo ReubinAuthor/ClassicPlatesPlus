@@ -13,14 +13,14 @@ function func:Update_Auras(unit)
         local scaleOffset = unit == "player" and 0.15 or 0.15;
         local nameplate = unit == "player" and data.nameplate or C_NamePlate.GetNamePlateForUnit(unit);
 
-        local scale = Config.AurasScale - scaleOffset;
+        local scale = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasScale - scaleOffset;
         if scale <= 0 then scale = 0.1 end
 
         if nameplate then
             local unitFrame = unit == "player" and nameplate or nameplate.unitFrame;
             local canAttack = UnitCanAttack("player", unit);
-            local AurasHidePassive = Config.AurasHidePassive;
-            local AurasShow = Config.AurasShow;
+            local AurasHidePassive = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasHidePassive;
+            local AurasShow = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasShow;
 
             unitFrame.toSort = {
                 important_buffs = {},
@@ -57,25 +57,25 @@ function func:Update_Auras(unit)
 
                         local function showType()
                             if unit == "player" then
-                                if Config.BuffsPersonal and auraType == "buffs" then
+                                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].BuffsPersonal and auraType == "buffs" then
                                     return true;
                                 end
-                                if Config.DebuffsPersonal and auraType == "debuffs" then
+                                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].DebuffsPersonal and auraType == "debuffs" then
                                     return true;
                                 end
                             else
                                 if canAttack then
-                                    if Config.BuffsEnemy and auraType == "buffs" then
+                                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].BuffsEnemy and auraType == "buffs" then
                                         return true;
                                     end
-                                    if Config.DebuffsEnemy and auraType == "debuffs" then
+                                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].DebuffsEnemy and auraType == "debuffs" then
                                         return true;
                                     end
                                 else
-                                    if Config.BuffsFriendly and auraType == "buffs" then
+                                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].BuffsFriendly and auraType == "buffs" then
                                         return true;
                                     end
-                                    if Config.DebuffsFriendly and auraType == "debuffs" then
+                                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].DebuffsFriendly and auraType == "debuffs" then
                                         return true;
                                     end
                                 end
@@ -104,9 +104,9 @@ function func:Update_Auras(unit)
                         end
 
                         local SourceIsPlayer = source == "player" or source == "vehicle";
-                        local hidePassiveCheck = data.isClassic and true or not ( ( duration == 0 and (AurasHidePassive == 2 or ( AurasHidePassive == 3 and not SourceIsPlayer ) ) ) );
+                        local hidePassiveCheck = not ( duration == 0 and (AurasHidePassive == 2 or ( AurasHidePassive == 3 and not SourceIsPlayer ) ) );
                         local show = not UnitIsPlayer and ( ( AurasShow == 1 and SourceIsPlayer ) or AurasShow == 2);
-                        local isPlayersAura = UnitIsPlayer and (auraType == "debuffs" or auraType == "buffs" and ( Config.AurasSourcePersonal == 1 and SourceIsPlayer or Config.AurasSourcePersonal == 2 ) );
+                        local isPlayersAura = UnitIsPlayer and (auraType == "debuffs" or auraType == "buffs" and ( CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasSourcePersonal == 1 and SourceIsPlayer or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasSourcePersonal == 2 ) );
                         local toggle = data.settings and (
                                 data.settings.AurasImportantList[name]
                                 or (
@@ -179,7 +179,7 @@ function func:Update_Auras(unit)
                                 unitFrame[auraType]["auras"][i].cooldown:SetDrawBling(false);
                                 unitFrame[auraType]["auras"][i].cooldown:SetSwipeColor(0, 0, 0, 0.6);
                                 unitFrame[auraType]["auras"][i].cooldown:SetHideCountdownNumbers(true);
-                                unitFrame[auraType]["auras"][i].cooldown:SetReverse(Config.AurasReverseAnimation);
+                                unitFrame[auraType]["auras"][i].cooldown:SetReverse(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasReverseAnimation);
                                 unitFrame[auraType]["auras"][i].cooldown:SetFrameLevel(1);
 
                                 ------------------------------------
@@ -196,16 +196,16 @@ function func:Update_Auras(unit)
 
                                 -- Countdown
                                 unitFrame[auraType]["auras"][i].countdown = unitFrame[auraType]["auras"][i].second:CreateFontString(nil, nil, "GameFontNormalOutline");
-                                if Config.AurasCountdownPosition == 1 then
+                                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasCountdownPosition == 1 then
                                     unitFrame[auraType]["auras"][i].countdown:SetPoint("right", unitFrame[auraType]["auras"][i].second, "topRight", 5, -2.5);
                                     unitFrame[auraType]["auras"][i].countdown:SetJustifyH("right");
-                                elseif Config.AurasCountdownPosition == 2 then
+                                elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasCountdownPosition == 2 then
                                     unitFrame[auraType]["auras"][i].countdown:SetPoint("center", unitFrame[auraType]["auras"][i].second, "center");
                                     unitFrame[auraType]["auras"][i].countdown:SetJustifyH("center");
                                 end
                                 unitFrame[auraType]["auras"][i].countdown:SetScale(0.9);
                                 unitFrame[auraType]["auras"][i].countdown:SetText(func:formatTime(expirationTime - GetTime()));
-                                unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
+                                unitFrame[auraType]["auras"][i].countdown:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasCountdown);
 
                                 -- Stacks
                                 unitFrame[auraType]["auras"][i].stacks = unitFrame[auraType]["auras"][i].second:CreateFontString(nil, nil, "GameFontNormalOutline");
@@ -223,11 +223,11 @@ function func:Update_Auras(unit)
 
                                 -- Cooldown
                                 unitFrame[auraType]["auras"][i].cooldown:SetCooldown(GetTime() - (duration - (expirationTime - GetTime())), duration, timeMod);
-                                unitFrame[auraType]["auras"][i].cooldown:SetReverse(Config.AurasReverseAnimation);
+                                unitFrame[auraType]["auras"][i].cooldown:SetReverse(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasReverseAnimation);
 
                                 -- Countdown
                                 unitFrame[auraType]["auras"][i].countdown:SetText(func:formatTime(expirationTime - GetTime()));
-                                unitFrame[auraType]["auras"][i].countdown:SetShown(Config.AurasCountdown);
+                                unitFrame[auraType]["auras"][i].countdown:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasCountdown);
 
                                 -- Stacks
                                 unitFrame[auraType]["auras"][i].stacks:SetText("x" .. stacks);
@@ -235,14 +235,14 @@ function func:Update_Auras(unit)
                             end
 
                             -- Tooltip
-                            if Config.Tooltip then
+                            if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Tooltip then
                                 local frame = unitFrame[auraType]["auras"][i];
                                 local hover;
 
                                 local function keyCheck()
-                                    if Config.Tooltip == 1 and IsShiftKeyDown()
-                                    or Config.Tooltip == 2 and IsControlKeyDown()
-                                    or Config.Tooltip == 3 and IsAltKeyDown()
+                                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Tooltip == 1 and IsShiftKeyDown()
+                                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Tooltip == 2 and IsControlKeyDown()
+                                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Tooltip == 3 and IsAltKeyDown()
                                     then
                                         return true;
                                     end
@@ -368,8 +368,11 @@ function func:Update_Auras(unit)
                 end
             end
 
-            createFrames("HELPFUL", "buffs", 0,1,0);
-            createFrames("HARMFUL", "debuffs", 1,0,0);
+            local helpful_Filter = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowOnlyApplicableAuras and "helpful";
+            local harmful_Filter = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowOnlyDispellableAuras and "harmful";
+
+            createFrames("helpful", "buffs", 0,1,0);
+            createFrames("harmful", "debuffs", 1,0,0);
 
             ----------------------------------------
             -- Sorting auras
@@ -388,20 +391,20 @@ function func:Update_Auras(unit)
 
             -- Sorting important auras first then normal ones
             if unit == "player" then
-                sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   Config.AurasPersonalMaxBuffs);
-                sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   Config.AurasPersonalMaxBuffs);
-                sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasPersonalMaxDebuffs);
-                sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, Config.AurasPersonalMaxDebuffs);
+                sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasPersonalMaxBuffs);
+                sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasPersonalMaxBuffs);
+                sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasPersonalMaxDebuffs);
+                sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasPersonalMaxDebuffs);
             elseif canAttack then
-                sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   Config.AurasMaxBuffsEnemy);
-                sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   Config.AurasMaxBuffsEnemy);
-                sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasMaxDebuffsEnemy);
-                sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, Config.AurasMaxDebuffsEnemy);
+                sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxBuffsEnemy);
+                sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxBuffsEnemy);
+                sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxDebuffsEnemy);
+                sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxDebuffsEnemy);
             else
-                sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   Config.AurasMaxBuffsFriendly);
-                sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   Config.AurasMaxBuffsFriendly);
-                sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, Config.AurasMaxDebuffsFriendly);
-                sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, Config.AurasMaxDebuffsFriendly);
+                sortAuras(unitFrame.toSort.important_buffs,   unitFrame.sorted.buffs,   CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxBuffsFriendly);
+                sortAuras(unitFrame.toSort.buffs,             unitFrame.sorted.buffs,   CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxBuffsFriendly);
+                sortAuras(unitFrame.toSort.important_debuffs, unitFrame.sorted.debuffs, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxDebuffsFriendly);
+                sortAuras(unitFrame.toSort.debuffs,           unitFrame.sorted.debuffs, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxDebuffsFriendly);
             end
 
             ----------------------------------------
@@ -428,18 +431,18 @@ function func:Update_Auras(unit)
                     counter:SetText("+" .. totalAuras - maxAuras);
                 end
 
-                counter:SetShown(Config.AurasOverFlowCounter and totalAuras > maxAuras);
+                counter:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasOverFlowCounter and totalAuras > maxAuras);
             end
 
             if unit == "player" then
-                processAuras(unitFrame.buffsCounter, "buffs", Config.AurasPersonalMaxBuffs, "left", "right", 5);
-                processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasPersonalMaxDebuffs, "left", "right", 5);
+                processAuras(unitFrame.buffsCounter, "buffs", CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasPersonalMaxBuffs, "left", "right", 5);
+                processAuras(unitFrame.debuffsCounter, "debuffs", CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasPersonalMaxDebuffs, "left", "right", 5);
             elseif canAttack then
-                processAuras(unitFrame.buffsCounter, "buffs", Config.AurasMaxBuffsEnemy, "right", "left", -5);
-                processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasMaxDebuffsEnemy, "left", "right", 5);
+                processAuras(unitFrame.buffsCounter, "buffs", CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxBuffsEnemy, "right", "left", -5);
+                processAuras(unitFrame.debuffsCounter, "debuffs", CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxDebuffsEnemy, "left", "right", 5);
             else
-                processAuras(unitFrame.buffsCounter, "buffs", Config.AurasMaxBuffsFriendly, "right", "left", -5);
-                processAuras(unitFrame.debuffsCounter, "debuffs", Config.AurasMaxDebuffsFriendly, "left", "right", 5);
+                processAuras(unitFrame.buffsCounter, "buffs", CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxBuffsFriendly, "right", "left", -5);
+                processAuras(unitFrame.debuffsCounter, "debuffs", CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasMaxDebuffsFriendly, "left", "right", 5);
             end
 
             -- Interact Icon
@@ -491,7 +494,7 @@ function func:PositionAuras(unitFrame, unit)
                         totalAuras = #unitFrame.sorted.buffs;
                         totalGaps = #unitFrame.sorted.buffs - 1;
                         anchor = unitFrame.healthbar;
-                        y = 10 * Config.PersonalNameplatesScale;
+                        y = 10 * CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatesScale;
                         calc = -((auraWidth * totalAuras + gap * totalGaps) / 2 - 13.5);
                     else
                         y = 6;

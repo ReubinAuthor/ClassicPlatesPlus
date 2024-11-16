@@ -23,7 +23,7 @@ function func:PersonalNameplateCreate()
             func:DefaultPowerBars();
         end);
 
-        Config.PersonalNameplatePointY = Config.PersonalNameplatePointY or 380;
+        CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatePointY = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatePointY or 380;
 
         -- Dragging part
         if not data.isRetail then
@@ -58,7 +58,7 @@ function func:PersonalNameplateCreate()
 
                     -- Set the frame's position along the Y-axis
                     self:SetPoint("top", UIParent, "bottom", 0, newY);
-                    Config.PersonalNameplatePointY = newY;
+                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatePointY = newY;
                 end
             end);
 
@@ -73,7 +73,7 @@ function func:PersonalNameplateCreate()
         -- Main / Scale
         nameplate.main = CreateFrame("frame", nil, nameplate);
         nameplate.main:SetAllPoints();
-        nameplate.main:SetScale(Config.PersonalNameplatesScale - 0.2);
+        nameplate.main:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatesScale - 0.2);
 
         -- Border
         nameplate.border = nameplate.main:CreateTexture();
@@ -130,12 +130,12 @@ function func:PersonalNameplateCreate()
         nameplate.healthMain:SetPoint("center", nameplate.healthbar, "center", 0, -0.5);
         nameplate.healthMain:SetJustifyH("center");
         nameplate.healthMain:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
-        if Config.LargeMainValue then
+        if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].LargeMainValue then
             nameplate.healthMain:SetFontObject("GameFontNormalLargeOutline");
             nameplate.healthMain:SetScale(1.4 + scaleOffset);
         else
@@ -149,10 +149,10 @@ function func:PersonalNameplateCreate()
         nameplate.healthSecondary:SetPoint("left", nameplate.healthbar, "left", 4, 0);
         nameplate.healthSecondary:SetJustifyH("left");
         nameplate.healthSecondary:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.healthSecondary:SetScale(0.9 + scaleOffset);
 
@@ -162,10 +162,10 @@ function func:PersonalNameplateCreate()
         nameplate.healthTotal:SetPoint("right", nameplate.healthbar, "right", -4, 0);
         nameplate.healthTotal:SetJustifyH("right");
         nameplate.healthTotal:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.healthTotal:SetScale(0.9 + scaleOffset);
 
@@ -196,10 +196,10 @@ function func:PersonalNameplateCreate()
         nameplate.powerMain:SetPoint("center", nameplate.powerbar, "center", 0, -0.2);
         nameplate.powerMain:SetJustifyH("center");
         nameplate.powerMain:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.powerMain:SetScale(0.9 + scaleOffset);
 
@@ -208,10 +208,10 @@ function func:PersonalNameplateCreate()
         nameplate.power:SetPoint("left", nameplate.powerbar, "left", 4, -0.2);
         nameplate.power:SetJustifyH("left");
         nameplate.power:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.power:SetScale(0.9 + scaleOffset);
 
@@ -220,10 +220,10 @@ function func:PersonalNameplateCreate()
         nameplate.powerTotal:SetPoint("right", nameplate.powerbar, "right", -4, -0.2);
         nameplate.powerTotal:SetJustifyH("right");
         nameplate.powerTotal:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.powerTotal:SetScale(0.9 + scaleOffset);
 
@@ -273,10 +273,10 @@ function func:PersonalNameplateCreate()
         nameplate.extraBar.value:SetPoint("center", nameplate.extraBar, "center");
         nameplate.extraBar.value:SetJustifyH("center");
         nameplate.extraBar.value:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.extraBar.value:SetScale(0.9 + scaleOffset);
 
@@ -348,13 +348,13 @@ function func:PersonalNameplateAdd()
                 nameplate.main:SetPoint("center", nameplate, "center", 0, 0);
             end
         else
-            nameplate:SetPoint("top", UIParent, "bottom", 0, Config.PersonalNameplatePointY);
+            nameplate:SetPoint("top", UIParent, "bottom", 0, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatePointY);
         end
 
-        nameplate.main:SetScale(Config.PersonalNameplatesScale - 0.2);
+        nameplate.main:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatesScale - 0.2);
         nameplate.border:SetVertexColor(data.colors.border.r, data.colors.border.g, data.colors.border.b);
 
-        if Config.LargeMainValue then
+        if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].LargeMainValue then
             nameplate.healthMain:SetFontObject("GameFontNormalLargeOutline");
             nameplate.healthMain:SetScale(1.4 + scaleOffset);
         else
@@ -362,53 +362,53 @@ function func:PersonalNameplateAdd()
             nameplate.healthMain:SetScale(0.9 + scaleOffset);
         end
 
-        nameplate.buffsCounter:SetScale(Config.PersonalNameplatesScale + 0.5);
-        nameplate.debuffsCounter:SetScale(Config.PersonalNameplatesScale + 0.5);
+        nameplate.buffsCounter:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatesScale + 0.5);
+        nameplate.debuffsCounter:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatesScale + 0.5);
 
         nameplate.classPower:SetPoint("top", dummyAnchor, "bottom", 0, -4);
         nameplate.classPower:SetHeight(data.classBarHeight);
 
         nameplate.healthSecondary:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.healthTotal:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.healthMain:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.powerMain:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.power:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
         nameplate.powerTotal:SetTextColor(
-            Config.HealthFontColor.r,
-            Config.HealthFontColor.g,
-            Config.HealthFontColor.b,
-            Config.HealthFontColor.a
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
+            CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
         );
 
         func:Update_Health("player");
 
-        nameplate.healthTotal:SetShown(Config.PersonalNameplateTotalHealth);
-        nameplate.powerTotal:SetShown(Config.PersonalNameplateTotalPower);
+        nameplate.healthTotal:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplateTotalHealth);
+        nameplate.powerTotal:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplateTotalPower);
 
         func:Toggle_ExtraBar();
         func:ToggleNameplatePersonal();
@@ -428,7 +428,7 @@ function func:Toggle_ExtraBar()
     local druidInCatOrBearFrom = classID == 11 and powerType ~= 0;
     local toggle = alternatePower or druidInCatOrBearFrom;
     local posY = 0;
-    local scale = math.max(0.75, math.min(1.25, Config.PersonalNameplatesScale)) -- Clamp Scale to the range [0.75, 1.25]
+    local scale = math.max(0.75, math.min(1.25, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatesScale)) -- Clamp Scale to the range [0.75, 1.25]
 
     if nameplate then
         -- Swapping border texture, calculating Y axis of the anchor and updating the extra powerbar values
@@ -469,7 +469,7 @@ function func:ToggleNameplatePersonal(event)
              and myNameplate
              and myNameplate:IsVisible()
 
-    elseif Config.PersonalNameplate then
+    elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplate then
         if not UnitIsDeadOrGhost("player") then
             local classID = select(3, UnitClass("player"));
             local powerType = UnitPowerType("player");
@@ -482,7 +482,7 @@ function func:ToggleNameplatePersonal(event)
 
                 nameplate:SetAlpha(0.5);
 
-                if Config.PersonalNameplateAlwaysShow then
+                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplateAlwaysShow then
                     toggle = true;
                 elseif classID == 11 then -- If player is a druid
                     local noRage = UnitPower("player", 1) <= 0;

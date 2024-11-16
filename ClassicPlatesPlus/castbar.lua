@@ -17,7 +17,7 @@ function func:Castbar_Start(event, unit)
             local text, icon, startTimeMS, endTimeMS, isTradeSkill, notInterruptible, minValue, maxValue, progressReverser;
             local r,g,b;
             local test = false;
-            local showIcon = Config.CastbarIconShow;
+            local showIcon = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].CastbarIconShow;
 
             castbar.animation:Stop();
 
@@ -152,7 +152,7 @@ function func:Castbar_Start(event, unit)
                 end);
 
                 castbar.countdown:Show();
-                castbar:SetShown(Config.CastbarShow and not isTradeSkill);
+                castbar:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].CastbarShow and not isTradeSkill);
             end
         end
     end

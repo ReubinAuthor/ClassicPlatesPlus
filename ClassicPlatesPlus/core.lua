@@ -66,7 +66,7 @@ function func:CVars(event)
         data.cvars.NamePlateVerticalScale = tostring(GetCVar("NamePlateVerticalScale"));
 
         -- Distance
-        SetCVar("nameplateMinScale", data.isClassic and 1 or Config.ScaleWithDistance and 0.8 or 1);
+        SetCVar("nameplateMinScale", data.isClassic and 1 or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ScaleWithDistance and 0.8 or 1);
         SetCVar("nameplateMaxScale", 1.0);
         SetCVar("nameplateMinScaleDistance", 10);
         SetCVar("nameplateMaxScaleDistance", 10);
@@ -75,14 +75,14 @@ function func:CVars(event)
         -- Selected
         SetCVar("nameplateNotSelectedAlpha", 1.0);
         SetCVar("nameplateSelectedAlpha", 1.0);
-        SetCVar("nameplateSelectedScale", Config.EnlargeSelected and 1.2 or not Config.EnlargeSelected and 1);
+        SetCVar("nameplateSelectedScale", CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].EnlargeSelected and 1.2 or not CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].EnlargeSelected and 1);
 
         -- Inset
-        local ComboPointsScaleClassless = data.isRetail and 0 or Config.ComboPointsScaleClassless;
-        SetCVar("nameplateOtherTopInset", .08 * Config.NameplatesScale + (.024 * Config.AurasScale) + (0.018 * ComboPointsScaleClassless));
+        local ComboPointsScaleClassless = data.isRetail and 0 or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ComboPointsScaleClassless;
+        SetCVar("nameplateOtherTopInset", .08 * CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NameplatesScale + (.024 * CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasScale) + (0.018 * ComboPointsScaleClassless));
 
         -- Nameplates size
-        SetCVar("nameplateGlobalScale", Config.NameplatesScale);
+        SetCVar("nameplateGlobalScale", CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NameplatesScale);
 
         -- Rest
         SetCVar("nameplateTargetRadialPosition", 2);
@@ -117,18 +117,18 @@ function func:ResizeNameplates()
         local inInstance, instanceType = IsInInstance();
 
         -- Width
-        local portrait = Config.Portrait and 18 or 0;
-        local level = Config.ShowLevel and 18 or 0;
+        local portrait = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait and 18 or 0;
+        local level = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowLevel and 18 or 0;
 
         -- Height
-        local portraitY = Config.Portrait and 2 or 0;
-        local powerbarY = Config.Powerbar and 6 or 0;
-        local inverseScale = 1 - Config.NameplatesScale;
+        local portraitY = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait and 2 or 0;
+        local powerbarY = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Powerbar and 6 or 0;
+        local inverseScale = 1 - CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NameplatesScale;
 
         local width = 128 + portrait + level;
         local height = 16 + portraitY + powerbarY
-            + ((Config.LargeName and 14 or 10) * (Config.NameplatesScale + inverseScale))
-            + (Config.ShowGuildName and ((Config.LargeGuildName and 13 or 10) * (Config.NameplatesScale + inverseScale)) or Config.ThreatPercentage and 10 or 0);
+            + ((CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].LargeName and 14 or 10) * (CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NameplatesScale + inverseScale))
+            + (CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowGuildName and ((CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].LargeGuildName and 13 or 10) * (CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NameplatesScale + inverseScale)) or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatPercentage and 10 or 0);
 
         -- Friendly Nameplates
         if inInstance and (instanceType == "party" or instanceType == "raid") then
@@ -362,6 +362,10 @@ function func:utf8sub(str, start, numChars)
     return str:sub(start, currentIndex - 1);
 end
 
+function func:TrimEmptySpaces(text)
+    return text:match("^%s*(.-)%s*$");
+end
+
 ----------------------------------------
 -- Format time
 ----------------------------------------
@@ -431,6 +435,25 @@ function func:InteractIcon(nameplate)
 end
 
 ----------------------------------------
+-- Trimming Text
+----------------------------------------
+
+function func:TrimText(maxWidth, frame)
+    local text = frame:GetText();
+
+    if frame:GetStringWidth() > maxWidth then
+        local length = strlenutf8(text);
+        local textWidth = frame:GetStringWidth(text);
+        local trimmedLength = math.floor(maxWidth / textWidth * length);
+
+        text = func:utf8sub(text, 1, trimmedLength);
+        return(text .. "...");
+    else
+        return(text);
+    end
+end
+
+----------------------------------------
 -- Get unit color
 ----------------------------------------
 function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
@@ -462,13 +485,13 @@ function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
     local function getDefault()
         if isPlayer then
             if canAttackUnit then
-                if Config.HealthBarClassColorsEnemy then
+                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthBarClassColorsEnemy then
                     return classColor.r, classColor.g, classColor.b;
                 else
                     return r, g, b;
                 end
             else
-                if Config.HealthBarClassColorsFriendly then
+                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthBarClassColorsFriendly then
                     return classColor.r, classColor.g, classColor.b;
                 else
                     return r, g, b;
@@ -487,14 +510,14 @@ function func:GetUnitColor(unit, ThreatPercentageOfLead, status)
         else
             if status == 2 or status == 3 then
                 if ThreatPercentageOfLead == 0 then
-                    return Config.ThreatAggroColor.r, Config.ThreatAggroColor.g, Config.ThreatAggroColor.b;
+                    return CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatAggroColor.r, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatAggroColor.g, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatAggroColor.b;
                 else
-                    return getLighterColor(ThreatPercentageOfLead, Config.ThreatAggroColor.r, Config.ThreatAggroColor.g, Config.ThreatAggroColor.b);
+                    return getLighterColor(ThreatPercentageOfLead, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatAggroColor.r, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatAggroColor.g, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatAggroColor.b);
                 end
             elseif GetPartyAssignment("MainTank", "player", true) and func:OtherTank(unit) then
-                return Config.ThreatOtherTankColor.r, Config.ThreatOtherTankColor.g, Config.ThreatOtherTankColor.b;
-            elseif status == 1 or (ThreatPercentageOfLead and ThreatPercentageOfLead > Config.ThreatWarningThreshold) then
-                return Config.ThreatWarningColor.r, Config.ThreatWarningColor.g, Config.ThreatWarningColor.b;
+                return CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatOtherTankColor.r, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatOtherTankColor.g, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatOtherTankColor.b;
+            elseif status == 1 or (ThreatPercentageOfLead and ThreatPercentageOfLead > CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatWarningThreshold) then
+                return CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatWarningColor.r, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatWarningColor.g, CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatWarningColor.b;
             else
                 return getDefault();
             end
@@ -543,10 +566,10 @@ function func:Update_Colors(unit)
             unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
             unitFrame.guild:SetTextColor(0.5, 0.5, 0.5);
         else
-            if Config.FriendlyClassColorNamesAndGuild and not canAttack and isPlayer then
+            if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].FriendlyClassColorNamesAndGuild and not canAttack and isPlayer then
                 unitFrame.name:SetTextColor(classColor.r, classColor.g, classColor.b);
                 unitFrame.guild:SetTextColor(classColor.r, classColor.g, classColor.b);
-            elseif Config.EnemyClassColorNamesAndGuild and canAttack and isPlayer then
+            elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].EnemyClassColorNamesAndGuild and canAttack and isPlayer then
                 unitFrame.name:SetTextColor(classColor.r, classColor.g, classColor.b);
                 unitFrame.guild:SetTextColor(classColor.r, classColor.g, classColor.b);
             else
@@ -571,13 +594,13 @@ function func:Update_Colors(unit)
         end
 
         -- Fade
-        if Config.FadeUnselected then
+        if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].FadeUnselected then
             if not UnitExists("target") then
                 unitFrame:SetAlpha(1);
             elseif target then
                 unitFrame:SetAlpha(1);
             else
-                unitFrame:SetAlpha(Config.FadeIntensity);
+                unitFrame:SetAlpha(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].FadeIntensity);
             end
         else
             unitFrame:SetAlpha(1);
@@ -653,7 +676,7 @@ function func:Update_quests(unit)
             local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
             if nameplate then
-                nameplate.unitFrame.quest:SetShown(Config.QuestMark and getQuestProgress());
+                nameplate.unitFrame.quest:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].QuestMark and getQuestProgress());
             end
         end
     end
@@ -683,7 +706,7 @@ function func:Update_Health(unit)
         local healthMax = UnitHealthMax(unit);
         local health = UnitHealth(unit);
         local healthPercent = string.format("%.0f", (health/healthMax)*100) .. "%";
-        local percentageAsMainValue = Config.PercentageAsMainValue and Config.NumericValue and Config.Percentage;
+        local percentageAsMainValue = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PercentageAsMainValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage;
         local player = UnitIsPlayer(unit);
         local otherPlayersPet = UnitIsOtherPlayersPet(unit);
         local hp = AbbreviateNumbers(health);
@@ -695,15 +718,15 @@ function func:Update_Health(unit)
             if nameplate then
                 nameplate.healthMain:SetText(
                     percentageAsMainValue and healthPercent
-                    or Config.NumericValue and hp
-                    or Config.Percentage and healthPercent
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and hp
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage and healthPercent
                     or ""
                 );
 
                 nameplate.healthSecondary:SetText(percentageAsMainValue and hp or healthPercent);
 
-                nameplate.healthMain:SetShown(Config.NumericValue or Config.Percentage);
-                nameplate.healthSecondary:SetShown(Config.NumericValue and Config.Percentage);
+                nameplate.healthMain:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage);
+                nameplate.healthSecondary:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage);
 
                 -- Total health
                 data.nameplate.healthTotal:SetText(AbbreviateNumbers(healthMax));
@@ -733,16 +756,16 @@ function func:Update_Health(unit)
 
                 unitFrame.healthMain:SetText(
                     percentageAsMainValue and healthPercent
-                    or Config.NumericValue and hp
-                    or Config.Percentage and healthPercent
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and hp
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage and healthPercent
                     or ""
                 );
                 unitFrame.healthSecondary:SetText(
                     percentageAsMainValue and hp or healthPercent
                 );
 
-                unitFrame.healthMain:SetShown(Config.NumericValue or Config.Percentage);
-                unitFrame.healthSecondary:SetShown(Config.NumericValue and Config.Percentage and showSecondary);
+                unitFrame.healthMain:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage);
+                unitFrame.healthSecondary:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage and showSecondary);
 
                 -- Updating Health bar
                 unitFrame.healthbar:SetMinMaxValues(0, healthMax);
@@ -855,21 +878,21 @@ function func:Update_Power(unit)
                 nameplate.powerbar:SetValue(power);
 
                 if powerType == 0 then
-                    if Config.PercentageAsMainValue and Config.NumericValue and Config.Percentage then
+                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PercentageAsMainValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage then
                         nameplate.powerMain:SetText(powerPercent);
                         nameplate.power:SetText(AbbreviateNumbers(power));
                         nameplate.power:Show();
                         nameplate.powerMain:Show();
-                    elseif Config.NumericValue and Config.Percentage then
+                    elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage then
                         nameplate.powerMain:SetText(AbbreviateNumbers(power));
                         nameplate.power:SetText(powerPercent);
                         nameplate.power:Show();
                         nameplate.powerMain:Show();
-                    elseif Config.NumericValue then
+                    elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue then
                         nameplate.powerMain:SetText(AbbreviateNumbers(power));
                         nameplate.powerMain:SetShown(powerType == 0);
                         nameplate.power:Hide();
-                    elseif Config.Percentage then
+                    elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage then
                         nameplate.powerMain:SetText(powerPercent);
                         nameplate.powerMain:Show();
                         nameplate.power:Hide();
@@ -924,7 +947,7 @@ function func:Update_Power(unit)
 
                     unitFrame.powerbar.statusbar:SetMinMaxValues(0, powerMax);
                     unitFrame.powerbar.statusbar:SetValue(power);
-                    unitFrame.powerbar:SetShown(Config.Powerbar);
+                    unitFrame.powerbar:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Powerbar);
                     unitFrame.powerbar.border:Show();
                 else -- Powerbar is hidden
                     unitFrame.powerbar:Hide();
@@ -997,7 +1020,7 @@ function func:Update_ClassPower(unit, var1)
 
         for i = 1, 4 do
             local haveTotem, _, startTime, duration, icon = GetTotemInfo(i);
-            local toggle = Config.SpecialPower and haveTotem and duration > 0;
+            local toggle = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].SpecialPower and haveTotem and duration > 0;
 
             if toggle then
                 if not classPower[i] then
@@ -1029,13 +1052,13 @@ function func:Update_ClassPower(unit, var1)
                     classPower[i].countdown:SetText(func:formatTime(startTime + duration - GetTime()));
 
                     -- Tooltip
-                    if Config.Tooltip then
+                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Tooltip then
                         local hover;
 
                         local function keyCheck()
-                            if Config.Tooltip == 1 and IsShiftKeyDown()
-                            or Config.Tooltip == 2 and IsControlKeyDown()
-                            or Config.Tooltip == 3 and IsAltKeyDown()
+                            if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Tooltip == 1 and IsShiftKeyDown()
+                            or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Tooltip == 2 and IsControlKeyDown()
+                            or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Tooltip == 3 and IsAltKeyDown()
                             then
                                 return true;
                             end
@@ -1118,7 +1141,7 @@ function func:Update_ClassPower(unit, var1)
             end
         end
 
-        classPower:SetScale(Config.SpecialPowerScale);
+        classPower:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].SpecialPowerScale);
         classPower:SetShown(totalTotems > 0);
         func:PositionAuras(data.nameplate, "player");
     end
@@ -1172,7 +1195,7 @@ function func:Update_ClassPower(unit, var1)
                     func:PositionAuras(unitFrame);
                 end);
 
-                unitFrame.classPower:SetScale(Config.ComboPointsScaleClassless);
+                unitFrame.classPower:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ComboPointsScaleClassless);
                 unitFrame.classPower:SetWidth(18 * comboPoints);
                 unitFrame.classPower:SetShown(comboPoints > 0);
             end
@@ -1242,7 +1265,7 @@ function func:Update_Portrait(unit)
     local isEnemy = UnitIsEnemy(unit, "player");
     local isFriend = UnitIsFriend(unit, "player");
 
-    if Config.Portrait then
+    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait then
         if unit then
             local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
@@ -1258,7 +1281,7 @@ function func:Update_Portrait(unit)
                 end
 
                 if UnitIsPlayer(unit) then
-                    if Config.ClassIconsEnemy then
+                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ClassIconsEnemy then
                         if isEnemy then
                             setClassIcon();
                         end
@@ -1268,7 +1291,7 @@ function func:Update_Portrait(unit)
                         end
                     end
 
-                    if Config.ClassIconsFriendly then
+                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ClassIconsFriendly then
                         if isFriend then
                             setClassIcon();
                         end
@@ -1316,7 +1339,7 @@ function func:Update_Guild(unit)
                 unitFrame.guild:SetText("<"..guildName..">");
             end
 
-            unitFrame.guild:SetShown(Config.ShowGuildName and guildName);
+            unitFrame.guild:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowGuildName and guildName);
 
             func:Update_NameAndGuildPositions(nameplate);
         end
@@ -1334,17 +1357,17 @@ function func:Update_NameAndGuildPositions(nameplate, hook)
             local unitFrame = nameplate.unitFrame;
 
             local function work()
-                local portrait = Config.Portrait and 0 or -9;
-                local level = Config.ShowLevel and 0 or 9;
+                local portrait = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait and 0 or -9;
+                local level = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowLevel and 0 or 9;
                 local powerbarToggle = unitFrame.unit and UnitPower(unitFrame.unit) and UnitPowerMax(unitFrame.unit) > 0;
                 local DefaultNameY = (unitFrame.threatPercentage:IsShown() or unitFrame.guild:IsShown()) and 0
-                    or (Config.ShowGuildName or Config.ThreatPercentage) and not powerbarToggle and -6
-                    or (Config.ShowGuildName or Config.ThreatPercentage) and powerbarToggle and -4
+                    or (CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowGuildName or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatPercentage) and not powerbarToggle and -6
+                    or (CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowGuildName or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatPercentage) and powerbarToggle and -4
                     or not powerbarToggle and -2
                     or powerbarToggle and 0 or -6;
                 local x = portrait + level;
                 local y = unitFrame.threatPercentage:IsShown() and -17 or -8;
-                local anchor = Config.ShowGuildName and unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name;
+                local anchor = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowGuildName and unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name;
 
                 nameplate.UnitFrame.name:ClearAllPoints();
                 nameplate.UnitFrame.name:SetPoint("top", 0, DefaultNameY);
@@ -1354,20 +1377,20 @@ function func:Update_NameAndGuildPositions(nameplate, hook)
 
             local canAttack = UnitCanAttack("player", unit);
             local showParent = UnitIsUnit("target", unit)
-                or Config.NamesOnly == 1
-                or Config.NamesOnly == 2 and canAttack
-                or Config.NamesOnly == 3 and not canAttack
-                or Config.NamesOnly == 4 and false
+                or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 1
+                or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 2 and canAttack
+                or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 3 and not canAttack
+                or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 4 and false
 
             if not showParent then
                 local UnitIsPlayerOrPlayersPet = UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit);
                 local exclude =
-                       Config.NamesOnlyExcludeNPCs == 2 and not UnitIsPlayerOrPlayersPet
-                    or Config.NamesOnlyExcludeNPCs == 3 and canAttack and not UnitIsPlayerOrPlayersPet
-                    or Config.NamesOnlyExcludeFriends and func:isFriend(unit)
-                    or Config.NamesOnlyExcludeGuild and IsGuildMember(unit)
-                    or Config.NamesOnlyExcludeParty and func:UnitInYourParty(unit)
-                    or Config.NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
+                       CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeNPCs == 2 and not UnitIsPlayerOrPlayersPet
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeNPCs == 3 and canAttack and not UnitIsPlayerOrPlayersPet
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeFriends and func:isFriend(unit)
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeGuild and IsGuildMember(unit)
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeParty and func:UnitInYourParty(unit)
+                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
 
                 if not exclude then
                     nameplate.UnitFrame.name:ClearAllPoints();
@@ -1418,13 +1441,13 @@ function func:Update_Classification(unit)
             local unitFrame = nameplate.unitFrame;
             local classification = UnitClassification(unit);
 
-            if Config.Classification and classification and (
+            if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Classification and classification and (
                    classification == "rareelite"
                 or classification == "elite"
                 or classification == "worldboss"
                 or classification == "rare"
             ) then
-                if Config.Portrait then
+                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait then
                     unitFrame.classification:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\classifications\\" .. classification);
                 else
                     unitFrame.classification:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\classifications\\compact" .. classification);
@@ -1459,7 +1482,7 @@ function func:Update_PVP_Flag(unit)
 
             unitFrame.pvp_flag:ClearAllPoints();
             unitFrame.pvp_flag:SetPoint("left", unitFrame.name, "right", -1, englishFaction == "Horde" and -4 or (englishFaction == "Alliance" or isFreeForAll) and -3 or 0);
-            unitFrame.pvp_flag:SetShown(Config.ShowFaction and (isFreeForAll or flaggedPVP) and englishFaction);
+            unitFrame.pvp_flag:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowFaction and (isFreeForAll or flaggedPVP) and englishFaction);
         end
     end
 end
@@ -1527,7 +1550,7 @@ function func:Update_FellowshipBadge(unit)
         unitFrame.fellowshipBadge.badge:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\badge");
         unitFrame.fellowshipBadge.badge:SetVertexColor(badge_r, badge_g, badge_b);
 
-        unitFrame.fellowshipBadge:SetShown(Config.FellowshipBadge and toggle);
+        unitFrame.fellowshipBadge:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].FellowshipBadge and toggle);
     end
 
     if unit then

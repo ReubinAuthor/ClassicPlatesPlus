@@ -13,7 +13,6 @@ local orange = "|cff" .. "FF5600";
 local blue   = "|cff" .. "0072CA";
 local purple = "|cff" .. "FF00FF";
 
-
 -- Panels table
 data.settings = {
     panels = {}, -- Table that will store panels for initialization
@@ -23,13 +22,24 @@ data.settings = {
     }
 };
 
--- Creating Config table if it doesn't exist
-Config = Config or {};
-
 ----------------------------------------
 -- Loading Settings
 ----------------------------------------
 function func:Load_Settings()
+
+    -- Creating config tables
+    CFG_ClassicPlatesPlus = CFG_ClassicPlatesPlus or {};
+    CFG_Account_ClassicPlatesPlus = CFG_Account_ClassicPlatesPlus or { Profiles = {} };
+
+    -- Creating profiles
+    local profileID = func:GenerateID();
+    local playerName = UnitName("player");
+    local playerRealm = GetRealmName("player");
+    local profileName = playerName .. " - " .. playerRealm;
+
+    CFG_ClassicPlatesPlus.Profile = CFG_ClassicPlatesPlus.Profile or profileID;
+    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile] = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile] or { displayName = profileName };
+
     -- MAIN PANEL
     -- Fist panel has to be accessable to other panels, putting it outside of the code block.
     local panelMain = func:CreatePanel(nil, myAddon);
@@ -737,7 +747,7 @@ function func:Load_Settings()
                 [2] = "All",
                 [3] = "All except your own"
             }
-            local flair = { classicEra = false, cata = true, retail = true };
+            local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
@@ -1026,7 +1036,30 @@ function func:Load_Settings()
         func:AnchorFrames(panel);
     end
 
+    -- CATEGORY: Profiles
+    do
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "Profiles");
+
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- Auras List
+        do
+            local name = "Profiles";
+            local cfg = "Profiles";
+            local default = "Default";
+
+            func:Create_Profiles(panel, name, cfg, default);
+        end
+
+        -- Anchoring settings
+        func:AnchorFrames(panel);
+    end
+
+    ---------------------------------------
     -- Adding panels
+    ---------------------------------------
     local mainCategory = Settings.RegisterCanvasLayoutCategory(panelMain, panelMain.name)
 
     for k, v in ipairs(data.settings.panels) do
