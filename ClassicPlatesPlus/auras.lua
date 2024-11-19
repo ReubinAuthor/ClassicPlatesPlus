@@ -20,7 +20,6 @@ function func:Update_Auras(unit)
             local unitFrame = unit == "player" and nameplate or nameplate.unitFrame;
             local canAttack = UnitCanAttack("player", unit);
             local AurasHidePassive = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasHidePassive;
-            local AurasShow = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasShow;
 
             unitFrame.toSort = {
                 important_buffs = {},
@@ -105,15 +104,23 @@ function func:Update_Auras(unit)
 
                         local SourceIsPlayer = source == "player" or source == "vehicle";
                         local hidePassiveCheck = not ( duration == 0 and (AurasHidePassive == 2 or ( AurasHidePassive == 3 and not SourceIsPlayer ) ) );
-                        local show = not UnitIsPlayer and ( ( AurasShow == 1 and SourceIsPlayer ) or AurasShow == 2);
+
+                        -------- Checking aurs source --------
+                        local AurasSource = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasShow;
+                        local show = true;
+
+                        if canAttack then
+                            if auraType == "debuffs" then
+                                show = (AurasSource == 1 and SourceIsPlayer) or AurasSource == 2;
+                            end
+                        else
+                            if auraType == "buffs" then
+                                show = (AurasSource == 1 and SourceIsPlayer) or AurasSource == 2;
+                            end
+                        end
+
                         local isPlayersAura = UnitIsPlayer and (auraType == "debuffs" or auraType == "buffs" and ( CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasSourcePersonal == 1 and SourceIsPlayer or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasSourcePersonal == 2 ) );
-                        local toggle = data.settings and (
-                                data.settings.AurasImportantList[name]
-                                or (
-                                    showType() and  hidePassiveCheck and ( show or isPlayersAura )
-                                )
-                                    and not data.settings.AurasBlacklist[name]
-                            );
+                        local toggle = data.settings and (data.settings.AurasImportantList[name] or (showType() and hidePassiveCheck and ( show or isPlayersAura )) and not data.settings.AurasBlacklist[name]);
 
                         if toggle then
                             if not unitFrame[auraType]["auras"][i] then
