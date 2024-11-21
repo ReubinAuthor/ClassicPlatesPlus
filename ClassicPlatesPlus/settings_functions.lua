@@ -1116,7 +1116,7 @@ function func:Create_AurasList(panel, name, cfg)
     frame_PopUp.Button:Hide();
 
     local function addSpell(list, input)
-        local spellName = GetSpellInfo(input);
+        local spellName = C_Spell.GetSpellName(input);
 
         if input ~= "" then
             if spellName then
@@ -1162,11 +1162,11 @@ function func:Create_AurasList(panel, name, cfg)
         data.settings[cfg] = {};
         for k in pairs(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile][cfg]) do
             if k then
-                local spellName, _, icon = GetSpellInfo(k);
+                local spellInfo = C_Spell.GetSpellInfo(k);
 
-                if spellName then
-                    sorter[spellName] = { icon = icon, id = k };
-                    data.settings[cfg][spellName] = 1;
+                if spellInfo then
+                    sorter[spellInfo.name] = { icon = spellInfo.iconID, id = k };
+                    data.settings[cfg][spellInfo.name] = 1;
                 end
             end
         end
