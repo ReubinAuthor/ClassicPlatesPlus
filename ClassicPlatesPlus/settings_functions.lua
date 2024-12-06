@@ -98,30 +98,32 @@ end
 
 local function updateAurasVisuals()
     local nameplates = C_NamePlate.GetNamePlates();
+    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
 
-    local function work(unitFrame, auraType)
+    local function work(unitFrame, filter)
         local scaleOffset = unitFrame.unit == "player" and 0.15 or 0.15;
-        local scale = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasScale - scaleOffset;
-        if scale <= 0 then scale = 0.1 end
+        local scale = (CFG.AurasScale - scaleOffset) > 0 and (CFG.AurasScale - scaleOffset) or 0.1
 
-        for i = 1, 40 do
-            if unitFrame[auraType]["auras"] and unitFrame[auraType]["auras"][i] then
-                unitFrame[auraType]["auras"][i]:SetScale(scale);
-                unitFrame[auraType]["auras"][i].cooldown:SetReverse(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasReverseAnimation);
-                unitFrame[auraType]["auras"][i].countdown:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasCountdown);
-                unitFrame[auraType]["auras"][i].countdown:ClearAllPoints();
-                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasCountdownPosition == 1 then
-                    unitFrame[auraType]["auras"][i].countdown:SetPoint("right", unitFrame[auraType]["auras"][i].second, "topRight", 5, -2.5);
-                    unitFrame[auraType]["auras"][i].countdown:SetJustifyH("right");
-                elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasCountdownPosition == 2 then
-                    unitFrame[auraType]["auras"][i].countdown:SetPoint("center", unitFrame[auraType]["auras"][i].second, "center");
-                    unitFrame[auraType]["auras"][i].countdown:SetJustifyH("center");
+        if unitFrame.auras and unitFrame.auras[filter] then
+            for i = 1, 40 do
+                if unitFrame.auras[filter][i] then
+                    unitFrame.auras[filter][i]:SetScale(scale);
+                    unitFrame.auras[filter][i].cooldown:SetReverse(CFG.AurasReverseAnimation);
+                    unitFrame.auras[filter][i].countdown:SetShown(CFG.AurasCountdown);
+                    unitFrame.auras[filter][i].countdown:ClearAllPoints();
+                    if CFG.AurasCountdownPosition == 1 then
+                        unitFrame.auras[filter][i].countdown:SetPoint("right", unitFrame.auras[filter][i].second, "topRight", 5, -2.5);
+                        unitFrame.auras[filter][i].countdown:SetJustifyH("right");
+                    elseif CFG.AurasCountdownPosition == 2 then
+                        unitFrame.auras[filter][i].countdown:SetPoint("center", unitFrame.auras[filter][i].second, "center");
+                        unitFrame.auras[filter][i].countdown:SetJustifyH("center");
+                    end
                 end
             end
         end
 
-        unitFrame.buffsCounter:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasScale);
-        unitFrame.debuffsCounter:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasScale);
+        unitFrame.buffsCounter:SetScale(CFG.AurasScale);
+        unitFrame.debuffsCounter:SetScale(CFG.AurasScale);
     end
 
     if nameplates then
@@ -129,15 +131,15 @@ local function updateAurasVisuals()
             if k and v.unitFrame.unit then
                 local unitFrame = v.unitFrame;
 
-                work(unitFrame, "buffs");
-                work(unitFrame, "debuffs");
+                work(unitFrame, "helpful");
+                work(unitFrame, "harmful");
             end
         end
     end
 
     if data.nameplate then
-        work(data.nameplate, "buffs");
-        work(data.nameplate, "debuffs");
+        work(data.nameplate, "helpful");
+        work(data.nameplate, "harmful");
     end
 end
 
@@ -258,10 +260,12 @@ local functionsTable = {
     ThreatHighlight = function() updateNameplateVisuals(); end,
 
     -- Auras
-    AurasShow = function() updateAuras(); end,
+    AurasFilterFriendly = function() updateAuras(); end,
+    AurasFilterEnemy = function() updateAuras(); end,
     AurasHidePassive = function() updateAuras(); end,
     AurasCountdown = function() updateAurasVisuals(); end,
     AurasReverseAnimation = function() updateAurasVisuals(); end,
+    MarkStealableAuras = function() updateAuras(); end,
 
     BuffsFriendly = function() updateAuras(); end,
     DebuffsFriendly = function() updateAuras(); end,
@@ -285,7 +289,8 @@ local functionsTable = {
             end
         end
     end,
-    AurasSourcePersonal = function() func:Update_Auras("player"); end,
+    BuffsFilterPersonal = function() func:Update_Auras("player"); end,
+    DebuffsFilterPersonal = function() func:Update_Auras("player"); end,
 
     BuffsPersonal = function() func:Update_Auras("player"); end,
     DebuffsPersonal = function() func:Update_Auras("player"); end,
@@ -2000,15 +2005,19 @@ function func:Create_Profiles(panel, name, cfg, default)
         local sorted = {};
 
         for k,v in pairs(CFG_Account_ClassicPlatesPlus.Profiles) do
-            if k then
+            if k and v.displayName then
                 v.id = k;
                 table.insert(sorted, v);
             end
         end
 
-        -- Sorting a table values alphabetically while sortinf aplhabetically (Default one always stays on top)
+        -- Sorting a table values alphabetically while sorting aplhabetically
         table.sort(sorted, function(a, b)
-            return a.displayName < b.displayName;
+            if a.displayName and b.displayName then
+                return a.displayName < b.displayName;
+            else
+                return false;
+            end
         end);
 
         --[[table.sort(sorted, function(a, b)

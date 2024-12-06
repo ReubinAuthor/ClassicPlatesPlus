@@ -332,12 +332,6 @@ function func:Nameplate_Created(nameplate)
         unitFrame.debuffsCounter:SetTextColor(1, 0.2, 0);
 
         --------------------------------
-        -- Auras
-        --------------------------------
-        unitFrame.buffs = CreateFrame("Frame", nil, unitFrame.parent);
-        unitFrame.debuffs = CreateFrame("Frame", nil, unitFrame.parent);
-
-        --------------------------------
         -- Class Bar Dummy
         --------------------------------
         unitFrame.classPower = CreateFrame("frame", nil, unitFrame.parent);

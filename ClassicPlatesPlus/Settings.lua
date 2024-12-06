@@ -99,23 +99,6 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
-        -- DropDownMenu
-        do
-            local name = "Tooltip";
-            local tooltip = "";
-            local cfg = "Tooltip";
-            local default = 1;
-            local options = {
-                [1] = "Hold SHIFT",
-                [2] = "Hold CTRL",
-                [3] = "Hold ALT",
-                [4] = "Disabled"
-            }
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-        end
-
         -- CheckButton
         do
             local name = "Portrait";
@@ -723,13 +706,29 @@ function func:Load_Settings()
 
         -- DropDownMenu
         do
-            local name = "Auras Source";
-            local tooltip = white .. "You: " .. yellow .. "Show auras applied by you\n".. white .. "All: " .. yellow .. "Show all auras";
-            local cfg = "AurasShow";
+            local name = "Auras Filter On Frindlies";
+            local tooltip = "";
+            local cfg = "AurasFilterFriendly";
             local default = 1;
             local options = {
-                [1] = "You",
-                [2] = "All"
+                [1] = "Show all auras",
+                [2] = "Show auras applied by you",
+                [3] = "Show auras you can apply and dispell"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Auras Filter On Enemies";
+            local tooltip = "";
+            local cfg = "AurasFilterEnemy";
+            local default = 1;
+            local options = {
+                [1] = "Show all auras",
+                [2] = "Show auras applied by you"
             }
             local flair = { classicEra = true, cata = true, retail = true };
 
@@ -787,6 +786,34 @@ function func:Load_Settings()
             local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Mark Stealable Buffs";
+            local tooltip = "Marks stealable buffs in blue and prioritizes them over other buffs";
+            local cfg = "MarkStealableAuras";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Tooltip";
+            local tooltip = "";
+            local cfg = "Tooltip";
+            local default = 1;
+            local options = {
+                [1] = "Hold SHIFT",
+                [2] = "Hold CTRL",
+                [3] = "Hold ALT",
+                [4] = "Disabled"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
         -- CheckButton
@@ -924,13 +951,29 @@ function func:Load_Settings()
 
         -- DropDownMenu
         do
-            local name = "Buffs Source";
-            local tooltip = white .. "You: " .. yellow .. "Show buffs applied by you\n".. white .. "All: " .. yellow .. "Show buffs applied by anyone";
-            local cfg = "AurasSourcePersonal";
+            local name = "Buffs Filter";
+            local tooltip = "";
+            local cfg = "BuffsFilterPersonal";
             local default = 1;
             local options = {
-                [1] = "You",
-                [2] = "All"
+                [1] = "Show all buffs",
+                [2] = "Show buffs applied by you",
+                [3] = "Show buffs you can apply and applied"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Debuffs Filter";
+            local tooltip = "";
+            local cfg = "DebuffsFilterPersonal";
+            local default = 1;
+            local options = {
+                [1] = "Show all debuffs",
+                [2] = "Show debuffs you can dispell"
             }
             local flair = { classicEra = true, cata = true, retail = true };
 
