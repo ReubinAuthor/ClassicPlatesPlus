@@ -288,8 +288,10 @@ function func:Update_Auras(unit)
                                             GameTooltip:SetOwner(unitFrame.auras[filter][i], "ANCHOR_BOTTOMLEFT", 0, -2);
                                             GameTooltip:SetUnitAura(unit, i, filter);
 
-                                            C_Timer.After(0.05, function()
-                                                GameTooltip:AddDoubleLine("Spell ID", spellId, nil, nil, nil, 1, 1, 1);
+                                            C_Timer.After(0.025, function()
+                                                if CFG.TooltipSpellID then
+                                                    GameTooltip:AddDoubleLine("Spell ID", spellId, nil, nil, nil, 1, 1, 1);
+                                                end
                                                 GameTooltip:Show();
                                             end);
                                         end

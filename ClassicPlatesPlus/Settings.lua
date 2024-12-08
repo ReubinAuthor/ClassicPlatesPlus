@@ -818,6 +818,17 @@ function func:Load_Settings()
 
         -- CheckButton
         do
+            local name = "Show Spell ID on Tooltip";
+            local tooltip = "";
+            local cfg = "TooltipSpellID";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
             local name = "Show Buffs on Friendlies";
             local tooltip = "";
             local cfg = "BuffsFriendly";
