@@ -200,9 +200,7 @@ function core:init(event, ...)
     or event == "UNIT_SPELLCAST_CHANNEL_START"
     or event == "UNIT_SPELLCAST_DELAYED"
     or event == "UNIT_SPELLCAST_CHANNEL_UPDATE" then
-        local unit, _, spellID = ...;
         func:Castbar_Start(event, arg);
-        func:SpellCost(unit, spellID)
     end
 
     if event == "UNIT_SPELLCAST_STOP"

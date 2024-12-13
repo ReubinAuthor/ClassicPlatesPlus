@@ -18,17 +18,19 @@ function func:Nameplate_Removed(unit)
             unitFrame.portrait.countdown:Hide();
 
             -- Hidding auras
-            if unitFrame.auras.helpful then
-                for k,v in pairs(unitFrame.auras.helpful) do
-                    if k then
-                        v:Hide();
+            if unitFrame.auras then
+                if unitFrame.auras.helpful then
+                    for k,v in pairs(unitFrame.auras.helpful) do
+                        if k then
+                            v:Hide();
+                        end
                     end
                 end
-            end
-            if unitFrame.auras.harmful then
-                for k,v in pairs(unitFrame.auras.harmful) do
-                    if k then
-                        v:Hide();
+                if unitFrame.auras.harmful then
+                    for k,v in pairs(unitFrame.auras.harmful) do
+                        if k then
+                            v:Hide();
+                        end
                     end
                 end
             end

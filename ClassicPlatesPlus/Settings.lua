@@ -346,6 +346,16 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
+        do
+            local name = "Animate Personal Power Bar";
+            local tooltip = "";
+            local cfg = "PersonalPowerBarAnimation";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
         -- Slider
         do
             local name = "Personal Nameplates Scale";

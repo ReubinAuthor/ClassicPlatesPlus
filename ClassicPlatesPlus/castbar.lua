@@ -192,15 +192,5 @@ function func:Castbar_End(event, unit)
 
             castbar.statusbar:SetValue(0);
         end
-
-        -- Spell Cost
-        if UnitIsUnit(unit, "player") then
-            local name = UnitCastingInfo("player");
-
-            if not name then
-                data.nameplate.powerbarCost:Hide();
-                data.nameplate.powerbarCostSpark:Hide();
-            end
-        end
     end
 end

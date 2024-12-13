@@ -9,17 +9,25 @@ local data = core.data;
 -- Auras
 ----------------------------------------
 function func:Update_Auras(unit)
+    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
+
     if unit then
         local isNameplate = string.match(unit, "nameplate");
-        local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
         local UnitIsPlayer = UnitIsUnit("player", unit);
-        local canAttack = UnitCanAttack("player", unit);
-        local scaleOffset = UnitIsPlayer and 0.15 or 0.15;
-        local scale = (CFG.AurasScale - scaleOffset) > 0 and (CFG.AurasScale - scaleOffset) or 0.1
+        local nameplate, unitFrame;
 
-        if isNameplate or UnitIsPlayer then
-            local nameplate = UnitIsPlayer and data.nameplate or C_NamePlate.GetNamePlateForUnit(unit);
-            local unitFrame = UnitIsPlayer and nameplate or nameplate.unitFrame;
+        if UnitIsPlayer then
+            nameplate = data.nameplate;
+            unitFrame = nameplate;
+        elseif isNameplate then
+            nameplate = C_NamePlate.GetNamePlateForUnit(unit);
+            unitFrame = nameplate.unitFrame;
+        end
+
+        if nameplate and unitFrame then
+            local canAttack = UnitCanAttack("player", unit);
+            local scaleOffset = UnitIsPlayer and 0.15 or 0.15;
+            local scale = (CFG.AurasScale - scaleOffset) > 0 and (CFG.AurasScale - scaleOffset) or 0.1
 
             unitFrame.auras = unitFrame.auras or CreateFrame("Frame", nil, unitFrame.parent);
             unitFrame.auras.helpful = unitFrame.auras.helpful or {};
@@ -27,7 +35,7 @@ function func:Update_Auras(unit)
             unitFrame.auras.toSort = { helpful = {}, harmful = {}, important_helpful = {}, important_harmful = {}, stealable_helpful = {} };
             unitFrame.auras.sorted = { helpful = {}, harmful = {} };
 
-            if nameplate and unitFrame.auras then
+            if unitFrame.auras then
                 local function getAuras(filter)
                     for i = 1, 40 do
                         local aura = C_UnitAuras.GetAuraDataByIndex(unit, i, filter);
@@ -412,7 +420,7 @@ function func:Update_Auras(unit)
                 end
 
                 -- Sorting important auras first then normal ones
-                if unit == "player" then
+                if UnitIsPlayer then
                     sortAuras(unitFrame.auras.toSort.important_helpful,   unitFrame.auras.sorted.helpful,   CFG.AurasPersonalMaxBuffs);
                     sortAuras(unitFrame.auras.toSort.helpful,             unitFrame.auras.sorted.helpful,   CFG.AurasPersonalMaxBuffs);
                     sortAuras(unitFrame.auras.toSort.important_harmful,   unitFrame.auras.sorted.harmful,   CFG.AurasPersonalMaxDebuffs);
@@ -431,7 +439,7 @@ function func:Update_Auras(unit)
                 end
 
                 ----------------------------------------
-                -- Call to positioning auras
+                -- Call to position auras
                 ----------------------------------------
                 func:PositionAuras(unitFrame, unit);
 
@@ -445,7 +453,7 @@ function func:Update_Auras(unit)
                         local sortedAuras = unitFrame.auras.sorted[filter];
                         local anchor = filter == "harmful" and sortedAuras[#sortedAuras] or filter == "helpful" and sortedAuras[1];
 
-                        if unit == "player" and filter == "helpful" then
+                        if UnitIsPlayer and filter == "helpful" then
                             anchor = sortedAuras[#sortedAuras];
                         end
 
@@ -457,7 +465,7 @@ function func:Update_Auras(unit)
                     counter:SetShown(CFG.AurasOverFlowCounter and totalAuras > maxAuras);
                 end
 
-                if unit == "player" then
+                if UnitIsPlayer then
                     processAuras(unitFrame.buffsCounter, "helpful", CFG.AurasPersonalMaxBuffs, "left", "right", 5);
                     processAuras(unitFrame.debuffsCounter, "harmful", CFG.AurasPersonalMaxDebuffs, "left", "right", 5);
                 elseif canAttack then
@@ -500,99 +508,101 @@ function func:PositionAuras(unitFrame, unit)
 
         unit = unit or unitFrame.unit;
 
-        -- Get Anchor
-        if data.isRetail and resourceOnTarget == "1" and unit and UnitIsUnit(unit, "target") and class then
-            anchor = unitFrame.classPower;
-        elseif not data.isRetail and unitFrame.classPower:IsVisible() then
-            anchor = unitFrame.classPower;
-        else
-            anchor = unitFrame.name;
-        end
-
-        -- Position auras
-        if unitFrame.auras and unitFrame.auras.sorted then
-            -- helpful
-            for k,v in ipairs(unitFrame.auras.sorted.helpful) do
-                if k == 1 then
-                    if unit == "player" then
-                        totalAuras = #unitFrame.auras.sorted.helpful;
-                        totalGaps = #unitFrame.auras.sorted.helpful - 1;
-                        anchor = unitFrame.healthbar;
-                        y = 10 * CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatesScale;
-                        calc = -((auraWidth * totalAuras + gap * totalGaps) / 2 - 13.5);
-                    else
-                        y = 6;
-
-                        if #unitFrame.auras.sorted.harmful > 0 then
-                            totalAuras = #unitFrame.auras.sorted.helpful + #unitFrame.auras.sorted.harmful;
-                            totalGaps = #unitFrame.auras.sorted.helpful + #unitFrame.auras.sorted.harmful - 2;
-                            calc = -((auraWidth * totalAuras + gap * totalGaps) / 2 - 7);
-                        else
-                            totalAuras = #unitFrame.auras.sorted.helpful;
-                            totalGaps = #unitFrame.auras.sorted.helpful - 1;
-                            calc = -((auraWidth * totalAuras + gap * totalGaps) / 2 - 13.5);
-                        end
-                    end
-
-                    pos1, pos2 = "bottom", "top";
-                else
-                    anchor = unitFrame.auras.sorted.helpful[k - 1];
-                    pos1, pos2, y = "left", "right", 0;
-                    calc = gap;
-                end
-
-                v:ClearAllPoints();
-                v:SetPoint(pos1, anchor, pos2, calc, y);
+        if unit then
+            -- Get Anchor
+            if data.isRetail and resourceOnTarget == "1" and unit and UnitIsUnit(unit, "target") and class then
+                anchor = unitFrame.classPower;
+            elseif not data.isRetail and unitFrame.classPower:IsVisible() then
+                anchor = unitFrame.classPower;
+            else
+                anchor = unitFrame.name;
             end
 
-            -- harmful
-            local totalHelpful = #unitFrame.auras.sorted.helpful;
-
-            for k,v in ipairs(unitFrame.auras.sorted.harmful) do
-                if k == 1 then
-                    totalAuras = #unitFrame.auras.sorted.harmful;
-                    totalGaps = #unitFrame.auras.sorted.harmful - 1;
-                    calc = -((auraWidth * totalAuras + gap * totalGaps ) / 2 - 13.5);
-
-                    if unit == "player" then
-                        pos1, pos2 = "top", "bottom";
-
-                        if resourceOnTarget == "0" and class then
-                            anchor = unitFrame.classPower;
-
-                            if classFile == "PALADIN" then
-                                y = 0;
-                            else
-                                y = -8;
-                            end
+            -- Position auras
+            if unitFrame.auras and unitFrame.auras.sorted then
+                -- helpful
+                for k,v in ipairs(unitFrame.auras.sorted.helpful) do
+                    if k == 1 then
+                        if UnitIsUnit("player", unit) then
+                            totalAuras = #unitFrame.auras.sorted.helpful;
+                            totalGaps = #unitFrame.auras.sorted.helpful - 1;
+                            anchor = unitFrame.healthbar;
+                            y = 10 * CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PersonalNameplatesScale;
+                            calc = -((auraWidth * totalAuras + gap * totalGaps) / 2 - 13.5);
                         else
-                            if unitFrame.classPower:IsVisible() then
-                                anchor = unitFrame.classPower;
-                            elseif unitFrame.extraBar:IsShown() then
-                                anchor = unitFrame.extraBar;
-                            else
-                                anchor = unitFrame.powerbar;
-                            end
+                            y = 6;
 
-                            y = -10;
+                            if #unitFrame.auras.sorted.harmful > 0 then
+                                totalAuras = #unitFrame.auras.sorted.helpful + #unitFrame.auras.sorted.harmful;
+                                totalGaps = #unitFrame.auras.sorted.helpful + #unitFrame.auras.sorted.harmful - 2;
+                                calc = -((auraWidth * totalAuras + gap * totalGaps) / 2 - 7);
+                            else
+                                totalAuras = #unitFrame.auras.sorted.helpful;
+                                totalGaps = #unitFrame.auras.sorted.helpful - 1;
+                                calc = -((auraWidth * totalAuras + gap * totalGaps) / 2 - 13.5);
+                            end
                         end
+
+                        pos1, pos2 = "bottom", "top";
                     else
-                        if totalHelpful > 0 then
-                            anchor = unitFrame.auras.sorted.helpful[totalHelpful];
-                            pos1, pos2, y = "left", "right", 0;
-                            calc = bigGap;
-                        else
-                            pos1, pos2, y = "bottom", "top", 6;
-                        end
+                        anchor = unitFrame.auras.sorted.helpful[k - 1];
+                        pos1, pos2, y = "left", "right", 0;
+                        calc = gap;
                     end
-                elseif #unitFrame.auras.sorted.harmful > 0 then
-                    anchor = unitFrame.auras.sorted.harmful[k - 1];
-                    pos1, pos2, y = "left", "right", 0;
-                    calc = gap;
+
+                    v:ClearAllPoints();
+                    v:SetPoint(pos1, anchor, pos2, calc, y);
                 end
 
-                v:ClearAllPoints();
-                v:SetPoint(pos1, anchor, pos2, calc, y);
+                -- harmful
+                local totalHelpful = #unitFrame.auras.sorted.helpful;
+
+                for k,v in ipairs(unitFrame.auras.sorted.harmful) do
+                    if k == 1 then
+                        totalAuras = #unitFrame.auras.sorted.harmful;
+                        totalGaps = #unitFrame.auras.sorted.harmful - 1;
+                        calc = -((auraWidth * totalAuras + gap * totalGaps ) / 2 - 13.5);
+
+                        if UnitIsUnit("player", unit) then
+                            pos1, pos2 = "top", "bottom";
+
+                            if resourceOnTarget == "0" and class then
+                                anchor = unitFrame.classPower;
+
+                                if classFile == "PALADIN" then
+                                    y = 0;
+                                else
+                                    y = -8;
+                                end
+                            else
+                                if unitFrame.classPower:IsVisible() then
+                                    anchor = unitFrame.classPower;
+                                elseif unitFrame.extraBar:IsShown() then
+                                    anchor = unitFrame.extraBar;
+                                else
+                                    anchor = unitFrame.powerbar;
+                                end
+
+                                y = -10;
+                            end
+                        else
+                            if totalHelpful > 0 then
+                                anchor = unitFrame.auras.sorted.helpful[totalHelpful];
+                                pos1, pos2, y = "left", "right", 0;
+                                calc = bigGap;
+                            else
+                                pos1, pos2, y = "bottom", "top", 6;
+                            end
+                        end
+                    elseif #unitFrame.auras.sorted.harmful > 0 then
+                        anchor = unitFrame.auras.sorted.harmful[k - 1];
+                        pos1, pos2, y = "left", "right", 0;
+                        calc = gap;
+                    end
+
+                    v:ClearAllPoints();
+                    v:SetPoint(pos1, anchor, pos2, calc, y);
+                end
             end
         end
     end

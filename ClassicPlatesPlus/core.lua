@@ -371,19 +371,29 @@ end
 -- Abbreviate numbers
 ----------------------------------------
 function func:AbbreviateNumbers(num)
-    if num then
-        if num >= 1e9 then
-            return string.format("%.2fB", num / 1e9):gsub("%.00", "");
-        elseif num >= 1e6 then
-            return string.format("%.2fM", num / 1e6):gsub("%.00", "");
-        elseif num >= 1e3 then
-            return string.format("%.1fK", num / 1e3):gsub("%.0", "");
-        else
-            return tostring(num);
-        end
-    else
+    if not num or num == 0 then
         return nil;
     end
+
+    if num >= 1e11 then
+        num = string.format("%.0fB", num / 1e9)
+    elseif num >= 1e10 then
+        num = string.format("%.0fB", num / 1e9)
+    elseif num >= 1e9 then
+        num = string.format("%.1fB", num / 1e9)
+    elseif num >= 1e8 then
+        num = string.format("%.0fM", num / 1e6)
+    elseif num >= 1e7 then
+        num = string.format("%.0fM", num / 1e6)
+    elseif num >= 1e6 then
+        num = string.format("%.1fM", num / 1e6)
+    elseif num >= 1e4 then
+        num = string.format("%.0fK", num / 1e3)
+    elseif num >= 1e3 then
+        num = string.format("%.1fK", num / 1e3);
+    end
+
+    return num;
 end
 
 ----------------------------------------
@@ -434,7 +444,7 @@ function func:InteractIcon(nameplate)
     if nameplate and data.isRetail then
         local unitFrame = nameplate.unitFrame;
         local interactIcon = nameplate.UnitFrame and nameplate.UnitFrame.SoftTargetFrame and nameplate.UnitFrame.SoftTargetFrame.Icon;
-        local auras = unitFrame and unitFrame.auras.list and (unitFrame.auras.list[1]);
+        local auras = unitFrame and unitFrame.auras and unitFrame.auras.list and unitFrame.auras.list[1];
         local resourceOnTarget = data.cvars.nameplateResourceOnTarget;
 
         if interactIcon then
@@ -879,6 +889,8 @@ end
 -- Update power
 ----------------------------------------
 function func:Update_Power(unit)
+    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
+
     if unit then
         if unit == "player" then
             local nameplate = data.nameplate;
@@ -889,7 +901,12 @@ function func:Update_Power(unit)
             local classID = select(3, UnitClass("player"));
             local powerPercent = string.format("%.0f", (power/powerMax)*100) .. "%";
 
+            data.nameplate.prevPowerValue = nameplate.powerbar:GetValue();
+            data.nameplate.prevPowerType = nameplate.powerbar.powerType or powerType;
+
             if nameplate then
+                nameplate.powerbar.powerType = powerType;
+
                 if color then
                     nameplate.powerbar:SetStatusBarColor(color.r, color.g, color.b);
                 end
@@ -898,21 +915,21 @@ function func:Update_Power(unit)
                 nameplate.powerbar:SetValue(power);
 
                 if powerType == 0 then
-                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].PercentageAsMainValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage then
+                    if CFG.PercentageAsMainValue and CFG.NumericValue and CFG.Percentage then
                         nameplate.powerMain:SetText(powerPercent);
                         nameplate.power:SetText(func:AbbreviateNumbers(power));
                         nameplate.power:Show();
                         nameplate.powerMain:Show();
-                    elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue and CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage then
+                    elseif CFG.NumericValue and CFG.Percentage then
                         nameplate.powerMain:SetText(func:AbbreviateNumbers(power));
                         nameplate.power:SetText(powerPercent);
                         nameplate.power:Show();
                         nameplate.powerMain:Show();
-                    elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NumericValue then
+                    elseif CFG.NumericValue then
                         nameplate.powerMain:SetText(func:AbbreviateNumbers(power));
                         nameplate.powerMain:SetShown(powerType == 0);
                         nameplate.power:Hide();
-                    elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Percentage then
+                    elseif CFG.Percentage then
                         nameplate.powerMain:SetText(powerPercent);
                         nameplate.powerMain:Show();
                         nameplate.power:Hide();
@@ -967,7 +984,7 @@ function func:Update_Power(unit)
 
                     unitFrame.powerbar.statusbar:SetMinMaxValues(0, powerMax);
                     unitFrame.powerbar.statusbar:SetValue(power);
-                    unitFrame.powerbar:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Powerbar);
+                    unitFrame.powerbar:SetShown(CFG.Powerbar);
                     unitFrame.powerbar.border:Show();
                 else -- Powerbar is hidden
                     unitFrame.powerbar:Hide();
@@ -1237,45 +1254,42 @@ end
 ----------------------------------------
 -- Spell cost
 ----------------------------------------
-function func:SpellCost(unit, spellID)
-    --[[if not data.isRetail then
-        if UnitIsUnit(unit, "player") then
-            local costTable = GetSpellPowerCost(spellID);
+function func:SpellCostShow(unit, spellID)
+    --[[if unit and UnitIsUnit("player", unit) then
+        local powerCosts = C_Spell.GetSpellPowerCost(spellID);
+        local powerbarCost = data.nameplate and data.nameplate.powerbarCost;
 
-            local function cost(cost, costType)
-                local powerMax = UnitPowerMax("player", costType);
+        if powerCosts then
+            for k,v in ipairs(powerCosts) do
+                if k and v.type then
+                    if v.type == 0 then
+                        if v.cost and v.cost > 0 then
+                            local powerMax = UnitPowerMax("player", v.type);
+                            local powerCurrent = UnitPower("player", v.type);
+                            local cost = v.cost / powerMax * data.nameplate.powerbar:GetWidth();
 
-                if cost > 0 then
-                    data.nameplate.powerbarCost:SetWidth(cost / powerMax * data.nameplate.powerbar:GetWidth());
-                    data.nameplate.powerbarCost:Show();
-                    data.nameplate.powerbarCostSpark:Show();
-                end
-            end
+                            if cost > powerCurrent then
+                                cost = powerCurrent;
+                            end
 
-            if next(costTable) ~= nil then
-                for k,v in pairs(costTable) do
-                    for k,v in pairs(v) do
-                        --print(k,v)
+                            powerbarCost:SetWidth(cost);
+                            powerbarCost:Show();
+                            powerbarCost.Spark:Show();
+                        end
                     end
-                end
-            end
-
-            if next(costTable) ~= nil then
-                if type(costTable[1]["cost"]) == "table" then
-                    local costType = costTable[1].cost[1].type;
-                    local cost2Type = costTable[1].cost[2].type;
-
-                    if costType == 0 or costType == 1 or costType == 3 then print("1")
-                        cost(costTable[1].cost[1].cost, costType);
-                    elseif cost2Type == 0 or cost2Type == 1 or cost2Type == 3 then print("2")
-                        cost(costTable[1].cost[2].cost, cost2Type);
-                    end
-                else
-                    cost(costTable[1].cost, costTable[1].type);
                 end
             end
         end
     end]]
+end
+
+function func:SpellCostHide(unit, spellID)
+    local powerbarCost = data.nameplate and data.nameplate.powerbarCost;
+
+    if unit and UnitIsUnit("player", unit) then
+        --powerbarCost:Hide();
+        --powerbarCost.Spark:Hide();
+    end
 end
 
 ----------------------------------------
