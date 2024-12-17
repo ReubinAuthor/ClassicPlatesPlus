@@ -834,13 +834,12 @@ end
 -- Heal prediction
 ----------------------------------------
 function func:PredictHeal(unit)
-    local healthbar, prediction, missing, heal, predictionSpark;
+    local healthbar, prediction, missing, heal;
 
     if unit then
         if unit == "player" then
             healthbar = data.nameplate.healthbar;
             prediction = data.nameplate.healPrediction;
-            predictionSpark = data.nameplate.healPredictionSpark;
             missing = data.nameplate.missing;
             heal = data.nameplate.heal;
         else
@@ -849,7 +848,6 @@ function func:PredictHeal(unit)
             if nameplate then
                 healthbar = nameplate.unitFrame.healthbar;
                 prediction = nameplate.unitFrame.healthbar.healPrediction;
-                predictionSpark = nameplate.unitFrame.healthbar.healPredictionSpark;
                 missing = nameplate.unitFrame.healthbar.healPrediction.missing;
                 heal = nameplate.unitFrame.healthbar.healPrediction.heal;
             end
@@ -857,7 +855,7 @@ function func:PredictHeal(unit)
 
         local healValue = UnitGetIncomingHeals(unit) or heal;
 
-        if healValue and healValue > 0  and healthbar then
+        if healValue and healValue > 0 and healthbar then
             missing = UnitHealthMax(unit) - UnitHealth(unit);
             heal = healValue;
 
@@ -868,15 +866,20 @@ function func:PredictHeal(unit)
                 newValue = missingValue;
             end
 
+            local scaleToggle = false;
+            if data.isClassic and not UnitIsUnit("player", unit) and not (UnitInParty(unit) or UnitInRaid(unit) or UnitPlayerOrPetInParty(unit)) and (UnitIsOtherPlayersPet(unit) or UnitIsPlayer(unit)) then
+                newValue = missingValue;
+                scaleToggle = true;
+            end
+
             prediction:SetWidth(newValue);
             prediction:SetShown(newValue > 0);
-            predictionSpark:SetShown(newValue > 0);
+
+            prediction.animationGroupScale:SetPlaying(scaleToggle);
+            prediction.animationGroupAlpha:Play();
         else
             if prediction then
                 prediction:Hide();
-            end
-            if predictionSpark then
-                predictionSpark:Hide();
             end
         end
 

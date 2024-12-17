@@ -61,20 +61,29 @@ function func:Nameplate_Created(nameplate)
         unitFrame.healthbar.healPrediction = unitFrame.parent:CreateTexture(nil, "background");
         unitFrame.healthbar.healPrediction:SetPoint("left", unitFrame.healthbar:GetStatusBarTexture(), "right");
         unitFrame.healthbar.healPrediction:SetHeight(unitFrame.healthbar:GetHeight());
-        unitFrame.healthbar.healPrediction:SetTexture("Interface\\TARGETINGFRAME\\UI-StatusBar");
+        unitFrame.healthbar.healPrediction:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\healPredict"); --("Interface\\TARGETINGFRAME\\UI-StatusBar");
         unitFrame.healthbar.healPrediction:SetVertexColor(0, 0.5, 0.0, 0.5);
         unitFrame.healthbar.healPrediction:SetBlendMode("add");
         unitFrame.healthbar.healPrediction:Hide();
 
-        -- Heal prediction spark
-        unitFrame.healthbar.healPredictionSpark = unitFrame.parent:CreateTexture(nil, "background");
-        unitFrame.healthbar.healPredictionSpark:SetPoint("center", unitFrame.healthbar.healPrediction, "right");
-        unitFrame.healthbar.healPredictionSpark:SetSize(6, 12);
-        unitFrame.healthbar.healPredictionSpark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
-        unitFrame.healthbar.healPredictionSpark:SetVertexColor(0, 1, 0, 0.33);
-        unitFrame.healthbar.healPredictionSpark:SetBlendMode("add");
-        unitFrame.healthbar.healPredictionSpark:SetDrawLayer("artwork");
-        unitFrame.healthbar.healPredictionSpark:Hide();
+        -- Animation: Group Alpha
+        unitFrame.healthbar.healPrediction.animationGroupAlpha = unitFrame.healthbar.healPrediction:CreateAnimationGroup();
+        unitFrame.healthbar.healPrediction.animation_Alpha_From = unitFrame.healthbar.healPrediction.animationGroupAlpha:CreateAnimation("Alpha");
+        unitFrame.healthbar.healPrediction.animation_Alpha_From:SetDuration(0.36);
+        unitFrame.healthbar.healPrediction.animation_Alpha_From:SetFromAlpha(0.6);
+        unitFrame.healthbar.healPrediction.animation_Alpha_From:SetToAlpha(0.2);
+        unitFrame.healthbar.healPrediction.animationGroupAlpha:SetLooping("BOUNCE");
+        unitFrame.healthbar.healPrediction.animationGroupAlpha:Stop();
+
+        -- Animation: Group Scale
+        unitFrame.healthbar.healPrediction.animationGroupScale = unitFrame.healthbar.healPrediction:CreateAnimationGroup();
+        unitFrame.healthbar.healPrediction.animation_Scale_From = unitFrame.healthbar.healPrediction.animationGroupScale:CreateAnimation("Scale");
+        unitFrame.healthbar.healPrediction.animation_Scale_From:SetDuration(0.36);
+        unitFrame.healthbar.healPrediction.animation_Scale_From:SetScaleFrom(1, 1);
+        unitFrame.healthbar.healPrediction.animation_Scale_From:SetScaleTo(0.25, 1);
+        unitFrame.healthbar.healPrediction.animation_Scale_From:SetOrigin("left", 0, 0);
+        unitFrame.healthbar.healPrediction.animationGroupScale:SetLooping("BOUNCE");
+        unitFrame.healthbar.healPrediction.animationGroupScale:Stop();
 
         -- background
         unitFrame.healthbar.background = unitFrame.healthbar:CreateTexture();

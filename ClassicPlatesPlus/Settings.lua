@@ -346,12 +346,24 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
+        -- CheckButton
         do
             local name = "Animate Personal Power Bar";
             local tooltip = "";
             local cfg = "PersonalPowerBarAnimation";
             local default = true;
             local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Fade Out Personal Nameplate";
+            local tooltip = "Fade out personal nameplate when out of combat";
+            local cfg = "PersonalNameplateFade";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = false };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
@@ -759,6 +771,17 @@ function func:Load_Settings()
             local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Auras On Target Only";
+            local tooltip = "";
+            local cfg = "AurasOnTarget";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton

@@ -2,7 +2,7 @@
 ## Title: |TInterface/Addons/ClassicPlatesPlus/media/icons/ClassicPlatesPlus_icon:16:16|t ClassicPlates Plus
 ## Notes: ClassicPlates Plus is an addon that adds additional features and new Classic-themed visuals to nameplates.
 ## Author: Reubin
-## Version: 3.3.8
+## Version: 3.3.9
 ## DefaultState: enabled
 ## SavedVariables: CFG_Account_ClassicPlatesPlus
 ## SavedVariablesPerCharacter: CFG_ClassicPlatesPlus

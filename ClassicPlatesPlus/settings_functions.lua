@@ -263,6 +263,10 @@ local functionsTable = {
     AurasFilterFriendly = function() updateAuras(); end,
     AurasFilterEnemy = function() updateAuras(); end,
     AurasHidePassive = function() updateAuras(); end,
+    AurasOnTarget = function()
+        func:HideAllAuras();
+        updateAuras();
+    end,
     AurasCountdown = function() updateAurasVisuals(); end,
     AurasReverseAnimation = function() updateAurasVisuals(); end,
     MarkStealableAuras = function() updateAuras(); end,
@@ -343,6 +347,7 @@ local functionsTable = {
         end
         func:PersonalNameplateAdd();
     end,
+    PersonalNameplateFade = function() func:ToggleNameplatePersonal(); end,
     SpecialPower = function() func:Update_ClassPower(); end,
     SpecialPowerScale = function() func:Update_ClassPower(); end,
     CastbarIconShow = function() updateNameplateVisuals(); end,

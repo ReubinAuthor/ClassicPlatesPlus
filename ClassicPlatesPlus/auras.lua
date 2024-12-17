@@ -8,6 +8,39 @@ local data = core.data;
 ----------------------------------------
 -- Auras
 ----------------------------------------
+
+function func:HideAllAuras(unitframe)
+    local function hideAuras(unitFrame, filter)
+        if unitFrame.auras then
+            for i = 1, 40 do
+                if unitFrame.auras[filter][i] then
+                    unitFrame.auras[filter][i]:Hide();
+                    unitFrame.auras[filter][i].highlight.animationGrp:Stop();
+                else
+                    break;
+                end
+            end
+        end
+    end
+
+    if unitframe then
+        if unitframe.unit and not UnitIsUnit("player", unitframe.unit) then
+            hideAuras(unitframe, "helpful");
+            hideAuras(unitframe, "harmful");
+        end
+    else
+        for _, nameplate in ipairs(C_NamePlate.GetNamePlates(false)) do
+            local unitFrame = nameplate.unitFrame;
+            local unit = nameplate.unitFrame.unit;
+
+            if unit and not UnitIsUnit("player", unit) then
+                hideAuras(unitFrame, "helpful");
+                hideAuras(unitFrame, "harmful");
+            end
+        end
+    end
+end
+
 function func:Update_Auras(unit)
     local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
 
@@ -21,7 +54,7 @@ function func:Update_Auras(unit)
             unitFrame = nameplate;
         elseif isNameplate then
             nameplate = C_NamePlate.GetNamePlateForUnit(unit);
-            unitFrame = nameplate.unitFrame;
+            unitFrame = nameplate and nameplate.unitFrame;
         end
 
         if nameplate and unitFrame then
@@ -401,8 +434,15 @@ function func:Update_Auras(unit)
                     end
                 end
 
-                getAuras("helpful");
-                getAuras("harmful");
+                if CFG.AurasOnTarget then
+                    if UnitIsUnit("target", unit) or UnitIsPlayer then
+                        getAuras("helpful");
+                        getAuras("harmful");
+                    end
+                else
+                    getAuras("helpful");
+                    getAuras("harmful");
+                end
 
                 ----------------------------------------
                 -- Sorting auras

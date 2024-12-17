@@ -111,20 +111,29 @@ function func:PersonalNameplateCreate()
         nameplate.healPrediction = nameplate.main:CreateTexture(nil, "background");
         nameplate.healPrediction:SetPoint("left", nameplate.healthbar:GetStatusBarTexture(), "right");
         nameplate.healPrediction:SetHeight(nameplate.healthbar:GetHeight());
-        nameplate.healPrediction:SetTexture("Interface\\TARGETINGFRAME\\UI-StatusBar");
+        nameplate.healPrediction:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\healPredict");
         nameplate.healPrediction:SetBlendMode("add");
         nameplate.healPrediction:SetVertexColor(0, 0.5, 0.0, 0.5);
         nameplate.healPrediction:Hide();
 
-        nameplate.healPredictionSpark = nameplate.main:CreateTexture();
-        nameplate.healPredictionSpark:SetParent(nameplate.main);
-        nameplate.healPredictionSpark:SetPoint("center", nameplate.healPrediction, "right");
-        nameplate.healPredictionSpark:SetSize(10, 32);
-        nameplate.healPredictionSpark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\spark");
-        nameplate.healPredictionSpark:SetVertexColor(0, 1, 0, 0.33);
-        nameplate.healPredictionSpark:SetBlendMode("add");
-        nameplate.healPredictionSpark:SetDrawLayer("artwork");
-        nameplate.healPredictionSpark:Hide();
+        -- Animation: Group Alpha
+        nameplate.healPrediction.animationGroupAlpha = nameplate.healPrediction:CreateAnimationGroup();
+        nameplate.healPrediction.animation_Alpha_From = nameplate.healPrediction.animationGroupAlpha:CreateAnimation("Alpha");
+        nameplate.healPrediction.animation_Alpha_From:SetDuration(0.36);
+        nameplate.healPrediction.animation_Alpha_From:SetFromAlpha(0.6);
+        nameplate.healPrediction.animation_Alpha_From:SetToAlpha(0.2);
+        nameplate.healPrediction.animationGroupAlpha:SetLooping("BOUNCE");
+        nameplate.healPrediction.animationGroupAlpha:Stop();
+
+        -- Animation: Group Scale
+        nameplate.healPrediction.animationGroupScale = nameplate.healPrediction:CreateAnimationGroup();
+        nameplate.healPrediction.animation_Scale_From = nameplate.healPrediction.animationGroupScale:CreateAnimation("Scale");
+        nameplate.healPrediction.animation_Scale_From:SetDuration(0.36);
+        nameplate.healPrediction.animation_Scale_From:SetScaleFrom(1, 1);
+        nameplate.healPrediction.animation_Scale_From:SetScaleTo(0.25, 1);
+        nameplate.healPrediction.animation_Scale_From:SetOrigin("left", 0, 0);
+        nameplate.healPrediction.animationGroupScale:SetLooping("BOUNCE");
+        nameplate.healPrediction.animationGroupScale:Stop();
 
         -- Health main
         nameplate.healthMain = nameplate.main:CreateFontString(nil, "overlay");
@@ -230,7 +239,7 @@ function func:PersonalNameplateCreate()
                                 local valWidth = GetWidth(newValue)
                                 local percentage = (difference / powerMax) * 100;
 
-                                if percentage > 5 then
+                                if percentage > 10 then
                                     nameplate.powerbarCost:ClearAllPoints();
                                     nameplate.powerbarCost:SetPoint("left", nameplate.powerbar, "right", -(nameplate.powerbar:GetWidth() - valWidth), 0);
                                     nameplate.powerbarCost:SetWidth(diffWidth);
@@ -250,7 +259,7 @@ function func:PersonalNameplateCreate()
                                     diffWidth = nameplate.powerbar:GetWidth();
                                 end
 
-                                if percentage > 5 then
+                                if percentage > 10 then
                                     nameplate.powerbarCost:ClearAllPoints();
                                     nameplate.powerbarCost:SetPoint("right", self:GetStatusBarTexture(), "right");
                                     nameplate.powerbarCost:SetWidth(diffWidth);
@@ -555,7 +564,11 @@ function func:ToggleNameplatePersonal(event)
             else
                 local fullHealth = UnitHealth("player") >= UnitHealthMax("player");
 
-                nameplate:SetAlpha(0.5);
+                if CFG.PersonalNameplateFade then
+                    nameplate:SetAlpha(0.5);
+                else
+                    nameplate:SetAlpha(1);
+                end
 
                 if CFG.PersonalNameplateAlwaysShow then
                     toggle = true;
