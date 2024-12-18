@@ -561,37 +561,92 @@ function func:Load_Settings()
         -- Sub-Category
         func:Create_SubCategory(panel, "Names only");
 
-        -- DropDownMenu
+        -- CheckButton
         do
-            local name = "Names Only";
+            local name = "Friendly Players";
             local tooltip = "";
-            local cfg = "NamesOnly";
-            local default = 1;
-            local options = {
-                [1] = "None",
-                [2] = "Friendlies",
-                [3] = "Enemies",
-                [4] = "All"
-            }
+            local cfg = "NamesOnlyFriendlyPlayers";
+            local default = false;
             local flair = { classicEra = true, cata = true, retail = true };
 
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
-        -- DropDownMenu
+        -- CheckButton
         do
-            local name = "Exclude NPC";
+            local name = "Enemy Players";
             local tooltip = "";
-            local cfg = "NamesOnlyExcludeNPCs";
-            local default = 3;
-            local options = {
-                [1] = "None",
-                [2] = "All",
-                [3] = "Attackable"
-            }
+            local cfg = "NamesOnlyEnemyPlayers";
+            local default = false;
             local flair = { classicEra = true, cata = true, retail = true };
 
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Friendly Pets";
+            local tooltip = "";
+            local cfg = "NamesOnlyFriendlyPets";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Enemy Pets";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyPets";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Friendly NPC";
+            local tooltip = "";
+            local cfg = "NamesOnlyFriendlyNPC";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Enemy NPC";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyNPC";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Friendly Totems";
+            local tooltip = "";
+            local cfg = "NamesOnlyFriendlyTotems";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Enemy Totems";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyTotems";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
@@ -755,6 +810,17 @@ function func:Load_Settings()
             local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Only Important Auras";
+            local tooltip = "";
+            local cfg = "AurasShowOnlyImportant";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- DropDownMenu

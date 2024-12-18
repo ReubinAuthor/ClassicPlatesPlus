@@ -118,6 +118,8 @@ function func:Update_Auras(unit)
                                     return false;
                                 elseif data.settings.AurasImportantList[name] then
                                     return true;
+                                elseif CFG.AurasShowOnlyImportant then
+                                    return false;
                                 end
 
                                 -- Checking aura's filter

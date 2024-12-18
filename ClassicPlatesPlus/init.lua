@@ -9,7 +9,6 @@ local data = core.data;
 -- HANDLING EVENTS
 ----------------------------------------
 function core:init(event, ...)
-    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
     local arg = ...;
 
     if event == "VARIABLES_LOADED" then
@@ -60,7 +59,7 @@ function core:init(event, ...)
     if event == "PLAYER_TARGET_CHANGED" then
         func:myTarget();
         func:Update_Colors();
-        if CFG.AurasOnTarget then
+        if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasOnTarget then
             if UnitExists("target") then
                 if data.myTarget.previous then
                     func:HideAllAuras(data.myTarget.previous);

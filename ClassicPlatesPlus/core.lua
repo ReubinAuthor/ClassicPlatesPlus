@@ -1343,9 +1343,53 @@ function func:Update_Guild(unit)
 end
 
 ----------------------------------------
+-- Names only
+----------------------------------------
+function func:NamesOnly(unit)
+    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
+    local canAttack = UnitCanAttack("player", unit);
+    local isTarget = UnitIsUnit("target", unit);
+    local isTotem = UnitCreatureType(unit) == "Totem";
+    local isPlayer = UnitIsPlayer(unit);
+    local isPet = UnitIsOtherPlayersPet(unit);
+
+    if isTarget then
+        return false;
+    else
+        if isPlayer then
+            if canAttack then
+                return CFG.NamesOnlyEnemyPlayers;
+            else
+                return CFG.NamesOnlyFriendlyPlayers;
+            end
+        elseif isPet then
+            if canAttack then
+                return CFG.NamesOnlyEnemyPets;
+            else
+                return CFG.NamesOnlyFriendlyPets;
+            end
+        elseif isTotem then
+            if canAttack then
+                return CFG.NamesOnlyEnemyTotems;
+            else
+                return CFG.NamesOnlyFriendlyTotems;
+            end
+        else
+            if canAttack then
+                return CFG.NamesOnlyEnemyNPC;
+            else
+                return CFG.NamesOnlyFriendlyNPC;
+            end
+        end
+    end
+end
+
+----------------------------------------
 -- Update name and guild positions
 ----------------------------------------
 function func:Update_NameAndGuildPositions(nameplate, hook)
+    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
+
     if nameplate then
         local unit = nameplate.namePlateUnitToken;
 
@@ -1353,17 +1397,17 @@ function func:Update_NameAndGuildPositions(nameplate, hook)
             local unitFrame = nameplate.unitFrame;
 
             local function work()
-                local portrait = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait and 0 or -9;
-                local level = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowLevel and 0 or 9;
+                local portrait = CFG.Portrait and 0 or -9;
+                local level = CFG.ShowLevel and 0 or 9;
                 local powerbarToggle = unitFrame.unit and UnitPower(unitFrame.unit) and UnitPowerMax(unitFrame.unit) > 0;
                 local DefaultNameY = (unitFrame.threatPercentage:IsShown() or unitFrame.guild:IsShown()) and 0
-                    or (CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowGuildName or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatPercentage) and not powerbarToggle and -6
-                    or (CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowGuildName or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatPercentage) and powerbarToggle and -4
+                    or (CFG.ShowGuildName or CFG.ThreatPercentage) and not powerbarToggle and -6
+                    or (CFG.ShowGuildName or CFG.ThreatPercentage) and powerbarToggle and -4
                     or not powerbarToggle and -2
                     or powerbarToggle and 0 or -6;
                 local x = portrait + level;
                 local y = unitFrame.threatPercentage:IsShown() and -17 or -8;
-                local anchor = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowGuildName and unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name;
+                local anchor = CFG.ShowGuildName and unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name;
 
                 nameplate.UnitFrame.name:ClearAllPoints();
                 nameplate.UnitFrame.name:SetPoint("top", 0, DefaultNameY);
@@ -1371,22 +1415,13 @@ function func:Update_NameAndGuildPositions(nameplate, hook)
                 unitFrame.healthbar:SetPoint("top", anchor, "bottom", x, y);
             end
 
-            local canAttack = UnitCanAttack("player", unit);
-            local showParent = UnitIsUnit("target", unit)
-                or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 1
-                or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 2 and canAttack
-                or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 3 and not canAttack
-                or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 4 and false
+            local nameOnly = func:NamesOnly(unit);
 
-            if not showParent then
-                local UnitIsPlayerOrPlayersPet = UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit);
-                local exclude =
-                       CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeNPCs == 2 and not UnitIsPlayerOrPlayersPet
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeNPCs == 3 and canAttack and not UnitIsPlayerOrPlayersPet
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeFriends and func:isFriend(unit)
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeGuild and IsGuildMember(unit)
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeParty and func:UnitInYourParty(unit)
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
+            if nameOnly then
+                local exclude = CFG.NamesOnlyExcludeFriends and func:isFriend(unit)
+                    or CFG.NamesOnlyExcludeGuild and IsGuildMember(unit)
+                    or CFG.NamesOnlyExcludeParty and func:UnitInYourParty(unit)
+                    or CFG.NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
 
                 if not exclude then
                     nameplate.UnitFrame.name:ClearAllPoints();

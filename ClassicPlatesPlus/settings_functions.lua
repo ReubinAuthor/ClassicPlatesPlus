@@ -262,6 +262,7 @@ local functionsTable = {
     -- Auras
     AurasFilterFriendly = function() updateAuras(); end,
     AurasFilterEnemy = function() updateAuras(); end,
+    AurasShowOnlyImportant = function() updateAuras(); end,
     AurasHidePassive = function() updateAuras(); end,
     AurasOnTarget = function()
         func:HideAllAuras();
@@ -326,8 +327,14 @@ local functionsTable = {
         updateNameplateScale();
         func:ResizeNameplates();
     end,
-    NamesOnly = function() updateNameplateVisuals(); end,
-    NamesOnlyExcludeNPCs = function() updateNameplateVisuals(); end,
+    NamesOnlyFriendlyPlayers = function() updateNameplateVisuals(); end,
+    NamesOnlyEnemyPlayers = function() updateNameplateVisuals(); end,
+    NamesOnlyFriendlyPets = function() updateNameplateVisuals(); end,
+    NamesOnlyEnemyPets = function() updateNameplateVisuals(); end,
+    NamesOnlyFriendlyNPC = function() updateNameplateVisuals(); end,
+    NamesOnlyEnemyNPC = function() updateNameplateVisuals(); end,
+    NamesOnlyFriendlyTotems = function() updateNameplateVisuals(); end,
+    NamesOnlyEnemyTotems = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeFriends = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeGuild = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeParty = function() updateNameplateVisuals(); end,

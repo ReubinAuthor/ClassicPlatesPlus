@@ -10,6 +10,7 @@ local data = core.data;
 ----------------------------------------
 function func:Nameplate_Added(unit, visuals)
     if unit then
+        local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
         local nameplate = C_NamePlate.GetNamePlateForUnit(unit, false);
 
         if nameplate then
@@ -31,13 +32,13 @@ function func:Nameplate_Added(unit, visuals)
                     data.colors.border.g - 0.35,
                     data.colors.border.b - 0.35
                 );
-                unitFrame.level:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowLevel);
+                unitFrame.level:SetShown(CFG.ShowLevel);
 
                 -- Name and Guild
-                unitFrame.name:SetFontObject(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NameAndGuildOutline and "GameFontNormalOutline" or "GameFontNormal");
-                unitFrame.guild:SetFontObject(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NameAndGuildOutline and "GameFontNormalOutline" or "GameFontNormal");
-                unitFrame.name:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].LargeName and 0.95 or 0.75);
-                unitFrame.guild:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].LargeGuildName and 0.95 or 0.75);
+                unitFrame.name:SetFontObject(CFG.NameAndGuildOutline and "GameFontNormalOutline" or "GameFontNormal");
+                unitFrame.guild:SetFontObject(CFG.NameAndGuildOutline and "GameFontNormalOutline" or "GameFontNormal");
+                unitFrame.name:SetScale(CFG.LargeName and 0.95 or 0.75);
+                unitFrame.guild:SetScale(CFG.LargeGuildName and 0.95 or 0.75);
 
                 -- Threat percentage
                 unitFrame.threatPercentage:ClearAllPoints();
@@ -50,12 +51,12 @@ function func:Nameplate_Added(unit, visuals)
 
                 -- Health values: Main
                 unitFrame.healthMain:SetTextColor(
-                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
-                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
-                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
-                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
+                    CFG.HealthFontColor.r,
+                    CFG.HealthFontColor.g,
+                    CFG.HealthFontColor.b,
+                    CFG.HealthFontColor.a
                 );
-                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].LargeMainValue then
+                if CFG.LargeMainValue then
                     unitFrame.healthMain:SetFontObject("GameFontNormalLargeOutline");
                     unitFrame.healthMain:SetScale(0.85);
                 else
@@ -67,26 +68,26 @@ function func:Nameplate_Added(unit, visuals)
 
                 -- Health values: Left side
                 unitFrame.healthSecondary:SetTextColor(
-                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.r,
-                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.g,
-                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.b,
-                    CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].HealthFontColor.a
+                    CFG.HealthFontColor.r,
+                    CFG.HealthFontColor.g,
+                    CFG.HealthFontColor.b,
+                    CFG.HealthFontColor.a
                 );
 
                 -- Castbar
-                unitFrame.castbar:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].CastbarScale);
+                unitFrame.castbar:SetScale(CFG.CastbarScale);
                 unitFrame.castbar:ClearAllPoints();
 
                 -- Raid target
                 unitFrame.raidTarget.icon:ClearAllPoints();
 
                 -- Auras counters
-                unitFrame.buffsCounter:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasScale);
-                unitFrame.debuffsCounter:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasScale);
+                unitFrame.buffsCounter:SetScale(CFG.AurasScale);
+                unitFrame.debuffsCounter:SetScale(CFG.AurasScale);
 
                 -- powerbar
                 unitFrame.powerbar:ClearAllPoints();
-                local powerbarToggle = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Powerbar and UnitPower(unit) and UnitPowerMax(unit) > 0;
+                local powerbarToggle = CFG.Powerbar and UnitPower(unit) and UnitPowerMax(unit) > 0;
 
                 -- Name
                 unitFrame.name:ClearAllPoints();
@@ -97,7 +98,7 @@ function func:Nameplate_Added(unit, visuals)
 
                 -- Class power
                 unitFrame.classPower:SetHeight(data.classBarHeight);
-                unitFrame.classPower:SetScale(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].SpecialPowerScale);
+                unitFrame.classPower:SetScale(CFG.SpecialPowerScale);
 
                 -- Health Value Secondary
                 unitFrame.healthSecondary:SetJustifyH("left");
@@ -106,11 +107,11 @@ function func:Nameplate_Added(unit, visuals)
                 unitFrame.classification:SetTexCoord(0, 1, 0, 1) -- Undo Fliping horizontally
 
                 -- These frames depend on whether portraits and level are enabled or not!
-                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait then
+                if CFG.Portrait then
                     unitFrame.classification:SetParent(unitFrame.portrait);
                     unitFrame.classification:SetSize(48,48);
 
-                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowLevel then
+                    if CFG.ShowLevel then
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 0, -1.5);
                         unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 0, -1);
                         unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center");
@@ -130,7 +131,7 @@ function func:Nameplate_Added(unit, visuals)
                     unitFrame.classification:SetParent(unitFrame.parent);
                     unitFrame.classification:SetSize(32,32);
 
-                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowLevel then
+                    if CFG.ShowLevel then
                         unitFrame.threatPercentage:SetPoint("bottom", unitFrame.healthbar, "top", 9, -1.5);
                         unitFrame.powerbar:SetPoint("top", unitFrame.healthbar, "bottom", 6.33, -1);
                         unitFrame.healthMain:SetPoint("center", unitFrame.healthbar, "center", 9, 0);
@@ -181,8 +182,8 @@ function func:Nameplate_Added(unit, visuals)
                 end
 
                 -- Toggling frames
-                unitFrame.portrait:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait);
-                unitFrame.powerbar:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Powerbar);
+                unitFrame.portrait:SetShown(CFG.Portrait);
+                unitFrame.powerbar:SetShown(CFG.Powerbar);
                 unitFrame.castbar:Hide();
 
                 -- Assigning unit
@@ -241,54 +242,41 @@ function func:Nameplate_Added(unit, visuals)
                     end);
                 end
 
-                -- Names Only
-                local canAttack = UnitCanAttack("player", unit);
-                local isTarget = UnitIsUnit("target", unit);
+                local nameOnly = func:NamesOnly(unit);
 
-                local showParent =
-                       isTarget
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 1
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 2 and canAttack
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 3 and not canAttack
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnly == 4 and false
+                local exclude = CFG.NamesOnlyExcludeFriends and func:isFriend(unit)
+                    or CFG.NamesOnlyExcludeGuild and IsGuildMember(unit)
+                    or CFG.NamesOnlyExcludeParty and func:UnitInYourParty(unit)
+                    or CFG.NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
 
-                local UnitIsPlayerOrPlayersPet = UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit);
-                local exclude =
-                       CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeNPCs == 2 and not UnitIsPlayerOrPlayersPet
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeNPCs == 3 and canAttack and not UnitIsPlayerOrPlayersPet
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeFriends and func:isFriend(unit)
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeGuild and IsGuildMember(unit)
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeParty and func:UnitInYourParty(unit)
-                    or CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
-
-                if not showParent and not exclude then
+                if nameOnly and not exclude then
                     unitFrame.raidTarget.icon:SetPoint("right", unitFrame.name, "left", unitFrame.fellowshipBadge:IsShown() and -20 or -6, 0);
                     unitFrame.raidTarget.icon:SetScale(0.7);
-                    unitFrame.castbar:SetPoint("top", unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name, "bottom", 0, -2 - CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].CastbarPositionY);
+                    unitFrame.castbar:SetPoint("top", unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name, "bottom", 0, -2 - CFG.CastbarPositionY);
                 else
                     unitFrame.raidTarget.icon:SetScale(1);
 
-                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait then
+                    if CFG.Portrait then
                         unitFrame.raidTarget.icon:SetPoint("right", unitFrame.portrait.texture, "left", -6, 0);
 
-                        if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowLevel then
-                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or -3) - CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].CastbarPositionY);
+                        if CFG.ShowLevel then
+                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or -3) - CFG.CastbarPositionY);
                         else
-                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and -2 or -9, (powerbarToggle and 4 or -3) - CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].CastbarPositionY);
+                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and -2 or -9, (powerbarToggle and 4 or -3) - CFG.CastbarPositionY);
                         end
                     else
                         unitFrame.raidTarget.icon:SetPoint("right", unitFrame.healthbar, "left", -6, 0);
 
-                        if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ShowLevel then
-                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and 2.67 or 9, (powerbarToggle and 4 or 0) - CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].CastbarPositionY);
+                        if CFG.ShowLevel then
+                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", powerbarToggle and 2.67 or 9, (powerbarToggle and 4 or 0) - CFG.CastbarPositionY);
                         else
-                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or 0) - CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].CastbarPositionY);
+                            unitFrame.castbar:SetPoint("top", powerbarToggle and unitFrame.powerbar or unitFrame.healthbar.border, "bottom", 0, (powerbarToggle and 4 or 0) - CFG.CastbarPositionY);
                         end
                     end
                 end
 
                 -- Felloship Badge
-                if not showParent and not exclude or not CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait then
+                if nameOnly and not exclude or not CFG.Portrait then
                     unitFrame.fellowshipBadge:SetPoint("right", unitFrame.name, "left", 1, 1);
                     unitFrame.fellowshipBadge:SetScale(0.75);
                     unitFrame.fellowshipBadge:SetIgnoreParentScale(true);
@@ -302,7 +290,7 @@ function func:Nameplate_Added(unit, visuals)
                 func:InteractIcon(nameplate);
 
                 -- Toggling Parent
-                unitFrame.parent:SetShown(showParent or exclude);
+                unitFrame.parent:SetShown(not nameOnly or exclude);
 
                 -- Toggling nameplate
                 unitFrame:SetShown(widgetToggle and not UnitIsGameObject(unit) and (data.isRetail and not UnitNameplateShowsWidgetsOnly(unit) or not data.isRetail));
