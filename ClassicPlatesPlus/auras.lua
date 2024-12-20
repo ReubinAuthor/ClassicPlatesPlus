@@ -272,6 +272,14 @@ function func:Update_Auras(unit)
                                     unitFrame.auras[filter][i].border:SetPoint("center", unitFrame.auras[filter][i].second, "center");
                                     unitFrame.auras[filter][i].border:SetDrawLayer("border", 1);
 
+                                    -- Mark
+                                    unitFrame.auras[filter][i].mark = unitFrame.auras[filter][i].second:CreateTexture();
+                                    unitFrame.auras[filter][i].mark:SetPoint("center", unitFrame.auras[filter][i].first, "bottom", 0, -0.5);
+                                    unitFrame.auras[filter][i].mark:SetSize(14,14);
+                                    unitFrame.auras[filter][i].mark:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\mark");
+                                    unitFrame.auras[filter][i].mark:SetDrawLayer("artwork");
+                                    unitFrame.auras[filter][i].mark:Hide();
+
                                     -- Countdown
                                     unitFrame.auras[filter][i].countdown = unitFrame.auras[filter][i].second:CreateFontString(nil, nil, "GameFontNormalOutline");
                                     if CFG.AurasCountdownPosition == 1 then
@@ -357,6 +365,10 @@ function func:Update_Auras(unit)
                                         self:EnableMouse(ModifierState());
                                     end);
                                 end
+
+                                -- Mark your own auras
+                                unitFrame.auras[filter][i].mark:SetVertexColor(data.colors.yellow.r, data.colors.yellow.g, data.colors.yellow.b);
+                                unitFrame.auras[filter][i].mark:SetShown(CFG.AurasMarkYours and sourceIsPlayer);
 
                                 -- Flags
                                 unitFrame.auras[filter][i].name = name;

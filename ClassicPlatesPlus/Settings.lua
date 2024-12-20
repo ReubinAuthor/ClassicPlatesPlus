@@ -852,6 +852,17 @@ function func:Load_Settings()
 
         -- CheckButton
         do
+            local name = "Mark Your Auras";
+            local tooltip = "";
+            local cfg = "AurasMarkYours";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
             local name = "Countdown";
             local tooltip = "";
             local cfg = "AurasCountdown";

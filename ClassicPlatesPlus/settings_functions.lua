@@ -268,6 +268,7 @@ local functionsTable = {
         func:HideAllAuras();
         updateAuras();
     end,
+    AurasMarkYours = function() updateAuras(); end,
     AurasCountdown = function() updateAurasVisuals(); end,
     AurasReverseAnimation = function() updateAurasVisuals(); end,
     MarkStealableAuras = function() updateAuras(); end,
