@@ -488,6 +488,7 @@ function func:PersonalNameplateAdd()
         );
 
         func:Update_Health("player");
+        func:Update_Power("player");
 
         nameplate.healthTotal:SetShown(CFG.PersonalNameplateTotalHealth);
         nameplate.powerTotal:SetShown(CFG.PersonalNameplateTotalPower);

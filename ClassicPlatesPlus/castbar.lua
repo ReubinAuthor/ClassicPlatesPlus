@@ -37,7 +37,7 @@ function func:Castbar_Start(event, unit)
                 startTimeMS = GetTime() * 1000;
                 endTimeMS = GetTime() * 1000 + 30;
                 isTradeSkill = false;
-                notInterruptible = true;
+                notInterruptible = false;
                 progressReverser = -1;
                 minValue = -(endTimeMS - startTimeMS) / 1000;
                 maxValue = 0;

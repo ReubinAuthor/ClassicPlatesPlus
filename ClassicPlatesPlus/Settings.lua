@@ -44,12 +44,13 @@ function func:Load_Settings()
     -- Fist panel has to be accessable to other panels, putting it outside of the code block.
     local panelMain = func:CreatePanel(nil, myAddon);
 
+    -- CATEGORY: General
     do
-        -- Renaming the main panel so that we can easily copy/paste elements between panels
-        local panel = panelMain;
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "General");
 
-        -- Sub-Category
-        func:Create_SubCategory(panel, "General");
+        -- Spacer
+        func:Create_Spacer(panel);
 
         -- CheckButton
         do
@@ -167,7 +168,7 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Classification";
+            local name = "NPC Classification";
             local tooltip = "Creature class: " .. white .. "Elite, Rare, Rare Elite, World Boss";
             local cfg = "Classification";
             local default = true;
@@ -239,25 +240,92 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
-        -- Sub-Category
-        func:Create_SubCategory(panel, "Cast bar");
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- Anchoring settings
+        func:AnchorFrames(panel);
+    end
+
+    -- CATEGORY: Health & Power
+    do
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "Health & Power");
+
+        -- Spacer
+        func:Create_Spacer(panel);
 
         -- CheckButton
         do
-            local name = "Show Cast bar";
+            local name = "Power Bar";
             local tooltip = "";
-            local cfg = "CastbarShow";
+            local cfg = "Powerbar";
             local default = true;
-            local flair = { classicEra = true, cata = false, retail = false };
+            local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
         -- CheckButton
         do
-            local name = "Show Cast Bar Icon";
+            local name = "Numeric Value";
+            local tooltip = "Dispaly health and power numeric values";
+            local cfg = "NumericValue";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Percentage Value";
+            local tooltip = "Dispaly Health and Power percentage values";
+            local cfg = "Percentage";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Switch Values Positions";
+            local tooltip = "Swap positions of numeric and percentage values";
+            local cfg = "PercentageAsMainValue";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Total Health";
+            local tooltip = "Display Total amount of your health\n(Displayed on personal nameplate only)";
+            local cfg = "PersonalNameplateTotalHealth";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Total Power";
+            local tooltip = "Display Total amount of your power\n" .. white .. "Example: " .. yellow .. "Mana, Rage, Energy, etc...\n(Displayed on personal nameplate only)";
+            local cfg = "PersonalNameplateTotalPower";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Large Main Health Value";
             local tooltip = "";
-            local cfg = "CastbarIconShow";
+            local cfg = "LargeMainValue";
             local default = true;
             local flair = { classicEra = true, cata = true, retail = true };
 
@@ -266,36 +334,44 @@ function func:Load_Settings()
 
         -- Slider
         do
-            local name = "Castbar Scale";
+            local name = "Combo Points Scale";
             local tooltip = "";
-            local cfg = "CastbarScale";
+            local cfg = "ComboPointsScaleClassless" --"ClassPowerScale";
             local default = 1;
             local step = 0.01;
-            local minValue = 0.75;
-            local maxValue = 1.25;
+            local minValue = 0.50;
+            local maxValue = 1.50;
             local decimals = 2;
-            local flair = { classicEra = true, cata = true, retail = true };
+            local flair = { classicEra = true, cata = true, retail = false };
 
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
-        -- Slider
+        -- ColorPicker
         do
-            local name = "Castbar Position (vertical)";
+            local name = "Font Color";
             local tooltip = "";
-            local cfg = "CastbarPositionY";
-            local default = 2;
-            local step = 1;
-            local minValue = 0;
-            local maxValue = 50;
-            local decimals = 0;
+            local cfg = "HealthFontColor";
+            local default = {r = 1, g = 0.82, b = 0, a = 1};
             local flair = { classicEra = true, cata = true, retail = true };
 
-            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
         end
 
-        -- Sub-Category
-        func:Create_SubCategory(panel, "Personal Nameplate");
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- Anchoring settings
+        func:AnchorFrames(panel);
+    end
+
+    -- CATEGORY: Personal Nameplate
+    do
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "Personal Nameplate");
+
+        -- Spacer
+        func:Create_Spacer(panel);
 
         -- CheckButton
         do
@@ -383,114 +459,20 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
-        -- Sub-Category
-        func:Create_SubCategory(panel, "Health & Power");
+        -- Spacer
+        func:Create_Spacer(panel);
 
-        -- CheckButton
-        do
-            local name = "Power Bar";
-            local tooltip = "";
-            local cfg = "Powerbar";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
+        -- Anchoring settings
+        func:AnchorFrames(panel);
+    end
 
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
+    -- CATEGORY: Class Related
+    do
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "Class Related");
 
-        -- CheckButton
-        do
-            local name = "Numeric Value";
-            local tooltip = "Dispaly health and power numeric values";
-            local cfg = "NumericValue";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Percentage Value";
-            local tooltip = "Dispaly Health and Power percentage values";
-            local cfg = "Percentage";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Switch Values Positions";
-            local tooltip = "Swap positions of numeric and percentage values";
-            local cfg = "PercentageAsMainValue";
-            local default = false;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Total Health";
-            local tooltip = "Display Total amount of your health\n(Displayed on personal nameplate only)";
-            local cfg = "PersonalNameplateTotalHealth";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Total Power";
-            local tooltip = "Display Total amount of your power\n" .. white .. "Example: " .. yellow .. "Mana, Rage, Energy, etc...\n(Displayed on personal nameplate only)";
-            local cfg = "PersonalNameplateTotalPower";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Large Main Health Value";
-            local tooltip = "";
-            local cfg = "LargeMainValue";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- ColorPicker
-        do
-            local name = "Font Color";
-            local tooltip = "";
-            local cfg = "HealthFontColor";
-            local default = {r = 1, g = 0.82, b = 0, a = 1};
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- Slider
-        do
-            local name = "Combo Points Scale";
-            local tooltip = "";
-            local cfg = "ComboPointsScaleClassless" --"ClassPowerScale";
-            local default = 1;
-            local step = 0.01;
-            local minValue = 0.50;
-            local maxValue = 1.50;
-            local decimals = 2;
-            local flair = { classicEra = true, cata = true, retail = false };
-
-            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
-        end
-
-        -- Sub-Category
-        func:Create_SubCategory(panel, "Class Related");
+        -- Spacer
+        func:Create_Spacer(panel);
 
         -- CheckButton
         do
@@ -558,8 +540,20 @@ function func:Load_Settings()
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
-        -- Sub-Category
-        func:Create_SubCategory(panel, "Names only");
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- Anchoring settings
+        func:AnchorFrames(panel);
+    end
+
+    -- CATEGORY: Names Only
+    do
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "Names Only");
+
+        -- Spacer
+        func:Create_Spacer(panel);
 
         -- CheckButton
         do
@@ -693,14 +687,104 @@ function func:Load_Settings()
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
-        -- Sub-Category
-        func:Create_SubCategory(panel, "Threat");
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- Anchoring settings
+        func:AnchorFrames(panel);
+    end
+
+    -- CATEGORY: Cast Bar
+    do
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "Cast Bar");
+
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- CheckButton
+        do
+            local name = "Show Cast bar";
+            local tooltip = "";
+            local cfg = "CastbarShow";
+            local default = true;
+            local flair = { classicEra = true, cata = false, retail = false };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Cast Bar Icon";
+            local tooltip = "";
+            local cfg = "CastbarIconShow";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Slider
+        do
+            local name = "Castbar Scale";
+            local tooltip = "";
+            local cfg = "CastbarScale";
+            local default = 1;
+            local step = 0.01;
+            local minValue = 0.75;
+            local maxValue = 1.25;
+            local decimals = 2;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Slider
+        do
+            local name = "Castbar Position (vertical)";
+            local tooltip = "";
+            local cfg = "CastbarPositionY";
+            local default = 2;
+            local step = 1;
+            local minValue = 0;
+            local maxValue = 50;
+            local decimals = 0;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- Anchoring settings
+        func:AnchorFrames(panel);
+    end
+
+    -- CATEGORY: Threat
+    do
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "Threat");
+
+        -- Spacer
+        func:Create_Spacer(panel);
 
         -- CheckButton
         do
             local name = "Threat Percentage";
             local tooltip = "Display the amount of threat generated";
             local cfg = "ThreatPercentage";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Change Color Based On Threat Percentage";
+            local tooltip = "The less threat you have the lighter the color gets";
+            local cfg = "ThreatColorBasedOnPercentage";
             local default = true;
             local flair = { classicEra = true, cata = true, retail = true };
 
@@ -716,32 +800,6 @@ function func:Load_Settings()
             local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- Slider
-        do
-            local name = "Threat Warning Threshold";
-            local tooltip = "";
-            local cfg = "ThreatWarningThreshold";
-            local default = 75;
-            local step = 1;
-            local minValue = 1;
-            local maxValue = 100;
-            local decimals = 0;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
-        end
-
-        -- ColorPicker
-        do
-            local name = "Warning Color";
-            local tooltip = "";
-            local cfg = "ThreatWarningColor";
-            local default = {r = 1, g = 0.6, b = 0, a = 1};
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
         end
 
         -- ColorPicker
@@ -766,6 +824,46 @@ function func:Load_Settings()
             func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
         end
 
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Threat Warning");
+
+        -- CheckButton
+        do
+            local name = "Enable";
+            local tooltip = "";
+            local cfg = "ThreatWarning";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Slider
+        do
+            local name = "Threshold";
+            local tooltip = "";
+            local cfg = "ThreatWarningThreshold";
+            local default = 75;
+            local step = 1;
+            local minValue = 1;
+            local maxValue = 100;
+            local decimals = 0;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Warning Color";
+            local tooltip = "";
+            local cfg = "ThreatWarningColor";
+            local default = {r = 1, g = 0.6, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
         -- Spacer
         func:Create_Spacer(panel);
 
@@ -778,8 +876,8 @@ function func:Load_Settings()
         -- Panel
         local panel = func:CreatePanel(panelMain.name, "Buffs & Debuffs");
 
-        -- Sub-Category
-        func:Create_SubCategory(panel, "General");
+        -- Spacer
+        func:Create_Spacer(panel);
 
         -- DropDownMenu
         do

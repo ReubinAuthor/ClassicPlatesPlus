@@ -27,6 +27,7 @@ end
 ----------------------------------------
 function func:Update_Threat(unit)
     if unit and string.match(unit, "nameplate") then
+        local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
         local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
         if nameplate then
@@ -34,6 +35,7 @@ function func:Update_Threat(unit)
             local ThreatPercentageOfLead = UnitThreatPercentageOfLead("player", unit) or 0;
             local status = UnitThreatSituation("player", unit);
             local r,g,b = func:GetUnitColor(unit, ThreatPercentageOfLead, status);
+
             --[[local Rs,Gs,Bs = UnitSelectionColor(unit, true);
             local Rb,Gb,Bb = data.colors.border.r, data.colors.border.g, data.colors.border.b;
 
@@ -68,7 +70,7 @@ function func:Update_Threat(unit)
 
             --Swapping healthbar's highlight so that it won't show underneath the powerbar's background.
             if unitFrame.powerbar:IsShown() then
-                if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait then
+                if CFG.Portrait then
                     unitFrame.healthbar.highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\healthbar_2");
                 else
                     unitFrame.healthbar.highlight:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\highlights\\healthbar_3");
@@ -78,18 +80,18 @@ function func:Update_Threat(unit)
             end
 
             -- Updating threat percentage
-            if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatPercentage and ThreatPercentageOfLead > 0 then
+            if CFG.ThreatPercentage and ThreatPercentageOfLead > 0 then
                 if ThreatPercentageOfLead > 999 then
                     ThreatPercentageOfLead = 999;
                 end
 
                 unitFrame.threatPercentage.value:SetText(math.floor(ThreatPercentageOfLead) .. "%");
             end
-            unitFrame.threatPercentage:SetShown(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatPercentage and ThreatPercentageOfLead and ThreatPercentageOfLead > 0);
+            unitFrame.threatPercentage:SetShown(CFG.ThreatPercentage and ThreatPercentageOfLead and ThreatPercentageOfLead > 0);
 
             -- Toggle for highlights
-            local ShowHighlight = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatHighlight
-                and (ThreatPercentageOfLead > CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ThreatWarningThreshold -- Above threat threshold
+            local ShowHighlight = CFG.ThreatHighlight
+                and (ThreatPercentageOfLead > CFG.ThreatWarningThreshold -- Above threat threshold
                 or (UnitIsUnit(unit.."target", "player") and UnitIsEnemy(unit, "player") and (UnitIsPlayer(unit) or UnitIsOtherPlayersPet)) -- Enemy player or pet targeting you
                 or (status == 3 or status == 2) -- Tanking
                 or GetPartyAssignment("MainTank", "player", true) and func:OtherTank(unit) -- Other tank tanking
