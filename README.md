@@ -14,7 +14,7 @@ ClassicPlates Plus is a nameplates addon that adds additional features and new u
 <br />
 
 ## How to move Personal Nameplate
-You can move personal nameplate in Classic Era and Wrath by holding down CTRL and dragging it with Left Mouse Button.
+You can move personal nameplate in Classic Flavors by holding down CTRL and dragging it with Left Mouse Button.
 
 <br />
 
