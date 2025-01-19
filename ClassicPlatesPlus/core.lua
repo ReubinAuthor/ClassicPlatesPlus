@@ -571,6 +571,7 @@ end
 ----------------------------------------
 function func:Update_Colors(unit)
     local color = data.colors.border;
+    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
 
     local function work(unitFrame, unit)
         local r,g,b = func:GetUnitColor(unit);
@@ -588,16 +589,16 @@ function func:Update_Colors(unit)
             if isPVP or isFFA then
                 r,g,b = Rs, Gs, Bs;
             else
-                r,g,b = color.r, color.g, color.b;
+                r,g,b = CFG.BorderColor.r, CFG.BorderColor.g, CFG.BorderColor.b;
             end
         elseif not canAttack and (isPlayer or UnitIsOtherPlayersPet) then
             if isPVP or isFFA then
                 r,g,b = Rs, Gs, Bs;
             else
-                r,g,b = color.r, color.g, color.b;
+                r,g,b = CFG.BorderColor.r, CFG.BorderColor.g, CFG.BorderColor.b;
             end
         else
-            r,g,b = color.r, color.g, color.b;
+            r,g,b = CFG.BorderColor.r, CFG.BorderColor.g, CFG.BorderColor.b;
         end
 
         -- Coloring name and guild
@@ -605,10 +606,10 @@ function func:Update_Colors(unit)
             unitFrame.name:SetTextColor(0.5, 0.5, 0.5);
             unitFrame.guild:SetTextColor(0.5, 0.5, 0.5);
         else
-            if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].FriendlyClassColorNamesAndGuild and not canAttack and isPlayer then
+            if CFG.FriendlyClassColorNamesAndGuild and not canAttack and isPlayer then
                 unitFrame.name:SetTextColor(classColor.r, classColor.g, classColor.b);
                 unitFrame.guild:SetTextColor(classColor.r, classColor.g, classColor.b);
-            elseif CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].EnemyClassColorNamesAndGuild and canAttack and isPlayer then
+            elseif CFG.EnemyClassColorNamesAndGuild and canAttack and isPlayer then
                 unitFrame.name:SetTextColor(classColor.r, classColor.g, classColor.b);
                 unitFrame.guild:SetTextColor(classColor.r, classColor.g, classColor.b);
             else
@@ -633,13 +634,13 @@ function func:Update_Colors(unit)
         end
 
         -- Fade
-        if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].FadeUnselected then
+        if CFG.FadeUnselected then
             if not UnitExists("target") then
                 unitFrame:SetAlpha(1);
             elseif target then
                 unitFrame:SetAlpha(1);
             else
-                unitFrame:SetAlpha(CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].FadeIntensity);
+                unitFrame:SetAlpha(CFG.FadeIntensity);
             end
         else
             unitFrame:SetAlpha(1);
@@ -1363,33 +1364,41 @@ function func:NamesOnly(unit)
     local isPlayer = UnitIsPlayer(unit);
     local isPet = UnitIsOtherPlayersPet(unit);
 
-    if isTarget then
-        return false;
-    else
-        if isPlayer then
-            if canAttack then
-                return CFG.NamesOnlyEnemyPlayers;
+    local function work(config)
+        if isTarget then
+            if CFG.NamesOnlyAlwaysShowTargetsNameplate then
+                return false;
             else
-                return CFG.NamesOnlyFriendlyPlayers;
-            end
-        elseif isPet then
-            if canAttack then
-                return CFG.NamesOnlyEnemyPets;
-            else
-                return CFG.NamesOnlyFriendlyPets;
-            end
-        elseif isTotem then
-            if canAttack then
-                return CFG.NamesOnlyEnemyTotems;
-            else
-                return CFG.NamesOnlyFriendlyTotems;
+                return config;
             end
         else
-            if canAttack then
-                return CFG.NamesOnlyEnemyNPC;
-            else
-                return CFG.NamesOnlyFriendlyNPC;
-            end
+            return config;
+        end
+    end
+
+    if isPlayer then
+        if canAttack then
+            return work(CFG.NamesOnlyEnemyPlayers);
+        else
+            return work(CFG.NamesOnlyFriendlyPlayers);
+        end
+    elseif isPet then
+        if canAttack then
+            return work(CFG.NamesOnlyEnemyPets);
+        else
+            return work(CFG.NamesOnlyFriendlyPets);
+        end
+    elseif isTotem then
+        if canAttack then
+            return work(CFG.NamesOnlyEnemyTotems);
+        else
+            return work(CFG.NamesOnlyFriendlyTotems);
+        end
+    else
+        if canAttack then
+            return work(CFG.NamesOnlyEnemyNPC);
+        else
+            return work(CFG.NamesOnlyFriendlyNPC);
         end
     end
 end

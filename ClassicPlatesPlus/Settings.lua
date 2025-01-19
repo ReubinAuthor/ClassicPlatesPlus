@@ -375,7 +375,7 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Personal Nameplate";
+            local name = "Enable";
             local tooltip = not data.isRetail and "To move the personal nameplate, hold " .. green .. "CTRL" .. yellow .. " and drag it with " .. green .. "Left Mouse Button" or "";
             local cfg = "PersonalNameplate";
             local default = true;
@@ -547,30 +547,59 @@ function func:Load_Settings()
         func:AnchorFrames(panel);
     end
 
+    -- CATEGORY: Border
+    do
+        -- Panel
+        local panel = func:CreatePanel(panelMain.name, "Border");
+
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- ColorPicker
+        do
+            local name = "Color";
+            local tooltip = "";
+            local cfg = "BorderColor";
+            local default = {r = 0.75, g = 0.60, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Spacer
+        func:Create_Spacer(panel);
+
+        -- Anchoring settings
+        func:AnchorFrames(panel);
+    end
+
     -- CATEGORY: Names Only
     do
         -- Panel
         local panel = func:CreatePanel(panelMain.name, "Names Only");
 
-        -- Spacer
-        func:Create_Spacer(panel);
+        -- Sub-Category
+        func:Create_SubCategory(panel, "General");
+
+        -- CheckButton
+        do
+            local name = "Always Show Target's Nameplate";
+            local tooltip = "";
+            local cfg = "NamesOnlyAlwaysShowTargetsNameplate";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Friendlies");
 
         -- CheckButton
         do
             local name = "Friendly Players";
             local tooltip = "";
             local cfg = "NamesOnlyFriendlyPlayers";
-            local default = false;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Enemy Players";
-            local tooltip = "";
-            local cfg = "NamesOnlyEnemyPlayers";
             local default = false;
             local flair = { classicEra = true, cata = true, retail = true };
 
@@ -590,9 +619,9 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Enemy Pets";
+            local name = "Friendly NPC";
             local tooltip = "";
-            local cfg = "NamesOnlyEnemyPets";
+            local cfg = "NamesOnlyFriendlyNPC";
             local default = false;
             local flair = { classicEra = true, cata = true, retail = true };
 
@@ -601,9 +630,34 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Friendly NPC";
+            local name = "Friendly Totems";
             local tooltip = "";
-            local cfg = "NamesOnlyFriendlyNPC";
+            local cfg = "NamesOnlyFriendlyTotems";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Enemies");
+
+        -- CheckButton
+        do
+            local name = "Enemy Players";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyPlayers";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Enemy Pets";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyPets";
             local default = false;
             local flair = { classicEra = true, cata = true, retail = true };
 
@@ -623,17 +677,6 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Friendly Totems";
-            local tooltip = "";
-            local cfg = "NamesOnlyFriendlyTotems";
-            local default = false;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
             local name = "Enemy Totems";
             local tooltip = "";
             local cfg = "NamesOnlyEnemyTotems";
@@ -642,6 +685,9 @@ function func:Load_Settings()
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Exclusions");
 
         -- CheckButton
         do

@@ -81,6 +81,8 @@ local function updateNameplateVisuals()
             end
         end
     end
+
+    func:PersonalNameplateAdd();
 end
 
 local function updateAuras()
@@ -352,6 +354,7 @@ local functionsTable = {
         updateNameplateScale();
         func:ResizeNameplates();
     end,
+    NamesOnlyAlwaysShowTargetsNameplate = function() updateNameplateVisuals(); end,
     NamesOnlyFriendlyPlayers = function() updateNameplateVisuals(); end,
     NamesOnlyEnemyPlayers = function() updateNameplateVisuals(); end,
     NamesOnlyFriendlyPets = function() updateNameplateVisuals(); end,
@@ -383,6 +386,7 @@ local functionsTable = {
     SpecialPower = function() func:Update_ClassPower(); end,
     SpecialPowerScale = function() func:Update_ClassPower(); end,
     CastbarIconShow = function() updateNameplateVisuals(); end,
+    BorderColor = function() updateNameplateVisuals(); end,
 }
 
 -- Execute function by passed config name

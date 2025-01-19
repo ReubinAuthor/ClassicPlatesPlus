@@ -82,7 +82,7 @@ function func:PersonalNameplateCreate()
         nameplate.border:SetPoint("center");
         nameplate.border:SetSize(256,128);
         nameplate.border:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\borders\\borderOwn");
-        nameplate.border:SetVertexColor(data.colors.border.r, data.colors.border.g, data.colors.border.b);
+        nameplate.border:SetVertexColor(CFG.BorderColor.r, CFG.BorderColor.g, CFG.BorderColor.b);
         nameplate.border:SetDrawLayer("border", 1);
 
         -- Healthbar
@@ -434,7 +434,7 @@ function func:PersonalNameplateAdd()
         end
 
         nameplate.main:SetScale(CFG.PersonalNameplatesScale - 0.2);
-        nameplate.border:SetVertexColor(data.colors.border.r, data.colors.border.g, data.colors.border.b);
+        nameplate.border:SetVertexColor(CFG.BorderColor.r, CFG.BorderColor.g, CFG.BorderColor.b);
 
         if CFG.LargeMainValue then
             nameplate.healthMain:SetFontObject("GameFontNormalLargeOutline");
