@@ -44,6 +44,67 @@ function func:Load_Settings()
     -- Fist panel has to be accessable to other panels, putting it outside of the code block.
     local panelMain = func:CreatePanel(nil, myAddon);
 
+    -- CATEGORY: About
+    do
+        -- Sub-Category
+        do
+            local title = "Contact Me";
+            local description = "Feel free to leave feedback, ask for help, or suggest your idea.";
+
+            func:Create_SubCategory(panelMain, title, description);
+        end
+
+        -- Social Link
+        do
+            local name = "Discord";
+            local image = "Interface\\addons\\ClassicPlatesPlus\\media\\logo\\discord";
+            local link = "discord.gg/Hj49J2APGZ";
+            local text = "";
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_SocialLink(panelMain, flair, name, image, text, link)
+        end
+
+        -- Spacer
+        func:Create_Spacer(panelMain);
+
+        -- Social Link
+        do
+            local name = "GitHub";
+            local image = "Interface\\addons\\ClassicPlatesPlus\\media\\logo\\github";
+            local link = "github.com/ReubinAuthor/ClassicPlatesPlus";
+            local text = "";
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_SocialLink(panelMain, flair, name, image, text, link)
+        end
+
+        -- Spacer
+        func:Create_Spacer(panelMain);
+
+        -- Sub-Category
+        do
+            local title = "Consider Supporting This Project";
+            local description = "Development of this project takes 99% of my WoW time.\nPlease consider supporting it if you like it.";
+
+            func:Create_SubCategory(panelMain, title, description);
+        end
+
+        -- Social Link
+        do
+            local name = "Boosty";
+            local image = "Interface\\addons\\ClassicPlatesPlus\\media\\logo\\boosty";
+            local link = "boosty.to/reubin";
+            local text = "";
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_SocialLink(panelMain, flair, name, image, text, link)
+        end
+
+        -- Anchoring settings
+        func:AnchorFrames(panelMain);
+    end
+
     -- CATEGORY: General
     do
         -- Panel
@@ -925,85 +986,8 @@ function func:Load_Settings()
         -- Spacer
         func:Create_Spacer(panel);
 
-        -- DropDownMenu
-        do
-            local name = "Auras Filter On Frindlies";
-            local tooltip = "";
-            local cfg = "AurasFilterFriendly";
-            local default = 1;
-            local options = {
-                [1] = "Show all auras",
-                [2] = "Show auras applied by you",
-                [3] = "Show auras you can apply and dispell"
-            }
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-        end
-
-        -- DropDownMenu
-        do
-            local name = "Auras Filter On Enemies";
-            local tooltip = "";
-            local cfg = "AurasFilterEnemy";
-            local default = 1;
-            local options = {
-                [1] = "Show all auras",
-                [2] = "Show auras applied by you"
-            }
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-        end
-
-        -- CheckButton
-        do
-            local name = "Show Only Important Auras";
-            local tooltip = "";
-            local cfg = "AurasShowOnlyImportant";
-            local default = false;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- DropDownMenu
-        do
-            local name = "Hide Passive Auras";
-            local tooltip = "Hide auras without expiration time";
-            local cfg = "AurasHidePassive";
-            local default = 1;
-            local options = {
-                [1] = "None",
-                [2] = "All",
-                [3] = "All except your own"
-            }
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-        end
-
-        -- CheckButton
-        do
-            local name = "Show Auras On Target Only";
-            local tooltip = "";
-            local cfg = "AurasOnTarget";
-            local default = false;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Mark Your Auras";
-            local tooltip = "";
-            local cfg = "AurasMarkYours";
-            local default = false;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
+        -- Sub-Category
+        func:Create_SubCategory(panel, "General");
 
         -- CheckButton
         do
@@ -1044,14 +1028,263 @@ function func:Load_Settings()
 
         -- CheckButton
         do
-            local name = "Mark Stealable Buffs";
-            local tooltip = "Marks stealable buffs in blue and prioritizes them over other buffs";
-            local cfg = "MarkStealableAuras";
+            local name = "Mark Your Auras";
+            local tooltip = "";
+            local cfg = "AurasMarkYours";
             local default = true;
             local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
+
+        -- ColorPicker
+        do
+            local name = "Mark Color";
+            local tooltip = "";
+            local cfg = "AurasMarkColor";
+            local default = {r = 1, g = 1, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Mark Location";
+            local tooltip = "Hide auras without expiration time";
+            local cfg = "AurasMarkLocation";
+            local default = 2;
+            local options = {
+                [1] = "Top left",
+                [2] = "Bottom left",
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- CheckButton
+        do
+            local name = "Important Auras Highlight";
+            local tooltip = "";
+            local cfg = "AurasImportantHighlight";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Filters");
+
+        -- CheckButton
+        do
+            local name = "Show Only Important Auras";
+            local tooltip = "";
+            local cfg = "AurasShowOnlyImportant";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Auras On Target Only";
+            local tooltip = "";
+            local cfg = "AurasOnTarget";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Spacer
+        func:Create_Spacer(panel, "small");
+
+        -- CheckButton
+        do
+            local name = "Show Buffs On Friendlies";
+            local tooltip = "";
+            local cfg = "BuffsFriendly";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Debuffs On Friendlies";
+            local tooltip = "";
+            local cfg = "DebuffsFriendly";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Buffs On Enemies";
+            local tooltip = "";
+            local cfg = "BuffsEnemy";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Debuffs On Enemies";
+            local tooltip = "";
+            local cfg = "DebuffsEnemy";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Spacer
+        func:Create_Spacer(panel, "small");
+
+        -- CheckButton
+        do
+            local name = "Show Buffs On Personal Namplate";
+            local tooltip = "";
+            local cfg = "BuffsPersonal";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "Show Debuffs On Personal Namplate";
+            local tooltip = "";
+            local cfg = "DebuffsPersonal";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Spacer
+        func:Create_Spacer(panel, "small");
+
+        -- DropDownMenu
+        do
+            local name = "Passive Auras";
+            local tooltip = "Hide auras without expiration time";
+            local cfg = "AurasHidePassive";
+            local default = 1;
+            local options = {
+                [1] = "Show all",
+                [2] = "Hide all",
+                [3] = "Show only your own"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Auras On Frindlies";
+            local tooltip = "";
+            local cfg = "AurasFilterFriendly";
+            local default = 1;
+            local options = {
+                [1] = "Show all auras",
+                [2] = "Show auras applied by you",
+                [3] = "Show auras you can apply and dispell"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Auras On Enemies";
+            local tooltip = "";
+            local cfg = "AurasFilterEnemy";
+            local default = 1;
+            local options = {
+                [1] = "Show all auras",
+                [2] = "Show auras applied by you"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Personal Nameplate Buffs";
+            local tooltip = "";
+            local cfg = "BuffsFilterPersonal";
+            local default = 1;
+            local options = {
+                [1] = "Show all buffs",
+                [2] = "Show buffs applied by you",
+                [3] = "Show buffs you can apply and applied"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- DropDownMenu
+        do
+            local name = "Personal Nameplate Debuffs";
+            local tooltip = "";
+            local cfg = "DebuffsFilterPersonal";
+            local default = 1;
+            local options = {
+                [1] = "Show all debuffs",
+                [2] = "Show debuffs you can dispell"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- Spacer
+        func:Create_Spacer(panel, "small");
+
+        -- DropDownMenu
+        do
+            local name = "Group Filter";
+            local tooltip = "";
+            local cfg = "AurasGroupFilter";
+            local default = 1;
+            local options = {
+                [1] = "Show buffs for Everyone",
+                [2] = "Show buffs for Party Members",
+                [3] = "Show buffs for Raid Members",
+                [4] = "Show buffs for Party & Raid members"
+            }
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
+        end
+
+        -- CheckButton
+        do
+            local name = "Exclude Target";
+            local tooltip = "Exclude target from group filtering";
+            local cfg = "AurasGroupFilterExcludeTarget";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Tooltip");
 
         -- DropDownMenu
         do
@@ -1081,49 +1314,22 @@ function func:Load_Settings()
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Auras Limits");
+
         -- CheckButton
         do
-            local name = "Show Buffs on Friendlies";
+            local name = "Auras Overflow Counter";
             local tooltip = "";
-            local cfg = "BuffsFriendly";
+            local cfg = "AurasOverFlowCounter";
             local default = true;
             local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
 
-        -- CheckButton
-        do
-            local name = "Show Debuffs on Friendlies";
-            local tooltip = "";
-            local cfg = "DebuffsFriendly";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Show Buffs on Enemies";
-            local tooltip = "";
-            local cfg = "BuffsEnemy";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Show Debuffs on Enemies";
-            local tooltip = "";
-            local cfg = "DebuffsEnemy";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
+        -- Spacer
+        func:Create_Spacer(panel, "small");
 
         -- Slider
         do
@@ -1185,91 +1391,12 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
-        -- Slider
-        do
-            local name = "Auras Scale";
-            local tooltip = "";
-            local cfg = "AurasScale";
-            local default = 1.00
-            local step = 0.01;
-            local minValue = 0.75;
-            local maxValue = 1.25;
-            local decimals = 2;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
-        end
-
-        -- CheckButton
-        do
-            local name = "Auras Overflow Counter";
-            local tooltip = "";
-            local cfg = "AurasOverFlowCounter";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- Sub-Category
-        func:Create_SubCategory(panel, "Personal Auras");
-
-        -- DropDownMenu
-        do
-            local name = "Buffs Filter";
-            local tooltip = "";
-            local cfg = "BuffsFilterPersonal";
-            local default = 1;
-            local options = {
-                [1] = "Show all buffs",
-                [2] = "Show buffs applied by you",
-                [3] = "Show buffs you can apply and applied"
-            }
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-        end
-
-        -- DropDownMenu
-        do
-            local name = "Debuffs Filter";
-            local tooltip = "";
-            local cfg = "DebuffsFilterPersonal";
-            local default = 1;
-            local options = {
-                [1] = "Show all debuffs",
-                [2] = "Show debuffs you can dispell"
-            }
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-        end
-
-        -- CheckButton
-        do
-            local name = "Show Buffs";
-            local tooltip = "";
-            local cfg = "BuffsPersonal";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
-
-        -- CheckButton
-        do
-            local name = "Show Debuffs";
-            local tooltip = "";
-            local cfg = "DebuffsPersonal";
-            local default = true;
-            local flair = { classicEra = true, cata = true, retail = true };
-
-            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
-        end
+        -- Spacer
+        func:Create_Spacer(panel, "small");
 
         -- Slider
         do
-            local name = "Max Buffs";
+            local name = "Max Buffs On Personal Nameplate";
             local tooltip = "";
             local cfg = "AurasPersonalMaxBuffs";
             local default = 6;
@@ -1284,7 +1411,7 @@ function func:Load_Settings()
 
         -- Slider
         do
-            local name = "Max Debuffs";
+            local name = "Max Debuffs On Personal Nameplate";
             local tooltip = "";
             local cfg = "AurasPersonalMaxDebuffs";
             local default = 6;
@@ -1297,6 +1424,180 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Scale");
+
+        -- Slider
+        do
+            local name = "Regular Auras Scale";
+            local tooltip = "";
+            local cfg = "AurasScale";
+            local default = 1.00;
+            local step = 0.01;
+            local minValue = 0.75;
+            local maxValue = 1.25;
+            local decimals = 2;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Slider
+        do
+            local name = "Important Auras Scale";
+            local tooltip = "";
+            local cfg = "AurasImportantScale";
+            local default = 1.25;
+            local step = 0.01;
+            local minValue = 0.75;
+            local maxValue = 1.5;
+            local decimals = 2;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Buffs Border Color");
+
+        -- ColorPicker
+        do
+            local name = "Regular";
+            local tooltip = "";
+            local cfg = "AurasHelpfulBorderColor";
+            local default = {r = 0.85, g = 0.7, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Stealable Auras";
+            local tooltip = "";
+            local cfg = "AurasStealableBorderColor";
+            local default = {r = 0.6, g = 0.79, b = 1, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Debuffs Border Color");
+
+        -- ColorPicker
+        do
+            local name = "Regular";
+            local tooltip = "";
+            local cfg = "Auras_HarmfulBorderColor_Regular";
+            local default = {r = 0.8, g = 0, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Magic";
+            local tooltip = "";
+            local cfg = "Auras_HarmfulBorderColor_Magic";
+            local default = {r = 0.8, g = 0, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Curse";
+            local tooltip = "";
+            local cfg = "Auras_HarmfulBorderColor_Curse";
+            local default = {r = 0.8, g = 0, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Disease";
+            local tooltip = "";
+            local cfg = "Auras_HarmfulBorderColor_Disease";
+            local default = {r = 0.8, g = 0, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Poison";
+            local tooltip = "";
+            local cfg = "Auras_HarmfulBorderColor_Poison";
+            local default = {r = 0.8, g = 0, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Sub-Category
+        func:Create_SubCategory(panel, "Personal Debuffs Border Color");
+
+        -- ColorPicker
+        do
+            local name = "Regular";
+            local tooltip = "";
+            local cfg = "Auras_Personal_HarmfulBorderColor_Regular";
+            local default = {r = 0.8, g = 0, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Magic";
+            local tooltip = "";
+            local cfg = "Auras_Personal_HarmfulBorderColor_Magic";
+            local default = {r = 0.2, g = 0.6, b = 1, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Curse";
+            local tooltip = "";
+            local cfg = "Auras_Personal_HarmfulBorderColor_Curse";
+            local default = {r = 0.6, g = 0, b = 1, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Disease";
+            local tooltip = "";
+            local cfg = "Auras_Personal_HarmfulBorderColor_Disease";
+            local default = {r = 0.6, g = 0.4, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- ColorPicker
+        do
+            local name = "Poison";
+            local tooltip = "";
+            local cfg = "Auras_Personal_HarmfulBorderColor_Poison";
+            local default = {r = 0, g = 0.6, b = 0, a = 1};
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default);
+        end
+
         -- Spacer
         func:Create_Spacer(panel);
 
@@ -1307,7 +1608,7 @@ function func:Load_Settings()
     -- CATEGORY: Important Auras
     do
         -- Panel
-        local panel = func:CreatePanel(panelMain.name, "Important Auras");
+        local panel = func:CreatePanel(panelMain.name, "Important Auras List");
 
         -- Spacer
         func:Create_Spacer(panel);
@@ -1327,7 +1628,7 @@ function func:Load_Settings()
     -- CATEGORY: Blacklisted Auras
     do
         -- Panel
-        local panel = func:CreatePanel(panelMain.name, "Blacklisted Auras");
+        local panel = func:CreatePanel(panelMain.name, "Blacklisted Auras List");
 
         -- Spacer
         func:Create_Spacer(panel);

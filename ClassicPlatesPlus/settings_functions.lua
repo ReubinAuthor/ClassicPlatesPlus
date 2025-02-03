@@ -99,53 +99,6 @@ local function updateAuras()
     func:Update_Auras("player");
 end
 
-local function updateAurasVisuals()
-    local nameplates = C_NamePlate.GetNamePlates();
-    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
-
-    local function work(unitFrame, filter)
-        local scaleOffset = unitFrame.unit == "player" and 0.15 or 0.15;
-        local scale = (CFG.AurasScale - scaleOffset) > 0 and (CFG.AurasScale - scaleOffset) or 0.1
-
-        if unitFrame.auras and unitFrame.auras[filter] then
-            for i = 1, 40 do
-                if unitFrame.auras[filter][i] then
-                    unitFrame.auras[filter][i]:SetScale(scale);
-                    unitFrame.auras[filter][i].cooldown:SetReverse(CFG.AurasReverseAnimation);
-                    unitFrame.auras[filter][i].countdown:SetShown(CFG.AurasCountdown);
-                    unitFrame.auras[filter][i].countdown:ClearAllPoints();
-                    if CFG.AurasCountdownPosition == 1 then
-                        unitFrame.auras[filter][i].countdown:SetPoint("right", unitFrame.auras[filter][i].second, "topRight", 5, -2.5);
-                        unitFrame.auras[filter][i].countdown:SetJustifyH("right");
-                    elseif CFG.AurasCountdownPosition == 2 then
-                        unitFrame.auras[filter][i].countdown:SetPoint("center", unitFrame.auras[filter][i].second, "center");
-                        unitFrame.auras[filter][i].countdown:SetJustifyH("center");
-                    end
-                end
-            end
-        end
-
-        unitFrame.buffsCounter:SetScale(CFG.AurasScale);
-        unitFrame.debuffsCounter:SetScale(CFG.AurasScale);
-    end
-
-    if nameplates then
-        for k,v in pairs(nameplates) do
-            if k and v.unitFrame.unit then
-                local unitFrame = v.unitFrame;
-
-                work(unitFrame, "helpful");
-                work(unitFrame, "harmful");
-            end
-        end
-    end
-
-    if data.nameplate then
-        work(data.nameplate, "helpful");
-        work(data.nameplate, "harmful");
-    end
-end
-
 local function updateNameplateScale()
     local function work()
         local nameplates = C_NamePlate.GetNamePlates();
@@ -288,14 +241,9 @@ local functionsTable = {
     AurasFilterEnemy = function() updateAuras(); end,
     AurasShowOnlyImportant = function() updateAuras(); end,
     AurasHidePassive = function() updateAuras(); end,
-    AurasOnTarget = function()
-        func:HideAllAuras();
-        updateAuras();
-    end,
-    AurasMarkYours = function() updateAuras(); end,
-    AurasCountdown = function() updateAurasVisuals(); end,
-    AurasReverseAnimation = function() updateAurasVisuals(); end,
-    MarkStealableAuras = function() updateAuras(); end,
+    AurasOnTarget = function() updateAuras(); end,
+    AurasCountdown = function() updateAuras(); end,
+    AurasReverseAnimation = function() updateAuras(); end,
 
     BuffsFriendly = function() updateAuras(); end,
     DebuffsFriendly = function() updateAuras(); end,
@@ -307,7 +255,10 @@ local functionsTable = {
     AurasMaxDebuffsFriendly = function() updateAuras(); end,
     AurasMaxBuffsEnemy = function() updateAuras(); end,
     AurasMaxDebuffsEnemy = function() updateAuras(); end,
-    AurasScale = function() updateAurasVisuals(); end,
+    AurasScale = function() updateAuras(); end,
+    AurasImportantScale = function() updateAuras(); end,
+    AurasGroupFilter = function() updateAuras(); end,
+    AurasGroupFilterExcludeTarget = function() updateAuras(); end,
     AurasOverFlowCounter = function()
         local nameplates = C_NamePlate.GetNamePlates();
         if nameplates then
@@ -321,14 +272,22 @@ local functionsTable = {
     end,
     BuffsFilterPersonal = function() func:Update_Auras("player"); end,
     DebuffsFilterPersonal = function() func:Update_Auras("player"); end,
-
     BuffsPersonal = function() func:Update_Auras("player"); end,
     DebuffsPersonal = function() func:Update_Auras("player"); end,
-
     AurasPersonalMaxBuffs = function() func:Update_Auras("player"); end,
     AurasPersonalMaxDebuffs = function() func:Update_Auras("player"); end,
     AurasImportantList = function() updateAuras(); end,
     AurasBlacklist = function() updateAuras(); end,
+    AurasMarkYours = function() updateAuras(); end,
+    AurasMarkColor = function() updateAuras(); end,
+    AurasMarkLocation = function() updateAuras(); end,
+    AurasImportantHighlight = function() updateAuras(); end,
+
+    AurasHelpfulBorderColor = function() updateAuras(); end,
+    AurasHarmfulBorderColor = function() updateAuras(); end,
+    AurasOwnHarmfulBorderColor = function() updateAuras(); end,
+    AurasStealableBorderColor = function() updateAuras(); end,
+
     ThreatWarning = function() updateNameplateVisuals(); end,
     ThreatWarningColor = function() updateNameplateVisuals(); end,
     ThreatAggroColor = function() updateNameplateVisuals(); end,
@@ -342,7 +301,7 @@ local functionsTable = {
     CastbarScale = function() updateNameplateVisuals(); end,
     CastbarPositionY = function() updateNameplateVisuals(); end,
     ComboPointsScaleClassless = function() func:Update_ClassPower(); end,
-    AurasCountdownPosition = function() updateAurasVisuals(); end,
+    AurasCountdownPosition = function() updateAuras(); end,
     NameAndGuildOutline = function()
         updateNameplateVisuals();
     end,
@@ -548,30 +507,37 @@ function func:CreatePanel(mainPanelName, name)
     if mainPanelName then
         panel.parent = mainPanelName;
     else
-        nameDivider = "";
-        name = "";
+        local version = C_AddOns.GetAddOnMetadata(name, "Version");
+
+        if version then
+            nameDivider = "  |  ";
+            name = "v".. version;
+        else
+            nameDivider = "";
+            name = "";
+        end
     end
 
+    -- Header
+    panel.header = CreateFrame("frame", nil, panel);
+    panel.header:SetPoint("topLeft");
+    panel.header:SetPoint("topRight");
+    panel.header:SetHeight(50);
+
+    -- Addon icon
+    panel.icon = panel.header:CreateTexture();
+    panel.icon:SetPoint("left", 8, -6);
+    panel.icon:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\ClassicPlatesPlus_icon");
+    panel.icon:SetSize(20, 20);
+
+    -- Title
+    panel.title = panel:CreateFontString(nil, "overlay", "GameFontHighlightHuge");
+    panel.title:SetPoint("bottomLeft", panel.icon, "bottomRight", 8, 0);
+    panel.title:SetJustifyH("left");
+    panel.title:SetText("ClassicPlates Plus" .. nameDivider .. name);
+
+    -- Button: Reset all settings
     if mainPanelName then
-        -- Header
-        panel.header = CreateFrame("frame", nil, panel);
-        panel.header:SetPoint("topLeft");
-        panel.header:SetPoint("topRight");
-        panel.header:SetHeight(50);
-
-        -- Addon icon
-        panel.icon = panel.header:CreateTexture();
-        panel.icon:SetPoint("left", 8, -6);
-        panel.icon:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\icons\\ClassicPlatesPlus_icon");
-        panel.icon:SetSize(20, 20);
-
-        -- Title
-        panel.title = panel:CreateFontString(nil, "overlay", "GameFontHighlightHuge");
-        panel.title:SetPoint("bottomLeft", panel.icon, "bottomRight", 8, 0);
-        panel.title:SetJustifyH("left");
-        panel.title:SetText("ClassicPlates Plus" .. nameDivider .. name);
-
-        -- Button: Reset all settings
         panel.resetSettings = CreateFrame("Button", nil, panel.header, "GameMenuButtonTemplate");
         panel.resetSettings:SetPoint("right", -36, -2);
         panel.resetSettings:SetSize(96, 22);
@@ -611,36 +577,36 @@ function func:CreatePanel(mainPanelName, name)
                 end
             end
         };
-
-        -- Line Divider
-        panel.divider = panel.header:CreateTexture();
-        panel.divider:SetPoint("bottomLeft", 16, -1);
-        panel.divider:SetPoint("bottomRight", -40, -1);
-        panel.divider:SetHeight(1);
-        panel.divider:SetAtlas("Options_HorizontalDivider");
-
-        -- Scroll Frame
-        panel.scrollFrame = CreateFrame("ScrollFrame", nil, panel, "ScrollFrameTemplate");
-        panel.scrollFrame:SetPoint("topLeft", 16, -52);
-        panel.scrollFrame:SetPoint("bottomRight", -26, 0);
-
-        -- Scroll Child
-        panel.scrollChild = CreateFrame("frame", nil, panel.scrollFrame);
-        panel.scrollChild:SetPoint("topLeft");
-        panel.scrollChild:SetSize(1,1);
-
-        -- Parent Scroll Child
-        panel.scrollFrame:SetScrollChild(panel.scrollChild);
-
-        -- Categories table
-        panel.list = {};
-
-        -- Configs table
-        data.settings.configs.panels[panel.name] = {};
-
-        -- Adding panel to the list of panels to initialize
-        table.insert(data.settings.panels, panel);
     end
+
+    -- Line Divider
+    panel.divider = panel.header:CreateTexture();
+    panel.divider:SetPoint("bottomLeft", 16, -1);
+    panel.divider:SetPoint("bottomRight", -40, -1);
+    panel.divider:SetHeight(1);
+    panel.divider:SetAtlas("Options_HorizontalDivider");
+
+    -- Scroll Frame
+    panel.scrollFrame = CreateFrame("ScrollFrame", nil, panel, "ScrollFrameTemplate");
+    panel.scrollFrame:SetPoint("topLeft", 16, -52);
+    panel.scrollFrame:SetPoint("bottomRight", -26, 0);
+
+    -- Scroll Child
+    panel.scrollChild = CreateFrame("frame", nil, panel.scrollFrame);
+    panel.scrollChild:SetPoint("topLeft");
+    panel.scrollChild:SetSize(1,1);
+
+    -- Parent Scroll Child
+    panel.scrollFrame:SetScrollChild(panel.scrollChild);
+
+    -- Categories table
+    panel.list = {};
+
+    -- Configs table
+    data.settings.configs.panels[panel.name] = {};
+
+    -- Adding panel to the list of panels to initialize
+    table.insert(data.settings.panels, panel);
 
     return panel;
 end
@@ -648,22 +614,163 @@ end
 ----------------------------------------
 -- Creating Category
 ----------------------------------------
-function func:Create_SubCategory(panel, name)
+function func:Create_SubCategory(panel, name, description)
     local frameName = myAddon .. "_" .. panel.name .. "_Category_" .. name;
+    local height = 0;
 
     -- Creating parent
     local parent = CreateFrame("frame", frameName, panel.scrollChild);
-    parent:SetSize(620, 64);
 
     local frame_text = parent:CreateFontString(nil, "overlay", "GameFontHighlightLarge");
-    frame_text:SetPoint("left");
     frame_text:SetJustifyH("left");
     frame_text:SetText(name);
 
     frame_text.isTitle = true;
     frame_text.settingsList = {};
 
+    if description and description ~= "" then
+        frame_text:SetPoint("topLeft", 0, -24);
+
+        local text = parent:CreateFontString(nil, "overlay", "GameFontNormal");
+        text:SetPoint("topLeft", frame_text, "bottomLeft", 0, -8);
+        text:SetJustifyH("left");
+        text:SetSpacing(2);
+        text:SetText(description);
+
+        height = height + text:GetStringHeight() + 16;
+    else
+        frame_text:SetPoint("left");
+    end
+
+    parent:SetSize(620, 64 + height);
+
     table.insert(panel.list, parent);
+end
+
+----------------------------------------
+-- Create Description
+----------------------------------------
+function func:Create_Description(panel, flair, text)
+
+    -- Creating parent
+    local parent = CreateFrame("frame", nil, panel.scrollChild);
+
+    local description = parent:CreateFontString(nil, "overlay", "GameFontNormal");
+    description:SetPoint("topLeft");
+    description:SetJustifyH("left");
+    description:SetText(text);
+
+    parent:SetSize(620, description:GetStringHeight());
+
+    -- Adding frame to the settings list
+    if data.isClassic and flair.classicEra
+    or data.isCata   and flair.cata
+    or data.isRetail  and flair.retail
+    then
+        table.insert(panel.list, parent);
+    end
+end
+
+----------------------------------------
+-- Create Social Link
+----------------------------------------
+function func:Create_SocialLink(panel, flair, name, image, text, link)
+    local frameName = myAddon .. "_" .. panel.name .. "_SocialLink_" .. name;
+
+    -- Creating parent
+    local parent = CreateFrame("frame", frameName, panel.scrollChild);
+
+    local backdrop = {
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileEdge = true,
+        tileSize = 16,
+        edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    };
+
+    local imageFrame;
+
+    if image then
+        local icon = parent:CreateTexture();
+        icon:SetParent(parent);
+        icon:SetPoint("topLeft");
+        icon:SetSize(32,32);
+        icon:SetTexture(image);
+
+        imageFrame = icon;
+    end
+
+    local subTitle = parent:CreateFontString(nil, "overlay", "GameFontHighlightLarge");
+    subTitle:SetJustifyH("left");
+    subTitle:SetText(name);
+
+    local dummyText = parent:CreateFontString(nil, "overlay", "GameFontHighlight");
+    dummyText:SetText(link);
+
+    local linkWidth = dummyText:GetStringWidth();
+
+    local inputBox_BG = CreateFrame("Frame", nil, parent, "BackdropTemplate");
+    inputBox_BG:SetSize(linkWidth + 40, 32);
+    inputBox_BG:SetBackdrop(backdrop);
+    inputBox_BG:SetBackdropColor(0, 0, 0, 0.5);
+    inputBox_BG:SetBackdropBorderColor(0.62, 0.62, 0.62);
+    inputBox_BG:EnableMouse(false);
+
+    local inputBox = CreateFrame("EditBox", nil, inputBox_BG);
+    inputBox:SetAllPoints();
+    inputBox:SetFontObject("GameFontHighlight");
+    inputBox:SetMultiLine(false);
+    inputBox:SetTextInsets(10, 10, 0, 0);
+    inputBox:SetMovable(false);
+    inputBox:SetAutoFocus(false);
+    inputBox:SetMaxLetters(0);
+    inputBox:SetText(link);
+    inputBox:SetCursorPosition(0);
+    inputBox:SetScript("OnTextChanged", function(self)
+        self:SetText(link);
+    end);
+    inputBox:SetScript("OnEditFocusGained", function(self)
+        self:HighlightText();
+    end);
+    inputBox:SetScript("OnEditFocusLost", function(self)
+        self:HighlightText(0,0);
+    end);
+    inputBox:SetScript("OnEscapePressed", function(self)
+        self:ClearFocus();
+        self:ClearHighlightText();
+    end);
+
+    local description;
+    if text ~= "" then
+        description = parent:CreateFontString(nil, "overlay", "GameFontNormal");
+        description:SetPoint("topLeft", inputBox_BG, "bottomLeft", 0, -12);
+        description:SetJustifyH("left");
+        description:SetText(text);
+    end
+
+    if image then
+        subTitle:SetPoint("left", imageFrame, "right", 10, 0);
+        inputBox_BG:SetPoint("topLeft", imageFrame, "bottomLeft", 0, -8);
+    else
+        subTitle:SetPoint("topLeft");
+        inputBox_BG:SetPoint("topLeft", subTitle, "bottomLeft", 0, -12);
+    end
+
+    local SubTitle_height = image and 32 + 8 or subTitle:GetStringHeight() + 12;
+    local Description_height = description and description:GetStringHeight() + 12 or 0;
+    local EditBox_height = inputBox_BG:GetHeight();
+
+    parent:SetSize(620, SubTitle_height + Description_height + EditBox_height);
+
+    -- Adding frame to the settings list
+    if data.isClassic and flair.classicEra
+    or data.isCata   and flair.cata
+    or data.isRetail  and flair.retail
+    then
+        table.insert(panel.list, parent);
+    end
 end
 
 ----------------------------------------
@@ -1046,10 +1153,21 @@ end
 ----------------------------------------
 -- Creating Spacer
 ----------------------------------------
-function func:Create_Spacer(panel)
+function func:Create_Spacer(panel, type)
     -- Creating parent
     local parent = CreateFrame("frame", nil, panel.scrollChild);
-    parent:SetSize(620, 24);
+
+    if type then
+        if type == "small" then
+            parent:SetSize(620, 16);
+        elseif type == "medium" then
+            parent:SetSize(620, 24);
+        elseif type == "big" then
+            parent:SetSize(620, 36);
+        end
+    else
+        parent:SetSize(620, 24);
+    end
 
     -- Adding frame to the settings list
     table.insert(panel.list, parent);

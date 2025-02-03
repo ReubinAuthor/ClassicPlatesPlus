@@ -82,8 +82,8 @@ function func:Nameplate_Added(unit, visuals)
                 unitFrame.raidTarget.icon:ClearAllPoints();
 
                 -- Auras counters
-                unitFrame.buffsCounter:SetScale(CFG.AurasScale);
-                unitFrame.debuffsCounter:SetScale(CFG.AurasScale);
+                unitFrame.buffsCounter:SetScale(CFG.AurasScale - 0.2);
+                unitFrame.debuffsCounter:SetScale(CFG.AurasScale - 0.2);
 
                 -- powerbar
                 unitFrame.powerbar:ClearAllPoints();

@@ -444,8 +444,8 @@ function func:PersonalNameplateAdd()
             nameplate.healthMain:SetScale(0.9 + scaleOffset);
         end
 
-        nameplate.buffsCounter:SetScale(CFG.PersonalNameplatesScale + 0.5);
-        nameplate.debuffsCounter:SetScale(CFG.PersonalNameplatesScale + 0.5);
+        nameplate.buffsCounter:SetScale(CFG.AurasScale + 0.2);
+        nameplate.debuffsCounter:SetScale(CFG.AurasScale + 0.2);
 
         nameplate.classPower:SetPoint("top", dummyAnchor, "bottom", 0, -4);
         nameplate.classPower:SetHeight(data.classBarHeight);

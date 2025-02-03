@@ -57,9 +57,11 @@ function core:init(event, ...)
     end
 
     if event == "PLAYER_TARGET_CHANGED" then
+        local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
         func:myTarget();
         func:Update_Colors();
-        if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].AurasOnTarget then
+
+        if CFG.AurasOnTarget then
             if UnitExists("target") then
                 if data.myTarget.previous then
                     func:HideAllAuras(data.myTarget.previous);

@@ -335,9 +335,9 @@ function func:Nameplate_Created(nameplate)
         --------------------------------
         -- Auras counter
         --------------------------------
-        unitFrame.buffsCounter = unitFrame.parent:CreateFontString(nil, nil, "GameFontNormalOutline")
+        unitFrame.buffsCounter = unitFrame:CreateFontString(nil, nil, "GameFontNormalOutline")
         unitFrame.buffsCounter:SetTextColor(0,1,0);
-        unitFrame.debuffsCounter = unitFrame.parent:CreateFontString(nil, nil, "GameFontNormalOutline")
+        unitFrame.debuffsCounter = unitFrame:CreateFontString(nil, nil, "GameFontNormalOutline")
         unitFrame.debuffsCounter:SetTextColor(1, 0.2, 0);
 
         --------------------------------
