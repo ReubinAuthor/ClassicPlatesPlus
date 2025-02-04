@@ -9,6 +9,8 @@ local data = core.data;
 -- Removing nameplate
 ----------------------------------------
 function func:Nameplate_Removed(unit)
+    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
+
     if unit then
         local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
@@ -16,6 +18,10 @@ function func:Nameplate_Removed(unit)
             local unitFrame = nameplate.unitFrame;
 
             unitFrame.portrait.countdown:Hide();
+
+            if CFG.Portrait then
+                unitFrame.portrait.texture:Hide();
+            end
 
             -- Hidding auras
             if unitFrame.auras then
@@ -30,6 +36,16 @@ function func:Nameplate_Removed(unit)
                     for k,v in pairs(unitFrame.auras.harmful) do
                         if k then
                             v:Hide();
+                        end
+                    end
+                end
+            end
+
+            if data.portraits.queue then
+                for k,v in ipairs(data.portraits.queue) do
+                    if k then
+                        if v.unit == unit then
+                            table.remove(data.portraits.queue, k);
                         end
                     end
                 end

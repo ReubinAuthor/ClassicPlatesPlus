@@ -28,6 +28,7 @@ core.data = {
     hooks = {},
     tooltip = {},
     auras = {},
+    portraits = {isProcessing = false, queue = {}},
 };
 
 local func = core.func;
@@ -1269,46 +1270,87 @@ end
 -- Update portrait
 ----------------------------------------
 function func:Update_Portrait(unit)
+    local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
     local isEnemy = UnitIsEnemy(unit, "player");
     local isFriend = UnitIsFriend(unit, "player");
 
-    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].Portrait then
-        if unit then
+    if CFG.Portrait then
+        if unit and not UnitIsUnit("player", unit) then
             local nameplate = C_NamePlate.GetNamePlateForUnit(unit);
 
             if nameplate then
                 local unitFrame = nameplate.unitFrame;
 
-                local function setClassIcon()
+                local function SetClassIcon()
                     local _, class = UnitClass(unit);
 
                     if class then
                         unitFrame.portrait.texture:SetTexture("Interface\\addons\\ClassicPlatesPlus\\media\\classes\\" .. class);
+                        unitFrame.portrait.texture:Show();
                     end
                 end
 
-                if UnitIsPlayer(unit) then
-                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ClassIconsEnemy then
-                        if isEnemy then
-                            setClassIcon();
-                        end
-                    else
-                        if isEnemy then
-                            SetPortraitTexture(unitFrame.portrait.texture, unit);
+                -- Throttle interval (in seconds)
+                local throttleInterval = 0.0001;
+
+                local function ProcessVariable(FrameAndUnit)
+                    SetPortraitTexture(FrameAndUnit.frame, FrameAndUnit.unit);
+                    FrameAndUnit.frame:Show();
+                end
+
+                local function ProcessQueue()
+                    if data.portraits.isProcessing or #data.portraits.queue == 0 then
+                        return;
+                    end
+
+                    data.portraits.isProcessing = true;
+
+                    -- Process the next unit in the queue
+                    local FrameAndUnit = table.remove(data.portraits.queue, 1);
+                    ProcessVariable(FrameAndUnit);
+
+                    C_Timer.After(throttleInterval, function()
+                        data.portraits.isProcessing = false;
+                        ProcessQueue();
+                    end)
+                end
+
+                local function AddToQueue(frame, current_unit)
+                    local FrameAndUnit = {frame = frame, unit = current_unit}
+
+                    -- Check if unit is already in the queue
+                    local unitExists = false
+                    for _, v in ipairs(data.portraits.queue) do
+                        if v.unit == current_unit then
+                            unitExists = true
+                            break -- Exit the loop early since we found the unit
                         end
                     end
 
-                    if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile].ClassIconsFriendly then
-                        if isFriend then
-                            setClassIcon();
+                    -- If the unit is not in the queue, add it
+                    if not unitExists then
+                        table.insert(data.portraits.queue, FrameAndUnit)
+                    end
+
+                    ProcessQueue();
+                end
+
+                if UnitIsPlayer(unit) then
+                    if isEnemy then
+                        if CFG.ClassIconsEnemy then
+                            SetClassIcon();
+                        else
+                            AddToQueue(unitFrame.portrait.texture, unit);
                         end
-                    else
-                        if isFriend then
-                            SetPortraitTexture(unitFrame.portrait.texture, unit);
+                    elseif isFriend then
+                        if CFG.ClassIconsFriendly then
+                            SetClassIcon();
+                        else
+                            AddToQueue(unitFrame.portrait.texture, unit);
                         end
                     end
                 else
-                    SetPortraitTexture(unitFrame.portrait.texture, unit);
+                    AddToQueue(unitFrame.portrait.texture, unit);
                 end
             end
         end

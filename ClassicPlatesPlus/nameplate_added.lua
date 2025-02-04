@@ -196,7 +196,9 @@ function func:Nameplate_Added(unit, visuals)
                 func:Update_Name(unit);
                 func:Update_Guild(unit);
                 func:Update_Classification(unit);
-                func:Update_Portrait(unit);
+                if CFG.Portrait then
+                    func:Update_Portrait(unit);
+                end
                 func:Update_FellowshipBadge(unit);
                 func:Update_PVP_Flag(unit);
                 func:Update_Level(unit);
