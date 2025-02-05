@@ -222,6 +222,8 @@ local functionsTable = {
     end,
     PersonalNameplateTotalHealth = function() func:PersonalNameplateAdd(); end,
     PersonalNameplateTotalPower = function() func:PersonalNameplateAdd(); end,
+    --PersonalHealthBarAnimation = function() func:PersonalNameplateAdd(); end,
+    --PersonalPowerBarAnimation = function() func:PersonalNameplateAdd(); end,
     LargeMainValue = function()
         updateNameplateVisuals();
         func:PersonalNameplateAdd();

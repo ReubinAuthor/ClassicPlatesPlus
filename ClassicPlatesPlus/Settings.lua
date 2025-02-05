@@ -483,16 +483,66 @@ function func:Load_Settings()
             func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
         end
 
+        -- Spacer
+        func:Create_Spacer(panel, "small");
+
         -- CheckButton
         do
-            local name = "Animate Personal Power Bar";
-            local tooltip = "";
+            local name = "Health Bar Animation";
+            local tooltip = "Show the health bar draining and refilling animation";
+            local cfg = "PersonalHealthBarAnimation";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- Slider
+        do
+            local name = "Health Bar Animation Threshold";
+            local tooltip = "Animation Threshold (in percentage)";
+            local cfg = "PersonalHealthBarAnimationThreshold";
+            local default = 10.00;
+            local step = 1;
+            local minValue = 1;
+            local maxValue = 99;
+            local decimals = 0;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Spacer
+        func:Create_Spacer(panel, "small");
+
+        -- CheckButton
+        do
+            local name = "Power Bar Animation";
+            local tooltip = "Show the power bar draining and refilling animation";
             local cfg = "PersonalPowerBarAnimation";
             local default = true;
             local flair = { classicEra = true, cata = true, retail = true };
 
             func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
         end
+
+        -- Slider
+        do
+            local name = "Power Bar Animation Threshold";
+            local tooltip = "Animation Threshold (in percentage)";
+            local cfg = "PersonalPowerBarAnimationThreshold";
+            local default = 10.00;
+            local step = 1;
+            local minValue = 1;
+            local maxValue = 99;
+            local decimals = 0;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
+        end
+
+        -- Spacer
+        func:Create_Spacer(panel, "small");
 
         -- CheckButton
         do

@@ -757,6 +757,8 @@ function func:Update_Health(unit)
         if UnitIsUnit(unit, "player") then
             local nameplate = data.nameplate;
 
+            data.nameplate.prevHealthValue = nameplate.healthbar:GetValue();
+
             if nameplate then
                 nameplate.healthMain:SetText(
                     percentageAsMainValue and healthPercent
