@@ -502,7 +502,7 @@ function func:Load_Settings()
             local name = "Health Bar Animation Threshold";
             local tooltip = "Animation Threshold (in percentage)";
             local cfg = "PersonalHealthBarAnimationThreshold";
-            local default = 10.00;
+            local default = 1.00;
             local step = 1;
             local minValue = 1;
             local maxValue = 99;

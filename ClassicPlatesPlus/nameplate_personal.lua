@@ -93,35 +93,24 @@ function func:PersonalNameplateCreate()
         nameplate.healthbar:SetStatusBarColor(0,1,0);
         nameplate.healthbar:SetFrameLevel(1);
 
-        nameplate.healthbarChange = nameplate.main:CreateTexture(nil, "background");
+        nameplate.healthbarChange = nameplate.main:CreateTexture();
+        nameplate.healthbarChange:SetParent(nameplate.healthbar);
         nameplate.healthbarChange:SetHeight(28);
-        nameplate.healthbarChange:SetTexture("Interface\\Buttons\\WHITE8x8");
+        nameplate.healthbarChange:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
         nameplate.healthbarChange:SetVertexColor(1, 0, 0, 1);
+        nameplate.healthbarChange:SetDrawLayer("background", 3);
         nameplate.healthbarChange:Hide();
 
-        nameplate.healthbarChange.animation_group_1 = nameplate.healthbarChange:CreateAnimationGroup();
-        nameplate.healthbarChange.animation_group_1.scale = nameplate.healthbarChange.animation_group_1:CreateAnimation("Scale");
-        nameplate.healthbarChange.animation_group_1.scale:SetDuration(0.5);
-        nameplate.healthbarChange.animation_group_1.scale:SetScaleFrom(1, 1);
-        nameplate.healthbarChange.animation_group_1.scale:SetScale(0, 1);
-        nameplate.healthbarChange.animation_group_1.scale:SetSmoothing("IN");
-        nameplate.healthbarChange.animation_group_1.scale:SetOrigin("right", 0, 0);
-
-        nameplate.healthbarChange.animation_group_2 = nameplate.healthbarChange:CreateAnimationGroup();
-        nameplate.healthbarChange.animation_group_2.alpha = nameplate.healthbarChange.animation_group_2:CreateAnimation("Alpha");
-        nameplate.healthbarChange.animation_group_2.alpha:SetDuration(0.5);
-        nameplate.healthbarChange.animation_group_2.alpha:SetFromAlpha(1);
-        nameplate.healthbarChange.animation_group_2.alpha:SetToAlpha(0);
-        nameplate.healthbarChange.animation_group_2.alpha:SetSmoothing("IN_OUT");
-
-        nameplate.healthbarChange.animation_group_1:SetScript("OnFinished", function(self)
+        nameplate.healthbarChange.animation_group = nameplate.healthbarChange:CreateAnimationGroup();
+        nameplate.healthbarChange.animation_group.scale = nameplate.healthbarChange.animation_group:CreateAnimation("Scale");
+        nameplate.healthbarChange.animation_group.scale:SetDuration(0.5);
+        nameplate.healthbarChange.animation_group.scale:SetScaleFrom(1, 1);
+        nameplate.healthbarChange.animation_group.scale:SetScale(0, 1);
+        nameplate.healthbarChange.animation_group.scale:SetSmoothing("IN_OUT");
+        nameplate.healthbarChange.animation_group.scale:SetOrigin("left", 0, 0);
+        nameplate.healthbarChange.animation_group:SetScript("OnFinished", function(self)
             nameplate.healthbarChange:Hide();
         end);
-
-        nameplate.healthbarChange.animation_group_2:SetScript("OnFinished", function(self)
-            nameplate.healthbarChange:Hide();
-        end);
-
         nameplate.healthbar:SetScript("OnValueChanged", function(self, newValue)
             if CFG.PersonalHealthBarAnimation then
                 local prevValue = data.nameplate.prevHealthValue;
@@ -136,7 +125,7 @@ function func:PersonalNameplateCreate()
                     if newValue < prevValue then
                         local difference = prevValue - newValue;
 
-                        if difference > 1 then
+                        if difference > 1 and prevValue <= healthMax then
                             local diffWidth = GetWidth(difference);
                             local valWidth = GetWidth(newValue)
                             local percentage = (difference / healthMax) * 100;
@@ -145,33 +134,8 @@ function func:PersonalNameplateCreate()
                                 nameplate.healthbarChange:ClearAllPoints();
                                 nameplate.healthbarChange:SetPoint("left", nameplate.healthbar, "right", -(nameplate.healthbar:GetWidth() - valWidth), 0);
                                 nameplate.healthbarChange:SetWidth(diffWidth);
-                                nameplate.healthbarChange:SetBlendMode("BLEND");
-                                nameplate.healthbarChange:SetVertexColor(0.75, 0, 0, 1);
                                 nameplate.healthbarChange:Show();
-                                nameplate.healthbarChange.animation_group_2:Restart();
-                                nameplate.healthbarChange.animation_group_1:Stop();
-                            end
-                        end
-                    elseif newValue > prevValue then
-                        local difference = newValue - prevValue;
-
-                        if difference > CFG.PersonalHealthBarAnimationThreshold then
-                            local diffWidth = GetWidth(difference);
-                            local percentage = (difference / healthMax) * 100;
-
-                            if diffWidth > nameplate.healthbar:GetWidth() then
-                                diffWidth = nameplate.healthbar:GetWidth();
-                            end
-
-                            if percentage > 1 then
-                                nameplate.healthbarChange:ClearAllPoints();
-                                nameplate.healthbarChange:SetPoint("right", self:GetStatusBarTexture(), "right");
-                                nameplate.healthbarChange:SetWidth(diffWidth);
-                                nameplate.healthbarChange:SetBlendMode("BLEND");
-                                nameplate.healthbarChange:SetVertexColor(0.66, 1, 0.66, 0.75);
-                                nameplate.healthbarChange:SetShown(diffWidth > 0);
-                                nameplate.healthbarChange.animation_group_1:Restart();
-                                nameplate.healthbarChange.animation_group_2:Stop();
+                                nameplate.healthbarChange.animation_group:Restart();
                             end
                         end
                     end
@@ -192,7 +156,7 @@ function func:PersonalNameplateCreate()
         nameplate.healthbarBackground:SetColorTexture(0.18, 0.18, 0.18, 0.85);
         nameplate.healthbarBackground:SetParent(nameplate.healthbar);
         nameplate.healthbarBackground:SetAllPoints();
-        nameplate.healthbarBackground:SetDrawLayer("background");
+        nameplate.healthbarBackground:SetDrawLayer("background", 2);
 
         nameplate.healPrediction = nameplate.main:CreateTexture(nil, "background");
         nameplate.healPrediction:SetPoint("left", nameplate.healthbar:GetStatusBarTexture(), "right");
