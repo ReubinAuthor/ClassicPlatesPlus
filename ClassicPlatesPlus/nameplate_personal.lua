@@ -97,16 +97,16 @@ function func:PersonalNameplateCreate()
         nameplate.healthbarChange:SetParent(nameplate.healthbar);
         nameplate.healthbarChange:SetHeight(28);
         nameplate.healthbarChange:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-        nameplate.healthbarChange:SetVertexColor(1, 0, 0, 1);
+        nameplate.healthbarChange:SetVertexColor(0.7, 0, 0, 1);
         nameplate.healthbarChange:SetDrawLayer("background", 3);
         nameplate.healthbarChange:Hide();
 
         nameplate.healthbarChange.animation_group = nameplate.healthbarChange:CreateAnimationGroup();
         nameplate.healthbarChange.animation_group.scale = nameplate.healthbarChange.animation_group:CreateAnimation("Scale");
-        nameplate.healthbarChange.animation_group.scale:SetDuration(0.5);
+        nameplate.healthbarChange.animation_group.scale:SetDuration(1);
         nameplate.healthbarChange.animation_group.scale:SetScaleFrom(1, 1);
         nameplate.healthbarChange.animation_group.scale:SetScale(0, 1);
-        nameplate.healthbarChange.animation_group.scale:SetSmoothing("IN_OUT");
+        nameplate.healthbarChange.animation_group.scale:SetSmoothing("IN");
         nameplate.healthbarChange.animation_group.scale:SetOrigin("left", 0, 0);
         nameplate.healthbarChange.animation_group:SetScript("OnFinished", function(self)
             nameplate.healthbarChange:Hide();

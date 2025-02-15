@@ -87,6 +87,7 @@ function func:Update_Threat(unit)
 
                 unitFrame.threatPercentage.value:SetText(math.floor(ThreatPercentageOfLead) .. "%");
             end
+
             unitFrame.threatPercentage:SetShown(CFG.ThreatPercentage and ThreatPercentageOfLead and ThreatPercentageOfLead > 0);
 
             -- Toggle for highlights

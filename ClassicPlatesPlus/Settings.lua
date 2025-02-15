@@ -1033,9 +1033,6 @@ function func:Load_Settings()
         -- Panel
         local panel = func:CreatePanel(panelMain.name, "Buffs & Debuffs");
 
-        -- Spacer
-        func:Create_Spacer(panel);
-
         -- Sub-Category
         func:Create_SubCategory(panel, "General");
 
@@ -1103,7 +1100,7 @@ function func:Load_Settings()
             local name = "Mark Location";
             local tooltip = "Hide auras without expiration time";
             local cfg = "AurasMarkLocation";
-            local default = 2;
+            local default = 1;
             local options = {
                 [1] = "Top left",
                 [2] = "Bottom left",

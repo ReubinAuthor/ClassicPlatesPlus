@@ -442,7 +442,9 @@ function func:formatTime(value)
     end
 end
 
+----------------------------------------
 -- Interract icon
+----------------------------------------
 function func:InteractIcon(nameplate)
     if nameplate then
         local unitFrame = nameplate.unitFrame;

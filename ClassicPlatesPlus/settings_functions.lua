@@ -31,6 +31,8 @@ local function updateEverything()
     end
 
     func:ResizeNameplates();
+    func:PersonalNameplateAdd();
+    func:Update_Auras("player");
 end
 
 local function updateCVar()
@@ -222,8 +224,6 @@ local functionsTable = {
     end,
     PersonalNameplateTotalHealth = function() func:PersonalNameplateAdd(); end,
     PersonalNameplateTotalPower = function() func:PersonalNameplateAdd(); end,
-    --PersonalHealthBarAnimation = function() func:PersonalNameplateAdd(); end,
-    --PersonalPowerBarAnimation = function() func:PersonalNameplateAdd(); end,
     LargeMainValue = function()
         updateNameplateVisuals();
         func:PersonalNameplateAdd();
@@ -568,6 +568,7 @@ function func:CreatePanel(mainPanelName, name)
                         func:ResetSettings(k,v);
                     end
                 end
+                updateEverything();
             end,
 
             -- Reset Current Panel Settings
@@ -577,6 +578,7 @@ function func:CreatePanel(mainPanelName, name)
                         func:ResetSettings(k,v);
                     end
                 end
+                updateEverything();
             end
         };
     end
@@ -1729,13 +1731,6 @@ function func:Create_Profiles(panel, name, cfg, default)
     end
 
     local function CloseAllStaticPopups()
-        --[[for index = 1, STATICPOPUP_NUMDIALOGS do
-            local dialog = _G["StaticPopup" .. index]
-            if dialog and dialog:IsShown() then
-                StaticPopup_Hide(dialog.which)
-            end
-        end]]
-
         local dialogsToClose = {
             "RENAME_PROFILE_DIALOG",
             "CREATE_NEW_PROFILE_DIALOG",
@@ -1909,7 +1904,7 @@ function func:Create_Profiles(panel, name, cfg, default)
 
     -- Line Divider
     newPanel.divider = newPanel:CreateTexture();
-    newPanel.divider:SetPoint("topLeft", 370, -106);
+    newPanel.divider:SetPoint("topLeft", 360, -106);
     newPanel.divider:SetPoint("topRight", -40, -106);
     newPanel.divider:SetAlpha(0.5);
     newPanel.divider:SetHeight(1);
@@ -1917,7 +1912,7 @@ function func:Create_Profiles(panel, name, cfg, default)
 
     -- Scroll Frame
     newPanel.scrollFrame = CreateFrame("ScrollFrame", nil, newPanel, "ScrollFrameTemplate");
-    newPanel.scrollFrame:SetPoint("topLeft", 370, -108);
+    newPanel.scrollFrame:SetPoint("topLeft", 360, -108);
     newPanel.scrollFrame:SetPoint("bottomRight", -26, 0);
 
     -- Scroll Child
@@ -2182,19 +2177,10 @@ function func:Create_Profiles(panel, name, cfg, default)
             end
         end);
 
-        --[[table.sort(sorted, function(a, b)
-            if a.id == CFG_ClassicPlatesPlus.Profile then
-                return true
-            elseif b.id == CFG_ClassicPlatesPlus.Profile then
-                return false
-            else
-                return a.displayName < b.displayName
-            end
-        end)]]
-
         local alphaLeave = 0.1;
         local alphaHover = 0.15;
         local alphaEnter = 0.3;
+        local list_width = 280;
 
         local function anchor(list, index)
             if index == 1 then
@@ -2226,11 +2212,11 @@ function func:Create_Profiles(panel, name, cfg, default)
                     list[k].name = newPanel.scrollFrame.scrollChild:CreateFontString(nil, "overlay", "GameFontNormal");
                     list[k].name:SetParent(list[k]);
                     list[k].name:SetPoint("left", 10, 0);
-                    list[k].name:SetWidth(233);
+                    list[k].name:SetWidth(list_width - 20);
                     list[k].name:SetJustifyH("left");
                     list[k].name:SetText(v.displayName);
 
-                    list[k]:SetSize(260, list[k].name:GetHeight() + 16);
+                    list[k]:SetSize(list_width, list[k].name:GetHeight() + 16);
 
                     list[k].background = newPanel.scrollFrame.scrollChild:CreateTexture();
                     list[k].background:SetParent(list[k]);
@@ -2240,7 +2226,7 @@ function func:Create_Profiles(panel, name, cfg, default)
                 else
                     list[k]:SetPoint(anchor(list, k));
                     list[k].name:SetText(v.displayName);
-                    list[k]:SetSize(260, list[k].name:GetHeight() + 16);
+                    list[k]:SetSize(list_width, list[k].name:GetHeight() + 16);
                     list[k]:Show();
                 end
 
