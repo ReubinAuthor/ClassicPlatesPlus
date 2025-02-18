@@ -344,6 +344,7 @@ local functionsTable = {
         func:PersonalNameplateAdd();
     end,
     PersonalNameplateFade = function() func:ToggleNameplatePersonal(); end,
+    PersonalNameplatePointY = function() func:PersonalNameplateAdd(); end,
     SpecialPower = function() func:Update_ClassPower(); end,
     SpecialPowerScale = function() func:Update_ClassPower(); end,
     CastbarIconShow = function() updateNameplateVisuals(); end,
@@ -616,18 +617,31 @@ function func:CreatePanel(mainPanelName, name)
 end
 
 ----------------------------------------
--- Creating Category
+-- Creating Sub-Category
 ----------------------------------------
-function func:Create_SubCategory(panel, name, description)
+function func:Create_SubCategory(panel, name, description, size)
     local frameName = myAddon .. "_" .. panel.name .. "_Category_" .. name;
-    local height = 0;
+    local height_2 = 0;
+    local scale = 1;
+    local height_1 = 64;
+    local x_offset = 0;
+    local alpha = 1;
+
+    if size == "small" then
+        x_offset = 22;
+        scale = 0.75;
+        height_1 = 48;
+        alpha = 0.8;
+    end
 
     -- Creating parent
     local parent = CreateFrame("frame", frameName, panel.scrollChild);
 
     local frame_text = parent:CreateFontString(nil, "overlay", "GameFontHighlightLarge");
+    frame_text:SetScale(scale);
     frame_text:SetJustifyH("left");
     frame_text:SetText(name);
+    frame_text:SetAlpha(alpha);
 
     frame_text.isTitle = true;
     frame_text.settingsList = {};
@@ -641,12 +655,12 @@ function func:Create_SubCategory(panel, name, description)
         text:SetSpacing(2);
         text:SetText(description);
 
-        height = height + text:GetStringHeight() + 16;
+        height_2 = height_2 + text:GetStringHeight() + 16;
     else
-        frame_text:SetPoint("left");
+        frame_text:SetPoint("left", x_offset, 0);
     end
 
-    parent:SetSize(620, 64 + height);
+    parent:SetSize(620, height_1 + height_2);
 
     table.insert(panel.list, parent);
 end
@@ -781,7 +795,7 @@ end
 -- Create CheckButton
 ----------------------------------------
 function func:Create_CheckButton(panel, flair, name, tooltip, cfg, default)
-    local frameName = myAddon .. "_" .. panel.name .. "_CheckButton_" .. name;
+    local frameName = myAddon .. "_" .. panel.name .. "_CheckButton_" .. cfg;
 
     if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile][cfg] == nil then
         CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile][cfg] = default;
@@ -840,7 +854,7 @@ end
 -- Create DropDown Menu
 ----------------------------------------
 function func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options)
-    local frameName = myAddon .. "_" .. panel.name .. "_DropDownMenu_" .. name;
+    local frameName = myAddon .. "_" .. panel.name .. "_DropDownMenu_" .. cfg;
 
     -- Adding CFG_ClassicPlatesPlus
     if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile][cfg] == nil then
@@ -936,7 +950,7 @@ end
 -- Create Slider
 ----------------------------------------
 function func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals)
-    local frameName = myAddon .. "_" .. panel.name .. "_Slider_" .. name;
+    local frameName = myAddon .. "_" .. panel.name .. "_Slider_" .. cfg;
     local format = "%." .. decimals .. "f";
 
     -- Adding CFG_ClassicPlatesPlus
@@ -1011,7 +1025,7 @@ end
 -- Create Color Picker
 ----------------------------------------
 function func:Create_ColorPicker(panel, flair, name, tooltip, cfg, default)
-    local frameName = myAddon .. "_" .. panel.name .. "_ColorPicker_" .. name;
+    local frameName = myAddon .. "_" .. panel.name .. "_ColorPicker_" .. cfg;
 
     -- Adding CFG_ClassicPlatesPlus
     if CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile][cfg] == nil then
@@ -1751,85 +1765,87 @@ function func:Create_Profiles(panel, name, cfg, default)
         local serialized = "{"
 
         for key, value in pairs(configsTable) do
-            local valueType = type(value)
+            local valueType = type(value);
 
             if valueType == "string" then
-                value = "\"" .. value .. "\""
+                value = "\"" .. value .. "\"";
             elseif valueType == "boolean" then
-                value = tostring(value)
+                value = tostring(value);
             elseif valueType == "table" then
-                value = serializeTable(value)
+                value = serializeTable(value);
             end
 
-            serialized = serialized .. key .. "=" .. value .. ","
+            serialized = serialized .. key .. "=" .. value .. ",";
         end
 
         if serialized:sub(-1) == "," then
-            serialized = serialized:sub(1, -2)
+            serialized = serialized:sub(1, -2);
         end
 
-        serialized = serialized .. "}"
+        serialized = serialized .. "}";
 
-        return serialized
+        return serialized;
     end
 
     local function deserializeTable(serialized)
         local function parseValue(value)
             if value:sub(1, 1) == "{" and value:sub(-1) == "}" then
-                return deserializeTable(value:sub(2, -2))
+                return deserializeTable(value:sub(2, -2));
             elseif value == "true" or value == "false" then
-                return value == "true"
+                return value == "true";
             elseif tonumber(value) then
-                return tonumber(value)
+                return tonumber(value);
             elseif value:sub(1, 1) == "\"" and value:sub(-1) == "\"" then
-                return value:sub(2, -2)
+                return value:sub(2, -2);
             else
-                return value
+                return value;
             end
         end
 
-        local configsTable = {}
-        serialized = serialized:sub(2, -2)
+        local configsTable = {};
 
-        local currentKey = nil
-        local nestedLevel = 0
-        local buffer = ""
-        local inQuotes = false
+        serialized = serialized:sub(2, -2);
+
+        local currentKey = nil;
+        local nestedLevel = 0;
+        local buffer = "";
+        local inQuotes = false;
 
         for char in serialized:gmatch(".") do
             if char == "\"" then
-                inQuotes = not inQuotes
-                buffer = buffer .. char
+                inQuotes = not inQuotes;
+                buffer = buffer .. char;
             elseif char == "{" and not inQuotes then
-                nestedLevel = nestedLevel + 1
-                buffer = buffer .. char
+                nestedLevel = nestedLevel + 1;
+                buffer = buffer .. char;
             elseif char == "}" and not inQuotes then
-                nestedLevel = nestedLevel - 1
-                buffer = buffer .. char
+                nestedLevel = nestedLevel - 1;
+                buffer = buffer .. char;
+
                 if nestedLevel == 0 then
                     if currentKey then
-                        configsTable[currentKey] = parseValue(buffer)
+                        configsTable[currentKey] = parseValue(buffer);
                     end
-                    currentKey, buffer = nil, ""
+                    currentKey, buffer = nil, "";
                 end
             elseif char == "," and nestedLevel == 0 and not inQuotes then
                 if currentKey then
-                    configsTable[currentKey] = parseValue(buffer)
-                    currentKey, buffer = nil, ""
+                    configsTable[currentKey] = parseValue(buffer);
+                    currentKey, buffer = nil, "";
                 end
             elseif char == "=" and nestedLevel == 0 and not inQuotes then
-                currentKey = buffer
-                buffer = ""
+                currentKey = buffer;
+                buffer = "";
             else
-                buffer = buffer .. char
+                buffer = buffer .. char;
             end
         end
 
         if currentKey then
-            configsTable[currentKey] = parseValue(buffer)
+            configsTable[currentKey] = parseValue(buffer);
         end
 
-        return configsTable
+        return configsTable;
     end
 
     local function PopUp(f, type)

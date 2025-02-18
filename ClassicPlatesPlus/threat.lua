@@ -36,27 +36,6 @@ function func:Update_Threat(unit)
             local status = UnitThreatSituation("player", unit);
             local r,g,b = func:GetUnitColor(unit, ThreatPercentageOfLead, status);
 
-            --[[local Rs,Gs,Bs = UnitSelectionColor(unit, true);
-            local Rb,Gb,Bb = data.colors.border.r, data.colors.border.g, data.colors.border.b;
-
-            if (UnitIsPlayer(unit) or UnitIsOtherPlayersPet(unit)) and (UnitIsPVP(unit) or UnitIsPVPFreeForAll(unit)) then
-                local R2,G2,B2 = Rs,Gs,Bs;
-
-                if UnitIsFriend(unit, "player") and string.format("%.2f", Rs) ~= "0.38" then
-                    R2,G2,B2 = 0, 0.85, 0;
-                end
-
-                unitFrame.portrait.highlight:SetVertexColor(R2,G2,B2);
-                unitFrame.healthbar.highlight:SetVertexColor(R2,G2,B2);
-                unitFrame.level.highlight:SetVertexColor(R2,G2,B2);
-                unitFrame.powerbar.highlight:SetVertexColor(R2,G2,B2);
-            else
-                unitFrame.portrait.highlight:SetVertexColor(Rb,Gb,Bb);
-                unitFrame.healthbar.highlight:SetVertexColor(Rb,Gb,Bb);
-                unitFrame.level.highlight:SetVertexColor(Rb,Gb,Bb);
-                unitFrame.powerbar.highlight:SetVertexColor(Rb,Gb,Bb);
-            end]]
-
             -- Coloring highlights
             unitFrame.portrait.highlight:SetVertexColor(r,g,b);
             unitFrame.healthbar.highlight:SetVertexColor(r,g,b);
@@ -103,7 +82,7 @@ function func:Update_Threat(unit)
             unitFrame.healthbar.highlight:SetShown(ShowHighlight);
             unitFrame.level.highlight:SetShown(ShowHighlight and unitFrame.level:IsShown());
             unitFrame.powerbar.highlight:SetShown(ShowHighlight and unitFrame.powerbar:IsShown());
-            unitFrame.threatPercentage.highlight:SetShown(false) --ShowHighlight and unitFrame.threatPercentage:IsShown());
+            unitFrame.threatPercentage.highlight:SetShown(false);
         end
     end
 end

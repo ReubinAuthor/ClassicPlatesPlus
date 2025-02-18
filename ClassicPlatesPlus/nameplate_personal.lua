@@ -25,8 +25,6 @@ function func:PersonalNameplateCreate()
             func:DefaultPowerBars();
         end);
 
-        CFG.PersonalNameplatePointY = CFG.PersonalNameplatePointY or 380;
-
         -- Dragging part
         if not data.isRetail then
             local startY = 0;
