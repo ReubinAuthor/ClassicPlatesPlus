@@ -25,7 +25,7 @@ function func:PersonalNameplateCreate()
             func:DefaultPowerBars();
         end);
 
-        -- Dragging part
+        -- Dragging Personal Nameplate
         if not data.isRetail then
             local startY = 0;
             local originalY = 0;
@@ -59,6 +59,13 @@ function func:PersonalNameplateCreate()
                     -- Set the frame's position along the Y-axis
                     self:SetPoint("top", UIParent, "bottom", 0, newY);
                     CFG.PersonalNameplatePointY = newY;
+
+                    -- Updating Personal Nameplate Configs
+                    local SettingFrame = _G[data.settings.configs.all.PersonalNameplatePointY.frame];
+
+                    if SettingFrame then
+                        SettingFrame:SetValue(CFG.PersonalNameplatePointY);
+                    end
                 end
             end);
 
@@ -614,7 +621,7 @@ function func:ToggleNameplatePersonal(event)
                 local fullHealth = UnitHealth("player") >= UnitHealthMax("player");
 
                 if CFG.PersonalNameplateFade then
-                    nameplate:SetAlpha(0.5);
+                    nameplate:SetAlpha(CFG.PersonalNameplateFadeIntensity);
                 else
                     nameplate:SetAlpha(1);
                 end

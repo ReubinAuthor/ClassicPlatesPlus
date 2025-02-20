@@ -344,6 +344,7 @@ local functionsTable = {
         func:PersonalNameplateAdd();
     end,
     PersonalNameplateFade = function() func:ToggleNameplatePersonal(); end,
+    PersonalNameplateFadeIntensity = function() func:PersonalNameplateAdd(); end,
     PersonalNameplatePointY = function() func:PersonalNameplateAdd(); end,
     SpecialPower = function() func:Update_ClassPower(); end,
     SpecialPowerScale = function() func:Update_ClassPower(); end,
