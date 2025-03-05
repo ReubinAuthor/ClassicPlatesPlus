@@ -58,6 +58,7 @@ function core:init(event, ...)
 
     if event == "PLAYER_TARGET_CHANGED" then
         local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
+
         func:myTarget();
         func:Update_Colors();
 

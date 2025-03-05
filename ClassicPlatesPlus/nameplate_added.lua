@@ -217,6 +217,7 @@ function func:Nameplate_Added(unit, visuals)
                 func:RaidTargetIndex();
                 func:PredictHeal(unit);
                 func:Update_quests(unit);
+                func:myTarget(true);
 
                 if not nameplate.UnitFrame.name[myAddon .. "_anchored"] then
                     local isAnchoringName = false;

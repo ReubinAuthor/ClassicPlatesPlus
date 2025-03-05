@@ -267,7 +267,7 @@ end
 ----------------------------------------
 -- Tracking player's targets
 ----------------------------------------
-function func:myTarget()
+function func:myTarget(update)
     if UnitExists("target") then
         local nameplate = C_NamePlate.GetNamePlateForUnit("target", false);
 
@@ -288,12 +288,13 @@ function func:myTarget()
     local unitFramePrev = data.myTarget.previous;
     local unitFrameCurr = data.myTarget.current;
 
-    -- Widget
-    if unitFramePrev and unitFramePrev.unit then
-        func:Nameplate_Added(unitFramePrev.unit);
-    end
-    if unitFrameCurr and unitFrameCurr.unit then
-        func:Nameplate_Added(unitFrameCurr.unit);
+    if not update then
+        if unitFramePrev and unitFramePrev.unit then
+            func:Nameplate_Added(unitFramePrev.unit);
+        end
+        if unitFrameCurr and unitFrameCurr.unit then
+            func:Nameplate_Added(unitFrameCurr.unit);
+        end
     end
 
     if data.cvars.nameplateResourceOnTarget == "1" or not data.isRetail then
@@ -1622,7 +1623,7 @@ function func:Update_FellowshipBadge(unit)
             if UnitIsGroupLeader(unit) then
                 toggle = true;
                 badge_r, badge_g, badge_b = data.colors.red.r, data.colors.red.g, data.colors.red.b;
-            elseif func:UnitInYourParty(unit) then
+            elseif UnitPlayerOrPetInParty(unit) then
                 toggle = true;
                 badge_r, badge_g, badge_b = data.colors.blue.r, data.colors.blue.g, data.colors.blue.b;
             elseif UnitPlayerOrPetInRaid(unit) then

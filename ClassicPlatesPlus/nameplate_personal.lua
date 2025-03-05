@@ -289,7 +289,7 @@ function func:PersonalNameplateCreate()
                         if newValue < prevValue then
                             local difference = prevValue - newValue;
 
-                            if difference > 2 then
+                            if difference > 1 then
                                 local diffWidth = GetWidth(difference);
                                 local valWidth = GetWidth(newValue)
                                 local percentage = (difference / powerMax) * 100;
@@ -306,7 +306,7 @@ function func:PersonalNameplateCreate()
                         elseif newValue > prevValue then
                             local difference = newValue - prevValue;
 
-                            if difference > 2 then
+                            if difference > 1 then
                                 local diffWidth = GetWidth(difference);
                                 local percentage = (difference / powerMax) * 100;
 
