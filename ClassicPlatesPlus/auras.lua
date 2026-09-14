@@ -520,7 +520,7 @@ function func:Update_Auras(unit)
                                 else
                                     -- Adjusting scale
                                     unitFrame.auras[filter][i]:SetSize(AuraSize.x * CFG.AurasScale, AuraSize.y * CFG.AurasScale);
-                                    unitFrame.auras[filter][i].first:SetSize(first_x * CFG.AurasScale, first_y *- CFG.AurasScale);
+                                    unitFrame.auras[filter][i].first:SetSize(first_x * CFG.AurasScale, first_y * CFG.AurasScale);
                                     unitFrame.auras[filter][i].second:SetSize(second_x * CFG.AurasScale, second_y * CFG.AurasScale);
                                     unitFrame.auras[filter][i].icon:SetSize(icon_x * CFG.AurasScale, icon_y * CFG.AurasScale);
                                     unitFrame.auras[filter][i].cooldown_wrap:SetSize(cooldown_x * CFG.AurasScale, cooldown_y * CFG.AurasScale);

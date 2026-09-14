@@ -1,4 +1,4 @@
-##Interface: 110100, 11506, 40402
+##Interface: 110100, 11509, 11508, 11507, 11506, 40402
 ## Title: |TInterface/Addons/ClassicPlatesPlus/media/icons/ClassicPlatesPlus_icon:16:16|t ClassicPlates Plus
 ## Notes: ClassicPlates Plus is an addon that adds additional features and new Classic-themed visuals to nameplates.
 ## Author: Reubin

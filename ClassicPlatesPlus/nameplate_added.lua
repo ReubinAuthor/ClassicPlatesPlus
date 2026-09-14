@@ -14,8 +14,10 @@ function func:Nameplate_Added(unit, visuals)
         local nameplate = C_NamePlate.GetNamePlateForUnit(unit, false);
 
         if nameplate then
-            nameplate.UnitFrame:Hide();
-            nameplate.UnitFrame:UnregisterAllEvents();
+            pcall(function()
+                nameplate.UnitFrame:Hide();
+                nameplate.UnitFrame:UnregisterAllEvents();
+            end);
 
             if UnitIsUnit(unit, "target") then
                 func:PositionAuras(nameplate.unitFrame);
@@ -91,7 +93,9 @@ function func:Nameplate_Added(unit, visuals)
 
                 -- Name
                 unitFrame.name:ClearAllPoints();
-                unitFrame.name:SetPoint("top", nameplate.UnitFrame.name, "top"); -- Anchor frame
+                if nameplate.UnitFrame.name then
+                    unitFrame.name:SetPoint("top", nameplate.UnitFrame.name, "top"); -- Anchor frame
+                end
 
                 -- Quest
                 unitFrame.quest:ClearAllPoints();
@@ -219,10 +223,12 @@ function func:Nameplate_Added(unit, visuals)
                 func:Update_quests(unit);
                 func:myTarget(true);
 
-                if not nameplate.UnitFrame.name[myAddon .. "_anchored"] then
+                local anchoredName = nameplate.UnitFrame and nameplate.UnitFrame.name;
+
+                if anchoredName and not anchoredName[myAddon .. "_anchored"] then
                     local isAnchoringName = false;
 
-                    hooksecurefunc(nameplate.UnitFrame.name,"SetPoint", function(self)
+                    hooksecurefunc(anchoredName,"SetPoint", function(self)
                         if not self:IsProtected() then
                             self[myAddon .. "_anchored"] = true;
 
@@ -302,8 +308,10 @@ function func:Nameplate_Added(unit, visuals)
             end
 
             -- Hiding default nameplates
-            nameplate.UnitFrame:SetScript("OnShow", function(self)
-                self:Hide();
+            pcall(function()
+                nameplate.UnitFrame:SetScript("OnShow", function(self)
+                    self:Hide();
+                end);
             end);
         end
     end

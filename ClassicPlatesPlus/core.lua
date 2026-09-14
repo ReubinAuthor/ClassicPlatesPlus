@@ -135,14 +135,19 @@ function func:ResizeNameplates()
             + (CFG.ShowGuildName and ((CFG.LargeGuildName and 13 or 10) * (CFG.NameplatesScale + inverseScale)) or CFG.ThreatPercentage and 10 or 0);
 
         -- Friendly Nameplates
-        if inInstance and (instanceType == "party" or instanceType == "raid") then
-            C_NamePlate.SetNamePlateFriendlySize(128, 30);
+        if C_NamePlate.SetNamePlateSize then
+            -- Classic Era 1.15.9+ / modern clients: single size for all nameplates
+            C_NamePlate.SetNamePlateSize(width, height);
         else
-            C_NamePlate.SetNamePlateFriendlySize(width, height);
-        end
+            if inInstance and (instanceType == "party" or instanceType == "raid") then
+                C_NamePlate.SetNamePlateFriendlySize(128, 30);
+            else
+                C_NamePlate.SetNamePlateFriendlySize(width, height);
+            end
 
-        -- Enemy Nameplates
-        C_NamePlate.SetNamePlateEnemySize(width, height);
+            -- Enemy Nameplates
+            C_NamePlate.SetNamePlateEnemySize(width, height);
+        end
     end
 
     if not InCombatLockdown() then
@@ -161,9 +166,15 @@ function func:ResizeNameplates()
     end
 end
 
-hooksecurefunc(NamePlateDriverFrame,"ApplyFrameOptions", function(_, nameplateFrame)
-    func:ResizeNameplates();
-end);
+if NamePlateDriverFrame and NamePlateDriverFrame.ApplyFrameOptions then
+    hooksecurefunc(NamePlateDriverFrame, "ApplyFrameOptions", function(_, nameplateFrame)
+        func:ResizeNameplates();
+    end);
+elseif NamePlateDriverFrame and NamePlateDriverFrame.UpdateNamePlateOptions then
+    hooksecurefunc(NamePlateDriverFrame, "UpdateNamePlateOptions", function()
+        func:ResizeNameplates();
+    end);
+end
 
 ----------------------------------------
 -- Hiding default personal power bars
@@ -1457,10 +1468,11 @@ function func:Update_NameAndGuildPositions(nameplate, hook)
     local CFG = CFG_Account_ClassicPlatesPlus.Profiles[CFG_ClassicPlatesPlus.Profile];
 
     if nameplate then
-        local unit = nameplate.namePlateUnitToken;
+        local unit = nameplate.namePlateUnitToken or nameplate.unitToken;
 
         if unit then
             local unitFrame = nameplate.unitFrame;
+            local blzName = nameplate.UnitFrame and nameplate.UnitFrame.name;
 
             local function work()
                 local portrait = CFG.Portrait and 0 or -9;
@@ -1475,8 +1487,10 @@ function func:Update_NameAndGuildPositions(nameplate, hook)
                 local y = unitFrame.threatPercentage:IsShown() and -17 or -8;
                 local anchor = CFG.ShowGuildName and unitFrame.guild:IsShown() and unitFrame.guild or unitFrame.name;
 
-                nameplate.UnitFrame.name:ClearAllPoints();
-                nameplate.UnitFrame.name:SetPoint("top", 0, DefaultNameY);
+                if blzName then
+                    blzName:ClearAllPoints();
+                    blzName:SetPoint("top", 0, DefaultNameY);
+                end
                 unitFrame.healthbar:ClearAllPoints();
                 unitFrame.healthbar:SetPoint("top", anchor, "bottom", x, y);
             end
@@ -1490,8 +1504,10 @@ function func:Update_NameAndGuildPositions(nameplate, hook)
                     or CFG.NamesOnlyExcludeRaid and UnitPlayerOrPetInRaid(unit)
 
                 if not exclude then
-                    nameplate.UnitFrame.name:ClearAllPoints();
-                    nameplate.UnitFrame.name:SetPoint("center", nameplate, "center", 0, unitFrame.guild:IsShown() and 8 or 0);
+                    if blzName then
+                        blzName:ClearAllPoints();
+                        blzName:SetPoint("center", nameplate, "center", 0, unitFrame.guild:IsShown() and 8 or 0);
+                    end
                 else
                     work();
                 end
